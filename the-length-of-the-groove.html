@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>the length of the groove — when where howe</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-webkit-font-smoothing:antialiased;}
+.page{max-width:620px;margin:0 auto;padding:2.75rem 2rem 6rem;}
+.wordmark{font-family:system-ui,sans-serif;font-size:11px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;text-decoration:none;display:block;margin-bottom:2.5rem;}
+.site-nav{font-family:system-ui,sans-serif;font-size:13px;color:#bbb;display:flex;gap:1.5rem;margin-bottom:2.5rem;}
+.site-nav a{color:#bbb;text-decoration:none;}
+.site-nav a:hover{color:#1c1c1a;}
+.essay-meta{font-family:system-ui,sans-serif;font-size:12px;color:#bbb;margin-bottom:1.25rem;letter-spacing:0.04em;}
+.essay-title{font-size:30px;font-weight:400;line-height:1.25;margin-bottom:2rem;color:#1c1c1a;}
+.rule{border:none;border-top:1px solid #e5e1d9;margin-bottom:2.5rem;}
+.essay-body{font-size:19px;line-height:1.85;color:#1c1c1a;}
+.essay-body p{margin-bottom:1.6em;}
+.section-heading{font-family:system-ui,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin:2.5rem 0 1.25rem;}
+.dialogue{margin:1.75rem 0;padding-left:1.5rem;border-left:2px solid #e5e1d9;font-style:italic;font-size:19px;line-height:1.75;color:#444;}
+.back-link{font-family:system-ui,sans-serif;font-size:12px;color:#aaa;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;margin-top:3.5rem;padding-top:2rem;border-top:1px solid #e5e1d9;width:100%;letter-spacing:0.04em;}
+.back-link::before{content:'←';}
+.back-link:hover{color:#1c1c1a;}
+</style>
+</head>
+<body>
+<div class="page">
+<a class="wordmark" href="/">when where howe</a>
+<nav class="site-nav"><a href="/">writings</a><a href="/nowplaying.html">now playing</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
+<p class="essay-meta">July 2026</p>
+<h1 class="essay-title">the length of the groove</h1>
+<hr class="rule">
+<div class="essay-body">
+<p>{{GROOVE_STATS}}</p>
+<p>That's how far the needle on my record player has physically traveled, tracing the groove, listening to my way through this collection — not how far the tonearm swings side to side (an inch or two), but the actual length of the spiral path the stylus rides, unspooled into a straight line.</p>
+<p class="section-heading">How this is calculated</p>
+<p>A record's groove is a spiral, but the spiral's pitch — the tiny gap between adjacent turns, a few thousandths of an inch — is negligible next to its radius, which is measured in inches. So the exact arc length of the spiral collapses to something much simpler: treat each individual revolution as a plain circle at that revolution's radius, and add them all up. For a record spinning at a constant speed for some number of minutes, that works out to:</p>
+<p><em>distance = 2π × RPM × minutes played × average groove radius</em></p>
+<p>Average groove radius depends on the format — a 12" LP's groove runs roughly from a 5.75" radius down to 2.35" near the label, so its average is about 4.05". A 7" single's groove occupies a much smaller band, so it contributes far less distance per minute despite spinning faster (45 RPM vs. 33⅓).</p>
+<p class="section-heading">Where the numbers come from</p>
+<p>Format and speed come from the same catalog data Discogs already has for each release in the collection. Minutes played is the harder part — it needs a real runtime for every record, not just a track count. {{GROOVE_SOURCES}} Whatever's left after that gets a flat estimate based on its format (roughly 19 minutes per side for a 12" LP, less for smaller/faster formats) — a rough number, but a small enough slice of the total that it doesn't move the estimate much either way.</p>
+<p class="section-heading">Caveats, for the honest version of this</p>
+<p>This assumes standard groove geometry for every format, when real mastering varies — a quiet, sparse album can be cut with a wider groove pitch and end further from the label than a loud, dense one, and neither Discogs nor Wikipedia expose that. It's a physically grounded estimate, not a measurement of any specific stylus's actual path. Consider it a fun lower-resolution truth rather than a load-bearing one.</p>
+
+</div>
+<a class="back-link" href="/">all essays</a>
+</div>
+</body>
+</html>
