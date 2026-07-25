@@ -607,7 +607,7 @@ const WHY = {
     <p>How many dollars short of this seat's funding target the candidate's <strong>cash on hand</strong> is.</p>
     <p>The target is the median of what the top two spenders actually spent in this seat in 2022 and 2024, inflated to 2026 dollars and scaled by how competitive the race is rated — a tossup needs the full amount, a safe seat about 40% of it.</p>
     <p>Cash on hand, not total raised: it's the money left to spend. The consequence is that a candidate who raised well and spent it winning a primary looks poor here. Expand the row to see both figures side by side.</p>
-    <p class="fine">An <strong>outside $</strong> flag means independent expenditure in this race exceeds half the seat's target — often the most important fact about a race, and money no individual donation can counter. Candidate finance only updates when campaigns file with the FEC, so these figures are usually weeks old; outside spending is reported within 24–48 hours.</p>`},
+    <p class="fine">An <strong>outside $</strong> flag means independent expenditure in this race exceeds half the seat's target — often the most important fact about a race, and money no individual donation can counter. Candidate cash on hand is only as current as the last FEC filing deadline (the exact date is in the footer), so it is normally weeks old and static between deadlines; outside spending is reported within 24–48 hours and moves far faster.</p>`},
   tier: {t:'Control tier', h:`
     <p>Where this seat sits on the path to a majority — the part of the score that asks whether winning it would actually change who runs the chamber.</p>
     <p>Every seat still in doubt is ranked by closeness, then banded against the number the party must still win: <strong>Pivot</strong> (×1.00) falls inside that number, <strong>Near-pivot</strong> (×0.85) just outside it, <strong>Cushion</strong> (×0.70) provides insurance if others fail, and <strong>Supplemental</strong> (×0.50) is beyond any realistic path.</p>
@@ -723,10 +723,21 @@ fetch('data.json', {cache: 'no-cache'}).then(r => {
     const o = document.createElement('option'); o.value=o.textContent=s; sel.appendChild(o);
   });
   const gen = new Date(d.generated);
+  const fmtDate = s => new Date(s+'T12:00:00Z').toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  // Three different dates, and conflating them is how a reader concludes that
+  // three-week-old cash-on-hand figures are current.
+  const financeLine = d.finance_through
+    ? `<strong>Candidate cash on hand is current through ${fmtDate(d.finance_through.through)}</strong>
+       — ${d.finance_through.age_days} days ago, because campaigns only report to the FEC at filing
+       deadlines, not continuously. It will not move again until the next deadline. Outside spending
+       is far fresher: independent expenditures are reported within 24–48 hours.`
+    : `Candidate finance reflects the most recent FEC filings, which land at quarterly deadlines
+       rather than continuously.`;
   document.getElementById('foot').innerHTML =
     `<p><strong>Data.</strong> Forecasts, ratings, candidate finance and outside spending from
      <a href="${d.source.forecast_url}" target="_blank" rel="noopener noreferrer">ElectIndex's 2026 model</a>,
-     refreshed ${gen.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}.
+     fetched ${gen.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}.
+     ${financeLine}
      Historical seat costs from <a href="${d.source.finance_url}" target="_blank" rel="noopener noreferrer">FEC bulk filings</a> for 2022 and 2024.
      ${d.build.federal_races} federal races processed, ${d.build.rankable} of them rankable.</p>
      <p><strong>What's excluded, and why.</strong> ${d.build.skipped} seats can't be ranked because no opponent is on the general-election ballot to fund against — seats where a top-two primary advanced two candidates of the same party. They still count toward the seat totals above, since someone wins them. Governors' races are out of scope entirely: they don't bear on control of Congress, which is what the score measures. Where a major party has no nominee but a serious independent is running, the independent is included and badged <span class="tag ind" style="font-size:9px">Ind.</span> — Nebraska's Senate race is the significant one. Those candidates are counted toward the caucus of the party whose ballot line is vacant, which is an assumption: an independent is not bound to caucus with anyone. Minor independents polling under 10% in races that also have both major-party nominees are shown in neither the names nor the maths, which slightly overstates the two leaders' positions in a handful of Senate races.</p>
