@@ -112,6 +112,7 @@ tbody tr.race[aria-expanded=true]{background:#f2f0ea;}
    Republican view is selected. The word already says it. */
 .tag{color:var(--ink-3);}
 .tag.ind{border-style:dashed;margin-left:0.3rem;}
+.soft{font-size:11px;color:var(--ink-3);font-variant-numeric:normal;}
 .indnote{
   font-size:13px;line-height:1.55;color:var(--ink-2);max-width:78ch;
   margin:0 0 1.15rem;padding-bottom:1rem;border-bottom:1px solid var(--rule);
@@ -320,18 +321,37 @@ function factors(r, party){
   const cohS = party==='D' ? r.coh_dem : r.coh_rep;
   const cohO = party==='D' ? r.coh_rep : r.coh_dem;
   const raiS = party==='D' ? r.raised_dem : r.raised_rep;
+  const raiO = party==='D' ? r.raised_rep : r.raised_dem;
   const ieUs = party==='D' ? r.out_dem : r.out_rep;
   const ieTh = party==='D' ? r.out_rep : r.out_dem;
+  // The two halves deliberately use different measures, each unit-consistent
+  // with what it is compared against.
+  //
+  // own_shortfall compares against target_spend, which is derived from a full
+  // cycle's DISBURSEMENTS — a cumulative flow. So it takes TOTAL RAISED, also
+  // cumulative. Using cash on hand here was a unit mismatch (a point-in-time
+  // stock against a cycle total) and it punished anyone who had just spent
+  // money winning a contested primary: MI-10 read as 4% funded on cash on hand
+  // versus 26% on receipts, purely because the primary was recent.
+  //
+  // relative_deficit is a head-to-head, so it takes CASH ON HAND: what decides
+  // the closing months is who still has money to spend, and being a ratio
+  // between the two candidates it stays internally consistent either way.
+  // A candidate who raised $5M and spent $4.8M on a primary looks evenly
+  // matched on receipts against an unopposed opponent holding $4.8M, which is
+  // false; on cash on hand they are correctly shown as outgunned.
+  const aRaised = clamp(raiS/tgt, 0, 2);
   const aS = clamp(cohS/tgt,0,2), aO = clamp(cohO/tgt,0,2);
-  const own = clamp(1-aS,0,1);
+  const own = clamp(1-aRaised,0,1);
   const rel = (aS+aO)===0 ? 0.5 : aO/(aS+aO);
   const rawNeed = W_OWN*own + W_REL*rel;
   const ieNet = IE_EFFICIENCY*(ieTh-ieUs)/tgt;
   const ieAdj = clamp(1+0.5*ieNet, 0.75, 1.5);
   const need = clamp(rawNeed*ieAdj, 0, 1);
   const via = Math.sqrt(clamp(raiS/(VIA_FLOOR*tgt),0,1));
-  return {p, lev, need, rawNeed, ieAdj, ieNet, via, aS, aO, own, rel, tgt,
+  return {p, lev, need, rawNeed, ieAdj, ieNet, via, aS, aO, aRaised, own, rel, tgt,
           cohS, cohO, raiS, ieUs, ieTh,
+          raiO,
           defend: r.held_by===party,
           gap: party==='D' ? r.gap_dem : r.gap_rep};
 }
@@ -455,14 +475,14 @@ function renderRows(rows){
     const {r,f} = x;
     const ourName = state.party==='D' ? r.dem : r.rep;
     const oppName = state.party==='D' ? r.rep : r.dem;
-    const gapDollars = Math.max(0, f.tgt - f.cohS);
+    const gapDollars = Math.max(0, f.tgt - f.raiS);
     const ieFlag = Math.abs(f.ieTh-f.ieUs) > 0.5*f.tgt;
     const ourInd = r.ind_side === state.party;
     return `<tr class="race" data-i="${i}" tabindex="0" role="button" aria-expanded="false">
       <td class="num rank">${i+1}</td>
       <td><span class="seat">${esc(seatLabel(r))}</span>${r.ind_side?' <span class="tag ind">Ind.</span>':''}<br><span class="cands">${esc(ourName)}${ourInd?' (I)':''} vs. ${esc(oppName)}${r.ind_side && !ourInd?' (I)':''}</span></td>
       <td class="posture"><span class="tag ${f.defend?'defend':'flip'}">${f.defend?'Defend':'Flip'}</span></td>
-      <td class="num">${pct(f.p)}</td>
+      <td class="num">${pct(f.p)}${r.polls===0?'<br><span class="soft">no polls</span>':''}</td>
       <td class="num">${f.gap ? '<span class="warn">no data</span>' : fmtM(gapDollars)+' short'}${ieFlag?'<br><span class="warn">outside $</span>':''}</td>
       <td><span class="tier"><b>${x.tier}</b></span></td>
       <td class="num"><span class="scorecell" style="color:${colour}">
@@ -486,10 +506,10 @@ function detailHTML(x){
   return `${indNote}<div class="dgrid">
     <dl>
       <dt>${esc(ourName)}${r.ind_side===state.party?' (independent)':''} — the candidate you'd fund</dt>
-      <dd>Cash on hand <span class="n">${fmtD(f.cohS)}</span> · raised <span class="n">${fmtD(f.raiS)}</span></dd>
-      <dd>That's <span class="n">${pct(f.aS)}</span> of what this seat historically costs${ourStatus && ourStatus!=='confirmed' ? ` · <em>${esc(ourStatus)} nominee</em>` : ''}</dd>
+      <dd>Raised <span class="n">${fmtD(f.raiS)}</span> this cycle — <span class="n">${pct(f.aRaised)}</span> of what this seat historically costs${ourStatus && ourStatus!=='confirmed' ? ` · <em>${esc(ourStatus)} nominee</em>` : ''}</dd>
+      <dd>Cash on hand <span class="n">${fmtD(f.cohS)}</span> — what's left to spend</dd>
       <dt>${esc(oppName)}</dt>
-      <dd>Cash on hand <span class="n">${fmtD(f.cohO)}</span> — <span class="n">${pct(f.aO)}</span> of the same target</dd>
+      <dd>Raised <span class="n">${fmtD(f.raiO)}</span> · cash on hand <span class="n">${fmtD(f.cohO)}</span></dd>
     </dl>
     <dl>
       <dt>This seat's funding target</dt>
@@ -500,7 +520,13 @@ function detailHTML(x){
         : `<span class="n">${fmtD(f.ieTh)}</span> against, <span class="n">${fmtD(f.ieUs)}</span> for — net <span class="n">${fmtD(ieNetAbs)}</span> ${ieDir}${
             ieNetAbs/f.tgt >= 0.1 ? `, ${(ieNetAbs/f.tgt).toFixed(1)}× this seat's target` : ' — small next to this seat\'s target'}.`}</dd>
       <dt>Forecast</dt>
-      <dd>${pct(f.p)} chance of winning · ${r.rating} · margin ${r.margin>0?'+':''}${r.margin} · ${r.polls} poll${r.polls===1?'':'s'} in the average</dd>
+      <dd>${pct(f.p)} chance of winning · ${r.rating} · projected margin ${r.margin>0?'+':''}${r.margin}</dd>
+      <dt>Polling behind that forecast</dt>
+      <dd>${r.polls===0
+        ? `<strong>No polls at all.</strong> This forecast is built entirely from fundamentals — past results, demographics and the national environment. Treat the probability as a model's prior, not a measurement of opinion in this district.`
+        : `${r.polls} poll${r.polls===1?'':'s'} in the average${r.poll_d && r.poll_r
+            ? `, at <span class="n">${r.poll_d.toFixed(1)}</span>–<span class="n">${r.poll_r.toFixed(1)}</span> D–R` : ''}.
+           Polling carries <span class="n">${pct(r.poll_weight)}</span> of the weight in this forecast; the rest is fundamentals.`}</dd>
     </dl>
     <dl>
       <dt>Why it scores ${x.score.toFixed(0)}</dt>
@@ -604,9 +630,9 @@ const WHY = {
     <p>It comes from ElectIndex's 2026 model, which blends a recency- and quality-weighted polling average with race fundamentals. Expand any row to see the poll count behind it; several races rest on one poll or none.</p>
     <p class="fine">This is <em>not</em> what drives the score. A 90% race is nearly settled, so money moves it less — the score uses closeness instead, which peaks at 50/50. Two caveats worth carrying: every probability here comes from a single model, so there's no cross-model disagreement to flag, and that model already uses fundraising as an input — meaning the score double-counts money to some unknown degree.</p>`},
   gap: {t:'Funding gap', h:`
-    <p>How many dollars short of this seat's funding target the candidate's <strong>cash on hand</strong> is.</p>
+    <p>The dollar figure in the column is how far the candidate's <strong>total raised</strong> falls below this seat's funding target.</p>
     <p>The target is the median of what the top two spenders actually spent in this seat in 2022 and 2024, inflated to 2026 dollars and scaled by how competitive the race is rated — a tossup needs the full amount, a safe seat about 40% of it.</p>
-    <p>Cash on hand, not total raised: it's the money left to spend. The consequence is that a candidate who raised well and spent it winning a primary looks poor here. Expand the row to see both figures side by side.</p>
+    <p>The underlying score uses <em>two</em> measures, each matched to what it's compared against. Against the historical target it uses <strong>total raised</strong>, because the target is itself a full cycle's spending — comparing a single moment's bank balance to a cycle total would be a unit mismatch, and would punish anyone who had just spent money winning a primary. Against the opponent it uses <strong>cash on hand</strong>, because what decides the closing months is who still has money left.</p>
     <p class="fine">An <strong>outside $</strong> flag means independent expenditure in this race exceeds half the seat's target — often the most important fact about a race, and money no individual donation can counter. Candidate cash on hand is only as current as the last FEC filing deadline (the exact date is in the footer), so it is normally weeks old and static between deadlines; outside spending is reported within 24–48 hours and moves far faster.</p>`},
   tier: {t:'Control tier', h:`
     <p>Where this seat sits on the path to a majority — the part of the score that asks whether winning it would actually change who runs the chamber.</p>
