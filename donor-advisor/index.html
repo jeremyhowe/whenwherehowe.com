@@ -111,6 +111,47 @@ tbody tr.race[aria-expanded=true]{background:#f2f0ea;}
    reads as party affiliation rather than posture — and inverts meaning when the
    Republican view is selected. The word already says it. */
 .tag{color:var(--ink-3);}
+.tag.ind{border-style:dashed;margin-left:0.3rem;}
+.indnote{
+  font-size:13px;line-height:1.55;color:var(--ink-2);max-width:78ch;
+  margin:0 0 1.15rem;padding-bottom:1rem;border-bottom:1px solid var(--rule);
+}
+.indnote strong{color:var(--ink);}
+/* ---------- metric explainers ---------- */
+/* The trigger lives inside a sticky <th> within an overflow-x:auto wrapper, so
+   an absolutely-positioned panel would be clipped by the scroll container.
+   The panel therefore goes in the top layer (popover API) and is positioned
+   with fixed coordinates computed from the trigger's rect. */
+.why{
+  appearance:none;border:1px solid currentColor;background:transparent;
+  color:var(--ink-3);width:15px;height:15px;line-height:1;padding:0;margin-left:0.35rem;
+  border-radius:50%;font-family:'EB Garamond',Georgia,serif;font-size:11px;font-style:italic;
+  cursor:help;vertical-align:middle;position:relative;
+  transition:color 160ms cubic-bezier(.22,1,.36,1),background 160ms;
+}
+/* Widen the hit area to ~28px without disturbing the header's line box. */
+.why::after{content:"";position:absolute;inset:-7px;}
+.why:hover,.why[aria-expanded=true]{color:var(--ink);background:#e6e4dd;}
+.tip{
+  position:fixed;margin:0;inset:auto;max-width:330px;width:max-content;
+  background:#fffefb;color:var(--ink);border:1px solid #cfcdc5;border-radius:3px;
+  box-shadow:0 6px 22px rgba(28,28,26,.13),0 1px 3px rgba(28,28,26,.09);
+  padding:0.95rem 1.05rem;z-index:var(--z-pop);
+  font-family:system-ui,sans-serif;font-size:13px;line-height:1.55;text-transform:none;
+  letter-spacing:normal;font-weight:400;
+  /* These explanations run to ~500px unwrapped, which overflows a short
+     viewport whether placed above or below the trigger. Cap and scroll
+     internally so the panel always fits on screen. */
+  max-height:min(62vh,520px);overflow-y:auto;overscroll-behavior:contain;
+}
+.tip::backdrop{background:transparent;}
+.tip h4{margin:0 0 0.4rem;font-family:'EB Garamond',Georgia,serif;font-size:16px;font-weight:400;letter-spacing:-0.005em;}
+.tip p{margin:0 0 0.55rem;max-width:none;color:var(--ink-2);}
+.tip p:last-child{margin-bottom:0;}
+.tip .fine{font-size:12px;color:var(--ink-3);border-top:1px solid var(--rule-2);padding-top:0.5rem;margin-top:0.65rem;}
+.tip code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--ink);}
+.tip:not(:popover-open):not(.fallback-open){display:none;}
+@media (max-width:420px){ .tip{max-width:calc(100vw - 24px);} }
 .tier{font-size:12px;color:var(--ink-3);white-space:nowrap;}
 .tier b{color:var(--ink);font-weight:600;}
 .warn{color:var(--rep);font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;}
@@ -221,11 +262,11 @@ details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1
     <thead><tr>
       <th class="num">#</th>
       <th>Seat</th>
-      <th>Posture</th>
-      <th class="num">Win prob.</th>
-      <th class="num">Funding gap</th>
-      <th>Control tier</th>
-      <th class="num">Score</th>
+      <th>Posture<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="posture" aria-label="What does posture mean?">i</button></th>
+      <th class="num">Win prob.<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="prob" aria-label="How is win probability calculated?">i</button></th>
+      <th class="num">Funding gap<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="gap" aria-label="How is the funding gap calculated?">i</button></th>
+      <th>Control tier<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="tier" aria-label="What is the control tier?">i</button></th>
+      <th class="num">Score<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="score" aria-label="How is the score calculated?">i</button></th>
     </tr></thead>
     <tbody id="rows"></tbody>
   </table>
@@ -409,9 +450,10 @@ function renderRows(rows){
     const oppName = state.party==='D' ? r.rep : r.dem;
     const gapDollars = Math.max(0, f.tgt - f.cohS);
     const ieFlag = Math.abs(f.ieTh-f.ieUs) > 0.5*f.tgt;
+    const ourInd = r.ind_side === state.party;
     return `<tr class="race" data-i="${i}" tabindex="0" role="button" aria-expanded="false">
       <td class="num rank">${i+1}</td>
-      <td><span class="seat">${esc(seatLabel(r))}</span><br><span class="cands">${esc(ourName)} vs. ${esc(oppName)}</span></td>
+      <td><span class="seat">${esc(seatLabel(r))}</span>${r.ind_side?' <span class="tag ind">Ind.</span>':''}<br><span class="cands">${esc(ourName)}${ourInd?' (I)':''} vs. ${esc(oppName)}${r.ind_side && !ourInd?' (I)':''}</span></td>
       <td class="posture"><span class="tag ${f.defend?'defend':'flip'}">${f.defend?'Defend':'Flip'}</span></td>
       <td class="num">${pct(f.p)}</td>
       <td class="num">${f.gap ? '<span class="warn">no data</span>' : fmtM(gapDollars)+' short'}${ieFlag?'<br><span class="warn">outside $</span>':''}</td>
@@ -431,9 +473,12 @@ function detailHTML(x){
   const ourStatus = state.party==='D' ? r.status_dem : r.status_rep;
   const ieDir = f.ieTh>=f.ieUs ? 'against' : 'favouring';
   const ieNetAbs = Math.abs(f.ieTh-f.ieUs);
-  return `<div class="dgrid">
+  const indName = r.ind_side===state.party ? ourName : oppName;
+  const indParty = r.ind_side==='D' ? 'Democrat' : 'Republican';
+  const indNote = r.ind_side ? `<p class="indnote"><strong>${esc(indName)} is running as an independent, not a ${indParty}.</strong> No ${indParty} is on the general-election ballot here, so this seat is scored with the independent in the ${indParty} column — and <strong>a win here is counted as a ${indParty === 'Democrat' ? 'Democratic' : 'Republican'} seat</strong> in the control arithmetic above. That is a deliberate assumption, and worth knowing you're relying on it: an independent is not bound to caucus with either party.</p>` : '';
+  return `${indNote}<div class="dgrid">
     <dl>
-      <dt>${esc(ourName)} — the candidate you'd fund</dt>
+      <dt>${esc(ourName)}${r.ind_side===state.party?' (independent)':''} — the candidate you'd fund</dt>
       <dd>Cash on hand <span class="n">${fmtD(f.cohS)}</span> · raised <span class="n">${fmtD(f.raiS)}</span></dd>
       <dd>That's <span class="n">${pct(f.aS)}</span> of what this seat historically costs${ourStatus && ourStatus!=='confirmed' ? ` · <em>${esc(ourStatus)} nominee</em>` : ''}</dd>
       <dt>${esc(oppName)}</dt>
@@ -492,8 +537,93 @@ function render(){
   renderAlloc(rows);
 }
 
+/* ---------- metric explainers ---------- */
+const WHY = {
+  posture: {t:'Posture', h:`
+    <p><strong>Flip</strong> means the other party holds this seat now. <strong>Defend</strong> means the party you selected holds it and could lose it.</p>
+    <p>Both are ranked in the same list on purpose. Chamber control only cares about the final seat count, so a coin-flip seat you might <em>lose</em> is exactly as pivotal as one you might <em>gain</em> — a dollar spent holding a seat and a dollar spent taking one buy the same thing.</p>
+    <p class="fine">Held-by comes from the forecast's seat-holder field, so a seat whose incumbent is retiring still shows the party that currently holds it.</p>`},
+  prob: {t:'Win probability', h:`
+    <p>The chance that <em>the party you selected</em> wins this seat — the chance of holding it for a seat they already have, of flipping it for one they don't.</p>
+    <p>It comes from ElectIndex's 2026 model, which blends a recency- and quality-weighted polling average with race fundamentals. Expand any row to see the poll count behind it; several races rest on one poll or none.</p>
+    <p class="fine">This is <em>not</em> what drives the score. A 90% race is nearly settled, so money moves it less — the score uses closeness instead, which peaks at 50/50. Two caveats worth carrying: every probability here comes from a single model, so there's no cross-model disagreement to flag, and that model already uses fundraising as an input — meaning the score double-counts money to some unknown degree.</p>`},
+  gap: {t:'Funding gap', h:`
+    <p>How many dollars short of this seat's funding target the candidate's <strong>cash on hand</strong> is.</p>
+    <p>The target is the median of what the top two spenders actually spent in this seat in 2022 and 2024, inflated to 2026 dollars and scaled by how competitive the race is rated — a tossup needs the full amount, a safe seat about 40% of it.</p>
+    <p>Cash on hand, not total raised: it's the money left to spend. The consequence is that a candidate who raised well and spent it winning a primary looks poor here. Expand the row to see both figures side by side.</p>
+    <p class="fine">An <strong>outside $</strong> flag means independent expenditure in this race exceeds half the seat's target — often the most important fact about a race, and money no individual donation can counter. Candidate finance only updates when campaigns file with the FEC, so these figures are usually weeks old; outside spending is reported within 24–48 hours.</p>`},
+  tier: {t:'Control tier', h:`
+    <p>Where this seat sits on the path to a majority — the part of the score that asks whether winning it would actually change who runs the chamber.</p>
+    <p>Every seat still in doubt is ranked by closeness, then banded against the number the party must still win: <strong>Pivot</strong> (×1.00) falls inside that number, <strong>Near-pivot</strong> (×0.85) just outside it, <strong>Cushion</strong> (×0.70) provides insurance if others fail, and <strong>Supplemental</strong> (×0.50) is beyond any realistic path.</p>
+    <p>Seats the party already holds are in this ranking too, which is why a well-placed defensive race can outrank a flip opportunity.</p>
+    <p class="fine">If near-certain seats alone already reach the threshold, the bands switch to margin-building (×0.70 / ×0.50 / ×0.30) — there is no pivot to be had. The Senate calculation includes the 65 seats not on the 2026 ballot, since they still count toward 51.</p>`},
+  score: {t:'Impact score', h:`
+    <p>A 0–100 index: <code>closeness × control tier × funding need × viability</code>, each factor bounded between 0 and 1, so the result is comparable across chambers, states, and days.</p>
+    <p>Because it multiplies four sub-1.0 factors, real scores cluster well below 100 — a 55 is a strong result, not a mediocre one. Expand any row to see the exact arithmetic for that race.</p>
+    <p class="fine">It is <strong>ordinal</strong>: it ranks where a marginal dollar goes furthest under one set of assumptions. It is not a forecast, not a measured effect, and emphatically not a claim that your donation shifts the outcome by some amount — a lawful individual contribution is a rounding error against a race costing millions.</p>`},
+};
+
+const tip = document.createElement('div');
+tip.className = 'tip';
+tip.setAttribute('role','dialog');
+tip.setAttribute('aria-label','Metric explanation');
+if ('popover' in HTMLElement.prototype) tip.popover = 'auto';
+document.body.appendChild(tip);
+let tipTrigger = null;
+const nativePopover = typeof tip.showPopover === 'function';
+
+function placeTip(){
+  if (!tipTrigger) return;
+  const r = tipTrigger.getBoundingClientRect();
+  const w = tip.offsetWidth, h = tip.offsetHeight, pad = 12;
+  // Prefer below-left of the trigger; flip above if there's room; otherwise sit
+  // flush against the viewport edge. With max-height capping h, one of these
+  // always fits, so the panel can never render partly off-screen.
+  let top = r.bottom + 8;
+  if (top + h > innerHeight - pad){
+    const above = r.top - 8 - h;
+    top = above > pad ? above : Math.max(pad, innerHeight - h - pad);
+  }
+  const left = Math.min(Math.max(r.left - 10, pad), Math.max(innerWidth - w - pad, pad));
+  tip.style.top = Math.max(top, pad) + 'px';
+  tip.style.left = left + 'px';
+}
+function closeTip(){
+  if (!tipTrigger) return;
+  const t = tipTrigger; tipTrigger = null;
+  t.setAttribute('aria-expanded','false');
+  if (nativePopover && tip.matches(':popover-open')) tip.hidePopover();
+  else tip.classList.remove('fallback-open');
+  removeEventListener('scroll', placeTip, true);
+  removeEventListener('resize', placeTip);
+}
+function openTip(btn){
+  const spec = WHY[btn.dataset.why];
+  if (!spec) return;
+  if (tipTrigger === btn){ closeTip(); return; }
+  closeTip();
+  tip.innerHTML = `<h4>${spec.t}</h4>${spec.h}`;
+  tipTrigger = btn;
+  btn.setAttribute('aria-expanded','true');
+  if (nativePopover) tip.showPopover();
+  else tip.classList.add('fallback-open');
+  placeTip();
+  addEventListener('scroll', placeTip, true);   // capture: also catches the table's own scroll
+  addEventListener('resize', placeTip);
+}
+// Native popover gives light dismiss for free; wire it up manually otherwise.
+if (nativePopover) tip.addEventListener('toggle', e => { if (e.newState === 'closed') closeTip(); });
+else {
+  document.addEventListener('click', e => {
+    if (tipTrigger && !tip.contains(e.target) && !e.target.closest('.why')) closeTip();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closeTip(); });
+}
+
 /* ---------- events ---------- */
 document.addEventListener('click', e => {
+  const why = e.target.closest('.why');
+  if (why){ e.preventDefault(); e.stopPropagation(); openTip(why); return; }
   const seg = e.target.closest('.seg button');
   if (seg){
     const group = seg.closest('.seg');
@@ -542,7 +672,8 @@ fetch('data.json', {cache: 'no-cache'}).then(r => {
      <a href="${d.source.forecast_url}" target="_blank" rel="noopener noreferrer">ElectIndex's 2026 model</a>,
      refreshed ${gen.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}.
      Historical seat costs from <a href="${d.source.finance_url}" target="_blank" rel="noopener noreferrer">FEC bulk filings</a> for 2022 and 2024.
-     ${d.build.federal_races} federal races processed${d.build.skipped ? `. ${d.build.skipped} of them can't be ranked because there's no two-party general-election matchup to donate into — California seats where the top-two primary advanced two candidates of the same party, plus states where no Democrat filed. They still count toward the seat totals above, since they're seats someone is going to win` : ''}.</p>
+     ${d.build.federal_races} federal races processed, ${d.build.rankable} of them rankable.</p>
+     <p><strong>What's excluded, and why.</strong> ${d.build.skipped} seats can't be ranked because no opponent is on the general-election ballot to fund against — seats where a top-two primary advanced two candidates of the same party. They still count toward the seat totals above, since someone wins them. Governors' races are out of scope entirely: they don't bear on control of Congress, which is what the score measures. Where a major party has no nominee but a serious independent is running, the independent is included and badged <span class="tag ind" style="font-size:9px">Ind.</span> — Nebraska's Senate race is the significant one. Those candidates are counted toward the caucus of the party whose ballot line is vacant, which is an assumption: an independent is not bound to caucus with anyone. Minor independents polling under 10% in races that also have both major-party nominees are shown in neither the names nor the maths, which slightly overstates the two leaders' positions in a handful of Senate races.</p>
      <p><strong>Caveats worth knowing.</strong> Candidate cash on hand only changes when campaigns file with the FEC — quarterly, so those figures are weeks old by design, while outside spending is reported within 24–48 hours and moves much faster. Every probability comes from a single model, so there's no cross-model disagreement flagging here, and that model already uses fundraising as an input — meaning the score double-counts money to some unknown degree. Dark money is invisible to it. Nothing on this page is advice about who to support.</p>`;
   render();
 }).catch(err => {
