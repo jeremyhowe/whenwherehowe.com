@@ -165,6 +165,13 @@ tr.detail>td{background:#f4f2ec;border-bottom:1px solid var(--rule);padding:1.25
 .dgrid dt{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:0.3rem;}
 .dgrid dd{margin:0 0 0.55rem;font-size:13px;line-height:1.5;}
 .dgrid dd .n{font-variant-numeric:tabular-nums;}
+/* The plain-English read on the score, set in the page's serif so it reads as a
+   sentence rather than another data field. */
+.dgrid dd.verdict{
+  font-family:'EB Garamond',Georgia,serif;font-size:15.5px;line-height:1.5;
+  color:var(--ink);margin-bottom:0.8rem;padding-bottom:0.7rem;
+  border-bottom:1px solid var(--rule);
+}
 .mathline{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;margin-top:0.9rem;padding-top:0.75rem;border-top:1px solid var(--rule);}
 .mathline code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--ink-2);}
 
@@ -471,7 +478,7 @@ function detailHTML(x){
   const ourName = state.party==='D' ? r.dem : r.rep;
   const oppName = state.party==='D' ? r.rep : r.dem;
   const ourStatus = state.party==='D' ? r.status_dem : r.status_rep;
-  const ieDir = f.ieTh>=f.ieUs ? 'against' : 'favouring';
+  const ieDir = f.ieTh>=f.ieUs ? 'against' : 'favoring';
   const ieNetAbs = Math.abs(f.ieTh-f.ieUs);
   const indName = r.ind_side===state.party ? ourName : oppName;
   const indParty = r.ind_side==='D' ? 'Democrat' : 'Republican';
@@ -497,6 +504,7 @@ function detailHTML(x){
     </dl>
     <dl>
       <dt>Why it scores ${x.score.toFixed(0)}</dt>
+      <dd class="verdict">${verdict(x)}</dd>
       <dd>Closeness <span class="n">${f.lev.toFixed(2)}</span> — ${f.lev>0.9?'as close as races get':f.lev>0.7?'genuinely competitive':'leaning, but live'}</dd>
       <dd>Control tier <span class="n">${x.mult.toFixed(2)}</span> — ${esc(x.tier.toLowerCase())}, ranked #${x.rank} by closeness in the ${r.chamber}</dd>
       <dd>Funding need <span class="n">${f.need.toFixed(2)}</span>${Math.abs(f.ieAdj-1)>0.005?` (outside money ×${f.ieAdj.toFixed(2)})`:''}</dd>
@@ -519,7 +527,7 @@ function renderAlloc(rows){
   }
   host.innerHTML = `<h2>Putting ${fmtD(b)} to work</h2>
   <div class="alloc">
-    <p class="note" style="margin-top:0">Because any lawful individual donation is small next to what these races cost, a dollar's value doesn't fall off within a race — so the arithmetic favours filling the top-ranked race to the legal maximum, then the next. Splitting more widely is a perfectly reasonable choice; it just isn't what the score optimises.</p>
+    <p class="note" style="margin-top:0">Because any lawful individual donation is small next to what these races cost, a dollar's value doesn't fall off within a race — so the arithmetic favors filling the top-ranked race to the legal maximum, then the next. Splitting more widely is a perfectly reasonable choice; it just isn't what the score optimizes.</p>
     <ol>${plan.map(([x,give]) => {
       const nm = state.party==='D' ? x.r.dem : x.r.rep;
       return `<li><span class="amt">${fmtD(give)}</span> — ${esc(nm)}, ${esc(seatLabel(x.r))} <span style="color:var(--ink-3)">(score ${x.score.toFixed(0)}${give===CAP?', at the per-candidate cap':''})</span></li>`;
@@ -535,6 +543,54 @@ function render(){
   const rows = visibleRows(per);
   renderRows(rows);
   renderAlloc(rows);
+}
+
+/* One plain-English sentence naming why a race scores what it does.
+   The score is a product of four factors, so its value is governed by whichever
+   is weakest — that's the thing worth saying out loud. No numbers, no jargon:
+   the arithmetic is directly underneath for anyone who wants it. */
+function verdict(x){
+  const {f, mult, tier} = x;
+  const defend = f.defend;
+  const parts = [
+    {k:'lev',  v:f.lev},
+    {k:'mult', v:mult},
+    {k:'need', v:f.need},
+    {k:'via',  v:f.via},
+  ];
+  const weakest = parts.reduce((a,b) => b.v < a.v ? b : a);
+  const marginTier = tier==='Margin-building' || tier==='Nice to have' || tier==='Very supplemental';
+
+  // Everything aligned: say so rather than hunting for a flaw. But the
+  // margin-building multiplier is 0.7, high enough to pass this check — and the
+  // "direct path to a majority" claim is false precisely when control is
+  // already settled on safer seats, which is what that tier means.
+  if (parts.every(p => p.v >= 0.65)){
+    return marginTier
+      ? `The race is close and your candidate is the one short of money — though control is already being settled on safer seats, so this pads the margin rather than deciding it.`
+      : `About as good as this gets: the race is genuinely close, the seat sits on the direct path to a majority, and your candidate is the one short of money.`;
+  }
+
+  const soft = weakest.v >= 0.45;   // a drag on the score, not a disqualifier
+  const lead = soft ? 'The main thing holding this back: ' : '';
+  // Without a lead-in the sentence starts mid-clause, so capitalize it.
+  const cap = s => lead ? lead + s : s.charAt(0).toUpperCase() + s.slice(1);
+
+  switch (weakest.k){
+    case 'lev':
+      return cap(f.p > 0.5
+        ? `your candidate is already favored enough that more money is unlikely to change the result${soft?'.':' — this race is closer to settled than to contested.'}`
+        : `your candidate is far enough behind that money probably isn't what turns this seat${soft?'.':', however much is spent.'}`);
+    case 'mult':
+      if (marginTier) return cap(`control of the chamber is already being decided on safer seats, so this would pad the margin rather than settle anything.`);
+      return cap(defend
+        ? `even losing this seat wouldn't decide who controls the chamber, so it matters less than races nearer the threshold.`
+        : `even winning this seat wouldn't decide who controls the chamber, so it matters less than races nearer the threshold.`);
+    case 'need':
+      return cap(`your candidate already holds close to what this seat historically costs to win, so an extra dollar buys less here than somewhere starved of it.`);
+    case 'via':
+      return cap(`this campaign has raised so little so far that it isn't clear it's a functioning operation — the shortfall may reflect a candidacy that never got going rather than an opportunity.`);
+  }
 }
 
 /* ---------- metric explainers ---------- */
