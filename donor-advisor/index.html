@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Donor Impact Advisor — 2026</title>
+<style>
+:root{
+  --paper:#f9f8f5;
+  --ink:#1c1c1a;
+  --ink-2:#44443f;
+  --ink-3:#5f5f58;
+  --rule:#dedcd5;
+  --rule-2:#e9e7e1;
+  --dem:#2f5d8a;
+  --rep:#9c3b32;
+  --z-sticky:10;
+  --z-pop:20;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:system-ui,sans-serif;font-size:15px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1080px;margin:0 auto;padding:2.5rem 1.5rem 5rem;}
+/* Darker than the site's #aaa wordmark: at 11px that fails contrast (2.3:1).
+   #706f68 keeps the same quiet register at a legible 4.75:1. */
+.wordmark{font-family:system-ui,sans-serif;font-size:11px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#706f68;text-decoration:none;display:block;margin-bottom:2.5rem;}
+.wordmark:hover{color:var(--ink);}
+.site-nav{font-size:13px;display:flex;gap:1.5rem;margin-bottom:3rem;flex-wrap:wrap;}
+.site-nav a{color:var(--ink-3);text-decoration:none;}
+.site-nav a:hover{color:var(--ink);}
+
+h1{font-family:'EB Garamond',Georgia,serif;font-size:clamp(28px,5vw,40px);font-weight:400;line-height:1.15;letter-spacing:-0.015em;margin:0 0 1rem;text-wrap:balance;}
+.standfirst{font-family:'EB Garamond',Georgia,serif;font-size:19px;line-height:1.65;color:var(--ink-2);max-width:64ch;margin:0 0 0.75rem;text-wrap:pretty;}
+.standfirst em{color:var(--ink);font-style:italic;}
+.caveat{font-size:13px;color:var(--ink-3);max-width:70ch;margin:0 0 2.5rem;}
+
+h2{font-family:'EB Garamond',Georgia,serif;font-size:24px;font-weight:400;margin:3.5rem 0 1rem;letter-spacing:-0.01em;}
+h3{font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-3);margin:0 0 0.75rem;}
+p{max-width:70ch;}
+a{color:var(--ink);text-decoration:underline;text-decoration-color:#bbb9b1;text-underline-offset:2px;}
+a:hover{text-decoration-color:var(--ink);}
+
+/* ---------- controls ---------- */
+.controls{border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:1.25rem 0;margin-bottom:2rem;}
+.ctl-row{display:flex;flex-wrap:wrap;gap:1.75rem;align-items:flex-end;}
+.ctl{display:flex;flex-direction:column;gap:0.4rem;}
+.ctl>label,.ctl>span.lab{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--ink-3);}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:2px;overflow:hidden;background:#fff;}
+.seg button{
+  appearance:none;border:0;background:transparent;color:var(--ink-2);
+  font:inherit;font-size:13px;padding:0.4rem 0.8rem;cursor:pointer;
+  border-right:1px solid var(--rule-2);
+  transition:background 180ms cubic-bezier(.22,1,.36,1),color 180ms;
+}
+.seg button:last-child{border-right:0;}
+.seg button:hover{background:#f2f0ea;}
+.seg button[aria-pressed=true]{background:var(--ink);color:var(--paper);}
+.seg.party button[aria-pressed=true][data-v=D]{background:var(--dem);}
+.seg.party button[aria-pressed=true][data-v=R]{background:var(--rep);}
+select,input[type=number]{
+  font:inherit;font-size:13px;padding:0.38rem 0.5rem;background:#fff;
+  border:1px solid var(--rule);border-radius:2px;color:var(--ink);min-width:9rem;
+}
+input[type=number]{min-width:7rem;}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
+
+/* ---------- summary ---------- */
+.summary{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:2.5rem;margin-bottom:1rem;}
+.chamber-line{font-family:'EB Garamond',Georgia,serif;font-size:18px;line-height:1.5;color:var(--ink);margin:0 0 0.6rem;max-width:46ch;}
+.chamber-line strong{font-weight:600;}
+.bar{position:relative;height:26px;background:#efeee8;border:1px solid var(--rule-2);border-radius:2px;overflow:hidden;}
+.bar i{position:absolute;top:0;bottom:0;left:0;display:block;}
+.bar .safe{background:currentColor;opacity:.85;}
+.bar .play{background:currentColor;opacity:.28;}
+.bar .thr{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--ink);}
+.bar-key{font-size:12px;color:var(--ink-3);margin-top:0.4rem;display:flex;gap:1rem;flex-wrap:wrap;}
+
+/* ---------- table ---------- */
+.tablewrap{overflow-x:auto;border-top:1px solid var(--rule);margin-top:0.5rem;}
+table{border-collapse:collapse;width:100%;min-width:760px;font-size:14px;}
+thead th{
+  position:sticky;top:0;z-index:var(--z-sticky);background:var(--paper);
+  text-align:left;font-size:11px;font-weight:600;letter-spacing:0.06em;
+  text-transform:uppercase;color:var(--ink-3);padding:0.7rem 0.6rem;
+  border-bottom:1px solid var(--rule);white-space:nowrap;
+}
+thead th.num{text-align:right;}
+tbody td{padding:0.6rem;border-bottom:1px solid var(--rule-2);vertical-align:baseline;}
+tbody td.num{text-align:right;font-variant-numeric:tabular-nums;}
+tbody tr.race{cursor:pointer;transition:background 140ms cubic-bezier(.22,1,.36,1);}
+tbody tr.race:hover{background:#f2f0ea;}
+tbody tr.race[aria-expanded=true]{background:#f2f0ea;}
+.rank{color:var(--ink-3);font-variant-numeric:tabular-nums;width:2.5rem;}
+.seat{font-weight:600;white-space:nowrap;}
+.cands{color:var(--ink-3);font-size:13px;}
+.score{font-weight:600;font-variant-numeric:tabular-nums;}
+.scorecell{display:flex;align-items:center;gap:0.5rem;justify-content:flex-end;}
+.sparkline{width:44px;height:6px;background:#e6e4dd;border-radius:1px;overflow:hidden;flex:none;}
+.sparkline i{display:block;height:100%;background:currentColor;opacity:.75;}
+.tag{
+  display:inline-block;font-size:10px;font-weight:600;letter-spacing:0.07em;
+  text-transform:uppercase;padding:0.15rem 0.4rem;border:1px solid currentColor;
+  border-radius:2px;white-space:nowrap;
+}
+/* Posture tags stay neutral on purpose. Colouring Defend red and Flip blue
+   reads as party affiliation rather than posture — and inverts meaning when the
+   Republican view is selected. The word already says it. */
+.tag{color:var(--ink-3);}
+.tier{font-size:12px;color:var(--ink-3);white-space:nowrap;}
+.tier b{color:var(--ink);font-weight:600;}
+.warn{color:var(--rep);font-size:11px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;}
+
+/* ---------- detail ---------- */
+tr.detail{display:none;}
+tr.detail.open{display:table-row;}
+tr.detail>td{background:#f4f2ec;border-bottom:1px solid var(--rule);padding:1.25rem 1rem 1.5rem;}
+.dgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:1.5rem 2rem;}
+.dgrid dl{margin:0;}
+.dgrid dt{font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-3);margin-bottom:0.3rem;}
+.dgrid dd{margin:0 0 0.55rem;font-size:13px;line-height:1.5;}
+.dgrid dd .n{font-variant-numeric:tabular-nums;}
+.mathline{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;margin-top:0.9rem;padding-top:0.75rem;border-top:1px solid var(--rule);}
+.mathline code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--ink-2);}
+
+/* ---------- allocation ---------- */
+.alloc{background:#f4f2ec;border:1px solid var(--rule);border-radius:2px;padding:1.5rem;margin-top:1rem;}
+.alloc ol{margin:1rem 0 0;padding-left:1.4rem;font-size:14px;}
+.alloc li{margin-bottom:0.35rem;}
+.alloc li .amt{font-weight:600;font-variant-numeric:tabular-nums;}
+.alloc .leftover{font-size:13px;color:var(--ink-3);margin-top:0.9rem;}
+
+.note{font-size:13px;color:var(--ink-3);max-width:72ch;}
+.foot{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3);}
+.foot p{max-width:74ch;}
+details.method{margin-top:1rem;}
+details.method summary{cursor:pointer;font-size:13px;color:var(--ink-2);}
+details.method[open] summary{margin-bottom:0.75rem;}
+details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1.6;}
+.empty{padding:2.5rem 0;color:var(--ink-3);font-style:italic;}
+
+@media (max-width:640px){
+  .wrap{padding:2rem 1rem 4rem;}
+  .ctl-row{gap:1.1rem;}
+  .summary{gap:1.75rem;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition-duration:0ms !important;animation-duration:0ms !important;}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="wordmark" href="/">when where howe</a>
+<nav class="site-nav">
+  <a href="/">writings</a>
+  <a href="/nowplaying.html">now playing</a>
+  <a href="/autobiodiscography.html">autobiodiscography</a>
+</nav>
+
+<h1>Donor Impact Advisor</h1>
+<p class="standfirst">Where a marginal campaign donation does the most work in the 2026 midterms — combining how close a race is, how much it matters to chamber control, and how far behind the money is.</p>
+<p class="caveat">This ranks races against each other. It does <em>not</em> predict that a donation changes any outcome, and it can't — a lawful individual contribution is a rounding error against a race that costs millions. Treat the score as a screening tool, not a measurement.</p>
+
+<div class="controls">
+  <div class="ctl-row">
+    <div class="ctl">
+      <span class="lab" id="lab-party">I want to help</span>
+      <div class="seg party" role="group" aria-labelledby="lab-party">
+        <button type="button" data-v="D" aria-pressed="true">Democrats</button>
+        <button type="button" data-v="R" aria-pressed="false">Republicans</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <span class="lab" id="lab-ch">Chamber</span>
+      <div class="seg chamber" role="group" aria-labelledby="lab-ch">
+        <button type="button" data-v="both" aria-pressed="true">Both</button>
+        <button type="button" data-v="house" aria-pressed="false">House</button>
+        <button type="button" data-v="senate" aria-pressed="false">Senate</button>
+      </div>
+    </div>
+    <div class="ctl">
+      <label for="f-posture">Posture</label>
+      <select id="f-posture"><option value="">Flip &amp; defend</option><option value="flip">Flip only</option><option value="defend">Defend only</option></select>
+    </div>
+    <div class="ctl">
+      <label for="f-tier">Control tier</label>
+      <select id="f-tier"><option value="">All tiers</option><option value="Pivot">Pivot</option><option value="Near-pivot">Near-pivot</option><option value="Cushion">Cushion</option><option value="Supplemental">Supplemental</option><option value="Margin-building">Margin-building</option><option value="Nice to have">Nice to have</option><option value="Very supplemental">Very supplemental</option></select>
+    </div>
+    <div class="ctl">
+      <label for="f-state">State</label>
+      <select id="f-state"><option value="">All states</option></select>
+    </div>
+    <div class="ctl">
+      <label for="f-sort">Sort by</label>
+      <select id="f-sort">
+        <option value="score">Impact score</option>
+        <option value="p">Win probability</option>
+        <option value="need">Funding need</option>
+        <option value="lev">Closeness</option>
+        <option value="state">State A–Z</option>
+      </select>
+    </div>
+    <div class="ctl">
+      <label for="f-budget">Budget ($)</label>
+      <input id="f-budget" type="number" min="0" step="100" placeholder="e.g. 1000">
+    </div>
+  </div>
+</div>
+
+<div class="summary" id="summary"></div>
+
+<h2>Ranked races</h2>
+<p class="note" id="count-note"></p>
+<div class="tablewrap">
+  <table>
+    <thead><tr>
+      <th class="num">#</th>
+      <th>Seat</th>
+      <th>Posture</th>
+      <th class="num">Win prob.</th>
+      <th class="num">Funding gap</th>
+      <th>Control tier</th>
+      <th class="num">Score</th>
+    </tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+<p class="empty" id="empty" style="display:none">No races match these filters.</p>
+
+<div id="alloc-host"></div>
+
+<h2>How the score works</h2>
+<p class="note">Every factor is bounded 0–1, so the product is a real 0–100 index that is comparable across chambers and across days. Scores cluster well below 100 by construction — a 55 is a strong result, not a mediocre one.</p>
+<details class="method">
+  <summary>The formula, and what it deliberately leaves out</summary>
+  <ul>
+    <li><strong>Closeness</strong> — <code>4 × p × (1 − p)</code>, peaking at a 50/50 race. Raw win probability would reward near-certain outcomes, where money changes nothing.</li>
+    <li><strong>Control tier</strong> — every seat is ranked by closeness, then banded by where it falls relative to the number still needed for a majority. Seats a party already holds are included, so defending a coin-flip seat counts exactly as much as winning one.</li>
+    <li><strong>Funding need</strong> — half from how far the candidate is below what this seat historically costs, half from how they compare to their opponent. Expressed as a share rather than a ratio so an unfunded opponent can't send it to infinity.</li>
+    <li><strong>Outside spending</strong> — independent expenditures adjust funding need by ±25–50%, discounted by half because outside groups pay market ad rates while candidates get the lowest unit charge. Bounded deliberately: it's money you cannot affect, cumulative spending rather than cash in hand, and heavily back-loaded.</li>
+    <li><strong>Viability</strong> — damps candidates who have raised almost nothing. Without it, a campaign with $0 raised scores highest of all, which is backwards: that's usually a non-campaign, not a bargain.</li>
+    <li><strong>Not included:</strong> dark money and issue advocacy that never triggers a filing, party coordinated spending, candidate quality, or anything about the candidates' politics beyond party.</li>
+  </ul>
+</details>
+
+<div class="foot" id="foot"></div>
+</div>
+
+<script>
+const CAP = 3500; // assumed 2026 individual per-candidate, per-election limit
+const IE_EFFICIENCY = 0.5, W_OWN = 0.5, W_REL = 0.5, VIA_FLOOR = 0.10;
+const state = {party:'D', chamber:'both', posture:'', tier:'', st:'', sort:'score', budget:null};
+let DATA = null;
+
+const fmtM = v => v>=1e6 ? '$'+(v/1e6).toFixed(1)+'M' : v>=1e3 ? '$'+Math.round(v/1e3)+'k' : '$'+Math.round(v);
+const fmtD = v => '$'+Math.round(v).toLocaleString('en-US');
+const pct  = v => (v*100).toFixed(0)+'%';
+const clamp = (v,a,b) => Math.min(Math.max(v,a),b);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* Per-race factors from one party's point of view. Mirrors spec §4C/§4D/§5. */
+function factors(r, party){
+  const p = party==='D' ? r.p_dem : 1-r.p_dem;
+  const lev = 4*p*(1-p);
+  const tgt = r.target || 1;
+  const cohS = party==='D' ? r.coh_dem : r.coh_rep;
+  const cohO = party==='D' ? r.coh_rep : r.coh_dem;
+  const raiS = party==='D' ? r.raised_dem : r.raised_rep;
+  const ieUs = party==='D' ? r.out_dem : r.out_rep;
+  const ieTh = party==='D' ? r.out_rep : r.out_dem;
+  const aS = clamp(cohS/tgt,0,2), aO = clamp(cohO/tgt,0,2);
+  const own = clamp(1-aS,0,1);
+  const rel = (aS+aO)===0 ? 0.5 : aO/(aS+aO);
+  const rawNeed = W_OWN*own + W_REL*rel;
+  const ieNet = IE_EFFICIENCY*(ieTh-ieUs)/tgt;
+  const ieAdj = clamp(1+0.5*ieNet, 0.75, 1.5);
+  const need = clamp(rawNeed*ieAdj, 0, 1);
+  const via = Math.sqrt(clamp(raiS/(VIA_FLOOR*tgt),0,1));
+  return {p, lev, need, rawNeed, ieAdj, ieNet, via, aS, aO, own, rel, tgt,
+          cohS, cohO, raiS, ieUs, ieTh,
+          defend: r.held_by===party,
+          gap: party==='D' ? r.gap_dem : r.gap_rep};
+}
+
+/* Chamber control multiplier — spec §6, computed per chamber per party. */
+function scoreChamber(races, chamber, party){
+  const c = DATA.chambers[chamber];
+  const inChamber = races.filter(r => r.chamber===chamber);
+  const structural = party==='D' ? c.structural_dem : c.structural_rep;
+  let safe = structural;
+  const inPlay = [];
+  for (const r of inChamber){
+    const f = factors(r, party);
+    if (f.p >= 0.95) safe++;
+    else if (f.p > 0.05) inPlay.push([r,f]);
+  }
+  const N = Math.round(c.threshold - safe);
+  inPlay.sort((a,b) => b[1].lev - a[1].lev);
+  const out = [];
+  inPlay.forEach(([r,f], i) => {
+    const rank = i+1;
+    let mult, tier;
+    if (N <= 0){
+      // Safe seats alone already clinch it: nothing is a pivot, so the bands
+      // measure margin-building instead. This replaces v1.2's "margin > 20"
+      // switch, which sat exactly on the current House projection (+20) and
+      // would have reshuffled every multiplier from one day to the next.
+      if (rank<=10){mult=0.7;tier='Margin-building';}
+      else if (rank<=25){mult=0.5;tier='Nice to have';}
+      else {mult=0.3;tier='Very supplemental';}
+    } else if (rank<=N){mult=1.0;tier='Pivot';}
+    else if (rank<=1.5*N){mult=0.85;tier='Near-pivot';}
+    else if (rank<=2*N){mult=0.7;tier='Cushion';}
+    else {mult=0.5;tier='Supplemental';}
+    out.push({r, f, mult, tier, rank, score: 100*f.lev*mult*f.need*f.via});
+  });
+  return {rows: out, N, safe, structural, threshold: c.threshold,
+          seats: party==='D' ? c.dem_seats : c.gop_seats,
+          control: party==='D' ? c.dem_control_pct : 100-c.dem_control_pct,
+          inPlayCount: inPlay.length};
+}
+
+function computeAll(){
+  const party = state.party;
+  const per = {house: scoreChamber(DATA.races,'house',party),
+               senate: scoreChamber(DATA.races,'senate',party)};
+  return per;
+}
+
+function renderSummary(per){
+  const other = state.party==='D' ? 'Republicans' : 'Democrats';
+  const us = state.party==='D' ? 'Democrats' : 'Republicans';
+  const colour = state.party==='D' ? 'var(--dem)' : 'var(--rep)';
+  const host = document.getElementById('summary');
+  host.innerHTML = ['house','senate'].map(ch => {
+    const s = per[ch];
+    const total = ch==='house' ? 435 : 100;
+    const safeW = (s.safe/total)*100;
+    const playW = (s.inPlayCount/total)*100;
+    const thrW  = (s.threshold/total)*100;
+    const need = s.N>0
+      ? `<strong>${s.N}</strong> of the ${s.inPlayCount} in-play seats to reach ${s.threshold}`
+      : `already at ${s.threshold} on safe seats alone`;
+    const label = ch==='house' ? 'House' : 'Senate';
+    return `<div style="color:${colour}">
+      <h3 style="color:var(--ink-3)">${label}</h3>
+      <p class="chamber-line">${us} project to <strong>${s.seats.toFixed(0)}</strong> seats
+        (${s.control.toFixed(0)}% chance of control) and need ${need}.</p>
+      <div class="bar">
+        <i class="safe" style="width:${safeW}%"></i>
+        <i class="play" style="left:${safeW}%;width:${playW}%"></i>
+        <span class="thr" style="left:${thrW}%"></span>
+      </div>
+      <div class="bar-key" style="color:var(--ink-3)">
+        <span>${s.safe} safe${s.structural?` (incl. ${s.structural} not up)`:''}</span>
+        <span>${s.inPlayCount} in play</span>
+        <span>| = ${s.threshold} for control</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function visibleRows(per){
+  let rows = [];
+  if (state.chamber==='both') rows = [...per.house.rows, ...per.senate.rows];
+  else rows = [...per[state.chamber].rows];
+  if (state.posture) rows = rows.filter(x => state.posture==='defend' ? x.f.defend : !x.f.defend);
+  if (state.tier) rows = rows.filter(x => x.tier===state.tier);
+  if (state.st) rows = rows.filter(x => x.r.state===state.st);
+  const key = {
+    score: x => -x.score, p: x => -x.f.p, need: x => -x.f.need,
+    lev: x => -x.f.lev, state: x => x.r.state+x.r.code
+  }[state.sort];
+  rows.sort((a,b) => { const ka=key(a), kb=key(b); return ka<kb?-1:ka>kb?1:0; });
+  return rows;
+}
+
+function seatLabel(r){
+  return r.chamber==='senate' ? `${r.state} Senate` : `${r.state}-${r.district}`;
+}
+
+function renderRows(rows){
+  const tb = document.getElementById('rows');
+  const colour = state.party==='D' ? 'var(--dem)' : 'var(--rep)';
+  document.getElementById('empty').style.display = rows.length ? 'none' : 'block';
+  document.getElementById('count-note').textContent =
+    `${rows.length} competitive race${rows.length===1?'':'s'} shown. Click any row for the underlying numbers.`;
+  const max = rows.length ? Math.max(...rows.map(x=>x.score)) : 1;
+  tb.innerHTML = rows.map((x,i) => {
+    const {r,f} = x;
+    const ourName = state.party==='D' ? r.dem : r.rep;
+    const oppName = state.party==='D' ? r.rep : r.dem;
+    const gapDollars = Math.max(0, f.tgt - f.cohS);
+    const ieFlag = Math.abs(f.ieTh-f.ieUs) > 0.5*f.tgt;
+    return `<tr class="race" data-i="${i}" tabindex="0" role="button" aria-expanded="false">
+      <td class="num rank">${i+1}</td>
+      <td><span class="seat">${esc(seatLabel(r))}</span><br><span class="cands">${esc(ourName)} vs. ${esc(oppName)}</span></td>
+      <td class="posture"><span class="tag ${f.defend?'defend':'flip'}">${f.defend?'Defend':'Flip'}</span></td>
+      <td class="num">${pct(f.p)}</td>
+      <td class="num">${f.gap ? '<span class="warn">no data</span>' : fmtM(gapDollars)+' short'}${ieFlag?'<br><span class="warn">outside $</span>':''}</td>
+      <td><span class="tier"><b>${x.tier}</b></span></td>
+      <td class="num"><span class="scorecell" style="color:${colour}">
+        <span class="sparkline"><i style="width:${(x.score/max*100).toFixed(0)}%"></i></span>
+        <span class="score">${x.score.toFixed(0)}</span></span></td>
+    </tr>
+    <tr class="detail" data-d="${i}"><td colspan="7">${detailHTML(x)}</td></tr>`;
+  }).join('');
+}
+
+function detailHTML(x){
+  const {r,f} = x;
+  const ourName = state.party==='D' ? r.dem : r.rep;
+  const oppName = state.party==='D' ? r.rep : r.dem;
+  const ourStatus = state.party==='D' ? r.status_dem : r.status_rep;
+  const ieDir = f.ieTh>=f.ieUs ? 'against' : 'favouring';
+  const ieNetAbs = Math.abs(f.ieTh-f.ieUs);
+  return `<div class="dgrid">
+    <dl>
+      <dt>${esc(ourName)} — the candidate you'd fund</dt>
+      <dd>Cash on hand <span class="n">${fmtD(f.cohS)}</span> · raised <span class="n">${fmtD(f.raiS)}</span></dd>
+      <dd>That's <span class="n">${pct(f.aS)}</span> of what this seat historically costs${ourStatus && ourStatus!=='confirmed' ? ` · <em>${esc(ourStatus)} nominee</em>` : ''}</dd>
+      <dt>${esc(oppName)}</dt>
+      <dd>Cash on hand <span class="n">${fmtD(f.cohO)}</span> — <span class="n">${pct(f.aO)}</span> of the same target</dd>
+    </dl>
+    <dl>
+      <dt>This seat's funding target</dt>
+      <dd><span class="n">${fmtD(f.tgt)}</span>, from the top two spenders here in 2022 and 2024, inflated to 2026 and weighted for how competitive the seat is (${esc(r.rating)}).${r.no_history?' <em>No history for this seat — chamber median used.</em>':''}</dd>
+      <dt>Outside spending</dt>
+      <dd>${(f.ieUs+f.ieTh)===0
+        ? 'None reported yet. Most independent expenditure lands after Labor Day.'
+        : `<span class="n">${fmtD(f.ieTh)}</span> against, <span class="n">${fmtD(f.ieUs)}</span> for — net <span class="n">${fmtD(ieNetAbs)}</span> ${ieDir}${
+            ieNetAbs/f.tgt >= 0.1 ? `, ${(ieNetAbs/f.tgt).toFixed(1)}× this seat's target` : ' — small next to this seat\'s target'}.`}</dd>
+      <dt>Forecast</dt>
+      <dd>${pct(f.p)} chance of winning · ${r.rating} · margin ${r.margin>0?'+':''}${r.margin} · ${r.polls} poll${r.polls===1?'':'s'} in the average</dd>
+    </dl>
+    <dl>
+      <dt>Why it scores ${x.score.toFixed(0)}</dt>
+      <dd>Closeness <span class="n">${f.lev.toFixed(2)}</span> — ${f.lev>0.9?'as close as races get':f.lev>0.7?'genuinely competitive':'leaning, but live'}</dd>
+      <dd>Control tier <span class="n">${x.mult.toFixed(2)}</span> — ${esc(x.tier.toLowerCase())}, ranked #${x.rank} by closeness in the ${r.chamber}</dd>
+      <dd>Funding need <span class="n">${f.need.toFixed(2)}</span>${Math.abs(f.ieAdj-1)>0.005?` (outside money ×${f.ieAdj.toFixed(2)})`:''}</dd>
+      ${f.via<0.999?`<dd>Viability <span class="n">${f.via.toFixed(2)}</span> — damped: this campaign has raised little enough to question whether it's live</dd>`:''}
+      <dd style="margin-top:.5rem"><a href="https://www.fec.gov/data/candidates/?q=${encodeURIComponent(ourName)}&election_year=2026" target="_blank" rel="noopener noreferrer">Look up ${esc(ourName)} at the FEC →</a></dd>
+    </dl>
+  </div>
+  <p class="mathline"><code>${x.score.toFixed(1)} = 100 × ${f.lev.toFixed(2)} closeness × ${x.mult.toFixed(2)} tier × ${f.need.toFixed(2)} need × ${f.via.toFixed(2)} viability</code></p>`;
+}
+
+function renderAlloc(rows){
+  const host = document.getElementById('alloc-host');
+  const b = state.budget;
+  if (!b || b<=0 || !rows.length){ host.innerHTML=''; return; }
+  let remaining = b; const plan = [];
+  for (const x of rows){
+    if (remaining<=0) break;
+    const give = Math.min(CAP, remaining);
+    plan.push([x, give]); remaining -= give;
+  }
+  host.innerHTML = `<h2>Putting ${fmtD(b)} to work</h2>
+  <div class="alloc">
+    <p class="note" style="margin-top:0">Because any lawful individual donation is small next to what these races cost, a dollar's value doesn't fall off within a race — so the arithmetic favours filling the top-ranked race to the legal maximum, then the next. Splitting more widely is a perfectly reasonable choice; it just isn't what the score optimises.</p>
+    <ol>${plan.map(([x,give]) => {
+      const nm = state.party==='D' ? x.r.dem : x.r.rep;
+      return `<li><span class="amt">${fmtD(give)}</span> — ${esc(nm)}, ${esc(seatLabel(x.r))} <span style="color:var(--ink-3)">(score ${x.score.toFixed(0)}${give===CAP?', at the per-candidate cap':''})</span></li>`;
+    }).join('')}</ol>
+    ${remaining>0?`<p class="leftover">${fmtD(remaining)} left over — you've reached the cap on every race matching your filters. Widen the filters to place the rest.</p>`:''}
+    <p class="leftover">Assumes a ${fmtD(CAP)} per-candidate, per-election federal limit for 2026 — <strong>verify the current indexed figure before giving</strong>, and note the primary and general count separately. This page processes nothing and collects nothing; it just points.</p>
+  </div>`;
+}
+
+function render(){
+  const per = computeAll();
+  renderSummary(per);
+  const rows = visibleRows(per);
+  renderRows(rows);
+  renderAlloc(rows);
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const seg = e.target.closest('.seg button');
+  if (seg){
+    const group = seg.closest('.seg');
+    group.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b===seg)));
+    if (group.classList.contains('party')) state.party = seg.dataset.v;
+    else state.chamber = seg.dataset.v;
+    render(); return;
+  }
+  const row = e.target.closest('tr.race');
+  if (row && !e.target.closest('a')) toggle(row);
+});
+document.addEventListener('keydown', e => {
+  if ((e.key==='Enter'||e.key===' ') && e.target.classList?.contains('race')){
+    e.preventDefault(); toggle(e.target);
+  }
+});
+function toggle(row){
+  const d = document.querySelector(`tr.detail[data-d="${row.dataset.i}"]`);
+  const open = d.classList.toggle('open');
+  row.setAttribute('aria-expanded', String(open));
+}
+const bind = (id, key, cast=v=>v) =>
+  document.getElementById(id).addEventListener('input', e => { state[key]=cast(e.target.value); render(); });
+bind('f-posture','posture'); bind('f-tier','tier'); bind('f-state','st'); bind('f-sort','sort');
+bind('f-budget','budget', v => v===''?null:Number(v));
+
+/* ---------- boot ---------- */
+fetch('data.json').then(r => {
+  if (!r.ok) throw new Error('HTTP '+r.status);
+  return r.json();
+}).then(d => {
+  DATA = d;
+  const sel = document.getElementById('f-state');
+  [...new Set(d.races.map(r=>r.state))].sort().forEach(s => {
+    const o = document.createElement('option'); o.value=o.textContent=s; sel.appendChild(o);
+  });
+  const gen = new Date(d.generated);
+  document.getElementById('foot').innerHTML =
+    `<p><strong>Data.</strong> Forecasts, ratings, candidate finance and outside spending from
+     <a href="${d.source.forecast_url}" target="_blank" rel="noopener noreferrer">ElectIndex's 2026 model</a>,
+     refreshed ${gen.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}.
+     Historical seat costs from <a href="${d.source.finance_url}" target="_blank" rel="noopener noreferrer">FEC bulk filings</a> for 2022 and 2024.
+     ${d.build.federal_races} federal races processed${d.build.skipped ? `, and ${d.build.skipped} excluded for having no two-party general-election matchup — California seats where the top-two primary sent two Democrats forward, plus states where no Democrat filed` : ''}.</p>
+     <p><strong>Caveats worth knowing.</strong> Candidate cash on hand only changes when campaigns file with the FEC — quarterly, so those figures are weeks old by design, while outside spending is reported within 24–48 hours and moves much faster. Every probability comes from a single model, so there's no cross-model disagreement flagging here, and that model already uses fundraising as an input — meaning the score double-counts money to some unknown degree. Dark money is invisible to it. Nothing on this page is advice about who to support.</p>`;
+  render();
+}).catch(err => {
+  document.getElementById('summary').innerHTML =
+    `<p class="empty">Couldn't load the race data (${esc(err.message)}). The snapshot may still be building.</p>`;
+});
+</script>
+</body>
+</html>
