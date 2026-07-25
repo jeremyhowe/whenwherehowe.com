@@ -293,6 +293,10 @@ function scoreChamber(races, chamber, party){
   const inChamber = races.filter(r => r.chamber===chamber);
   const structural = party==='D' ? c.structural_dem : c.structural_rep;
   let safe = structural;
+  // Every race counts toward control — including the same-party top-two seats
+  // that can't be ranked. Nine of them sit at 100%/0%, so omitting them from
+  // this tally moves "seats still needed" by eight and reshuffles the pivot
+  // bands for unrelated races.
   const inPlay = [];
   for (const r of inChamber){
     const f = factors(r, party);
@@ -317,6 +321,10 @@ function scoreChamber(races, chamber, party){
     else if (rank<=1.5*N){mult=0.85;tier='Near-pivot';}
     else if (rank<=2*N){mult=0.7;tier='Cushion';}
     else {mult=0.5;tier='Supplemental';}
+    // Unrankable races still occupy their position in the closeness ordering —
+    // they're contested seats that bear on control — but never get displayed,
+    // because there is no two-party matchup to donate into.
+    if (r.rankable === false) return;
     out.push({r, f, mult, tier, rank, score: 100*f.lev*mult*f.need*f.via});
   });
   return {rows: out, N, safe, structural, threshold: c.threshold,
@@ -524,7 +532,7 @@ fetch('data.json').then(r => {
      <a href="${d.source.forecast_url}" target="_blank" rel="noopener noreferrer">ElectIndex's 2026 model</a>,
      refreshed ${gen.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})}.
      Historical seat costs from <a href="${d.source.finance_url}" target="_blank" rel="noopener noreferrer">FEC bulk filings</a> for 2022 and 2024.
-     ${d.build.federal_races} federal races processed${d.build.skipped ? `, and ${d.build.skipped} excluded for having no two-party general-election matchup — California seats where the top-two primary sent two Democrats forward, plus states where no Democrat filed` : ''}.</p>
+     ${d.build.federal_races} federal races processed${d.build.skipped ? `. ${d.build.skipped} of them can't be ranked because there's no two-party general-election matchup to donate into — California seats where the top-two primary advanced two candidates of the same party, plus states where no Democrat filed. They still count toward the seat totals above, since they're seats someone is going to win` : ''}.</p>
      <p><strong>Caveats worth knowing.</strong> Candidate cash on hand only changes when campaigns file with the FEC — quarterly, so those figures are weeks old by design, while outside spending is reported within 24–48 hours and moves much faster. Every probability comes from a single model, so there's no cross-model disagreement flagging here, and that model already uses fundraising as an input — meaning the score double-counts money to some unknown degree. Dark money is invisible to it. Nothing on this page is advice about who to support.</p>`;
   render();
 }).catch(err => {
