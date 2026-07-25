@@ -239,6 +239,7 @@ details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1
 <details class="method">
   <summary>The formula, and what it deliberately leaves out</summary>
   <ul>
+    <li><strong>"Seats in doubt"</strong> — every House seat is contested every two years, so this is not a count of elections. From the selected party's point of view each seat is sorted by forecast win probability into <em>near-certain</em> (95% or better), <em>in doubt</em> (between 5% and 95%), or <em>out of reach</em> (5% or less). Only the middle group can realistically change the arithmetic, and only those are ranked here. The Senate figure also folds in the 65 seats not on the 2026 ballot, since they still count toward 51.</li>
     <li><strong>Closeness</strong> — <code>4 × p × (1 − p)</code>, peaking at a 50/50 race. Raw win probability would reward near-certain outcomes, where money changes nothing.</li>
     <li><strong>Control tier</strong> — every seat is ranked by closeness, then banded by where it falls relative to the number still needed for a majority. Seats a party already holds are included, so defending a coin-flip seat counts exactly as much as winning one.</li>
     <li><strong>Funding need</strong> — half from how far the candidate is below what this seat historically costs, half from how they compare to their opponent. Expressed as a share rather than a ratio so an unfunded opponent can't send it to infinity.</li>
@@ -351,9 +352,12 @@ function renderSummary(per){
     const safeW = (s.safe/total)*100;
     const playW = (s.inPlayCount/total)*100;
     const thrW  = (s.threshold/total)*100;
+    // "In play" was the first wording here and it misleads: every House seat is
+    // contested every two years, so a reader reasonably assumes 435. What this
+    // number means is narrower — seats the forecast can't call either way.
     const need = s.N>0
-      ? `<strong>${s.N}</strong> of the ${s.inPlayCount} in-play seats to reach ${s.threshold}`
-      : `already at ${s.threshold} on safe seats alone`;
+      ? `<strong>${s.N}</strong> of the ${s.inPlayCount} seats still in doubt to reach ${s.threshold}`
+      : `already at ${s.threshold} on near-certain seats alone`;
     const label = ch==='house' ? 'House' : 'Senate';
     return `<div style="color:${colour}">
       <h3 style="color:var(--ink-3)">${label}</h3>
@@ -365,8 +369,8 @@ function renderSummary(per){
         <span class="thr" style="left:${thrW}%"></span>
       </div>
       <div class="bar-key" style="color:var(--ink-3)">
-        <span>${s.safe} safe${s.structural?` (incl. ${s.structural} not up)`:''}</span>
-        <span>${s.inPlayCount} in play</span>
+        <span>${s.safe} near-certain${s.structural?` (incl. ${s.structural} not on the ballot)`:''}</span>
+        <span>${s.inPlayCount} in doubt</span>
         <span>| = ${s.threshold} for control</span>
       </div>
     </div>`;
