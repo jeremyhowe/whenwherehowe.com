@@ -37,7 +37,9 @@ body{
 h1{font-family:'EB Garamond',Georgia,serif;font-size:clamp(28px,5vw,40px);font-weight:400;line-height:1.15;letter-spacing:-0.015em;margin:0 0 1rem;text-wrap:balance;}
 .standfirst{font-family:'EB Garamond',Georgia,serif;font-size:19px;line-height:1.65;color:var(--ink-2);max-width:64ch;margin:0 0 0.75rem;text-wrap:pretty;}
 .standfirst em{color:var(--ink);font-style:italic;}
-.caveat{font-size:13px;color:var(--ink-3);max-width:70ch;margin:0 0 2.5rem;}
+.caveat{font-size:13px;color:var(--ink-3);max-width:70ch;margin:0 0 1rem;}
+.aboutlink{font-family:'EB Garamond',Georgia,serif;font-size:17px;margin:0 0 2.5rem;}
+.aboutlink a{text-decoration-color:var(--ink-3);}
 
 h2{font-family:'EB Garamond',Georgia,serif;font-size:24px;font-weight:400;margin:3.5rem 0 1rem;letter-spacing:-0.01em;}
 h3{font-size:13px;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;color:var(--ink-3);margin:0 0 0.75rem;}
@@ -208,6 +210,7 @@ details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1
 <h1>Donor Impact Advisor</h1>
 <p class="standfirst">Where a marginal campaign donation does the most work in the 2026 midterms — combining how close a race is, how much it matters to chamber control, and how far behind the money is.</p>
 <p class="caveat">This ranks races against each other. It does <em>not</em> predict that a donation changes any outcome, and it can't — a lawful individual contribution is a rounding error against a race that costs millions. Treat the score as a screening tool, not a measurement.</p>
+<p class="aboutlink"><a href="about.html">How this works, every metric explained, and what it gets wrong →</a></p>
 
 <div class="controls">
   <div class="ctl-row">
@@ -279,7 +282,7 @@ details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1
     <li><strong>"Seats in doubt"</strong> — every House seat is contested every two years, so this is not a count of elections. From the selected party's point of view each seat is sorted by forecast win probability into <em>near-certain</em> (95% or better), <em>in doubt</em> (between 5% and 95%), or <em>out of reach</em> (5% or less). Only the middle group can realistically change the arithmetic, and only those are ranked here. The Senate figure also folds in the 65 seats not on the 2026 ballot, since they still count toward 51.</li>
     <li><strong>Closeness</strong> — <code>4 × p × (1 − p)</code>, peaking at a 50/50 race. Raw win probability would reward near-certain outcomes, where money changes nothing.</li>
     <li><strong>Control tier</strong> — every seat is ranked by closeness, then banded by where it falls relative to the number still needed for a majority. Seats a party already holds are included, so defending a coin-flip seat counts exactly as much as winning one.</li>
-    <li><strong>Cash need</strong> — both halves measure <em>cash on hand</em> and nothing else, because money already spent has already done its work and is priced into the win probability. Half is <em>pace</em>: the bank balance as a share of the seat's anticipated full-cycle cost, divided by the share campaigns in that chamber typically had banked at this same filing in the last midterm. Half is the <em>head-to-head</em>: the opponent's share of the combined war chest, expressed as a share rather than a ratio so an unfunded opponent can't send it to infinity. Pace exists because a head-to-head alone is blind to scale — two campaigns with $90k apiece and two with $8M apiece are both "even," but a donation means something very different in each.</li>
+    <li><strong>Cash need</strong> — both halves measure <em>cash on hand</em> and nothing else, because money already spent has already done its work and is priced into the win probability. Half is <em>pace</em>: the bank balance as a share of the seat's anticipated full-cycle cost, measured against the higher of the chamber's historical norm at this point or the opponent's own war chest. Half is the <em>head-to-head</em>: the opponent's share of the combined cash, expressed as a share rather than a ratio so an unfunded opponent can't send it to infinity. Pace exists because a head-to-head alone is blind to scale — two campaigns with $90k apiece and two with $8M apiece are both "even," but a donation means something very different in each. The opponent enters both halves on purpose: matching a historical average means little when the other side has multiples of it.</li>
     <li><strong>Outside spending</strong> — independent expenditures adjust funding need by ±25–50%, discounted by half because outside groups pay market ad rates while candidates get the lowest unit charge. Bounded deliberately: it's money you cannot affect, cumulative spending rather than cash in hand, and heavily back-loaded.</li>
     <li><strong>Viability</strong> — damps candidates who have raised almost nothing. Without it, a campaign with $0 raised scores highest of all, which is backwards: that's usually a non-campaign, not a bargain. This one deliberately uses <em>total raised</em> rather than cash on hand, because money raised is never un-raised — it measures whether a real campaign exists, while cash on hand measures what's left to spend.</li>
     <li><strong>Not included:</strong> dark money and issue advocacy that never triggers a filing, party coordinated spending, candidate quality, or anything about the candidates' politics beyond party.</li>
@@ -327,10 +330,20 @@ function factors(r, party){
   // History supplies exactly two things: the seat's anticipated total, and the
   // pace constant. Total raised survives only in the viability floor below.
   const completion = tgt > 0 ? cohS / tgt : 0;
+  const oppCompletion = tgt > 0 ? cohO / tgt : 0;
   const paceRef = r.pace_ref || null;
   const pace = paceRef ? completion / paceRef : null;
-  const own = pace === null ? clamp(1 - clamp(raiS/tgt,0,2), 0, 1)
-                            : clamp(1 - clamp(pace, 0, 2), 0, 1);
+  // What counts as "enough" is the chamber norm OR whatever the opponent has
+  // actually banked, whichever is higher. Against the norm alone, a candidate
+  // just past it registered no need at all even when massively outgunned:
+  // FL-08 sat at 26% of the seat's cost against an opponent at 233% and scored
+  // zero shortfall. Taking the max cut that saturation from 61 of 145 races to
+  // 35, and every race it rescued was one where the opponent held multiples of
+  // our candidate's war chest.
+  const required = Math.max(paceRef || 0, oppCompletion);
+  const own = paceRef === null && required === 0
+    ? clamp(1 - clamp(raiS/tgt,0,2), 0, 1)
+    : clamp(1 - clamp(completion / required, 0, 2), 0, 1);
   const aS = clamp(cohS/tgt,0,2), aO = clamp(cohO/tgt,0,2);
   const rel = (cohS+cohO)===0 ? 0.5 : cohO/(cohS+cohO);
   const rawNeed = W_OWN*own + W_REL*rel;
@@ -338,7 +351,7 @@ function factors(r, party){
   const ieAdj = clamp(1+0.5*ieNet, 0.75, 1.5);
   const need = clamp(rawNeed*ieAdj, 0, 1);
   const via = Math.sqrt(clamp(raiS/(VIA_FLOOR*tgt),0,1));
-  return {p, lev, need, rawNeed, ieAdj, ieNet, via, aS, aO, completion, pace, paceRef, own, rel, tgt,
+  return {p, lev, need, rawNeed, ieAdj, ieNet, via, aS, aO, completion, oppCompletion, required, pace, paceRef, own, rel, tgt,
           cohS, cohO, raiS, ieUs, ieTh,
           raiO,
           defend: r.held_by===party,
@@ -502,7 +515,8 @@ function detailHTML(x){
       <dd>Cash on hand <span class="n">${fmtD(f.cohS)}</span>${ourStatus && ourStatus!=='confirmed' ? ` · <em>${esc(ourStatus)} nominee</em>` : ''}</dd>
       <dd>${f.pace===null
         ? `<em>No pace reference for this chamber</em>, so the shortfall falls back to receipts against the anticipated total.`
-        : `That's <strong><span class="n">${pct(f.completion)}</span></strong> of this seat's anticipated cost banked. Campaigns in the ${r.chamber==='senate'?'Senate':'House'} typically held <span class="n">${pct(f.paceRef)}</span> by this point in the last midterm — <strong>${f.pace>=1.15?'ahead of':f.pace>=0.85?'about level with':f.pace>=0.5?'behind':'well behind'} the usual pace</strong> (<span class="n">${f.pace.toFixed(2)}×</span>).`}</dd>
+        : `That's <strong><span class="n">${pct(f.completion)}</span></strong> of this seat's anticipated cost banked, against <span class="n">${pct(f.oppCompletion)}</span> for the opponent. Campaigns in the ${r.chamber==='senate'?'Senate':'House'} typically held <span class="n">${pct(f.paceRef)}</span> by this point in the last midterm.`}</dd>
+      ${f.pace===null?'':`<dd>Enough here means clearing <strong><span class="n">${pct(f.required)}</span></strong> — the higher of that norm and what the opponent holds${f.oppCompletion>f.paceRef?', which in this race is set by the opponent':', which in this race is set by the norm'}. This campaign is <strong>${f.own<=0.01?'at or above that mark':f.own<0.3?'most of the way there':f.own<0.6?'well short of it':'a long way short of it'}</strong>.</dd>`}
       <dd style="color:var(--ink-3)">Raised <span class="n">${fmtD(f.raiS)}</span> this cycle — shown for context; it doesn't enter the shortfall.</dd>
       <dt>${esc(oppName)}</dt>
       <dd>Cash on hand <span class="n">${fmtD(f.cohO)}</span> — <span class="n">${pct(f.rel)}</span> of the two campaigns' combined war chest</dd>
@@ -588,7 +602,7 @@ function verdict(x){
         ? `even losing this seat wouldn't decide who controls the chamber, so it matters less than races nearer the threshold.`
         : `even winning this seat wouldn't decide who controls the chamber, so it matters less than races nearer the threshold.`);
     case 'need':
-      return cap(`your candidate already has a healthy war chest — at or ahead of the usual pace for this chamber, and not badly outgunned — so an extra dollar buys less here than somewhere still short of money.`);
+      return cap(`your candidate is holding their own on money — clear of the usual pace for this chamber and not outgunned by the opponent — so an extra dollar buys less here than somewhere still short.`);
     case 'via':
       return cap(`this campaign has raised so little so far that it isn't clear it's a functioning operation — the shortfall may reflect a candidacy that never got going rather than an opportunity.`);
   }
@@ -608,7 +622,7 @@ const WHY = {
     <p>The column shows how far behind the opponent this campaign is in <strong>cash on hand</strong> — money still in the bank, not money already raised and spent.</p>
     <p>That distinction is the point. Everything a campaign has already spent has done its work, and its effect is <em>already inside the win probability</em> — this model even takes fundraising as an input. Counting past money again as a resource would be double-counting it. What isn't yet reflected anywhere is what's still in the bank.</p>
     <p>The score combines two readings of that balance:</p>
-    <p><strong>Pace.</strong> Cash on hand as a share of what this seat is expected to cost for the full cycle, divided by the share campaigns in this chamber typically had banked at this same filing in the last midterm (24% in the House, 40% in the Senate). A war chest in July is under construction; pace asks whether it's being built at a rate that historically produced a competitive campaign.</p>
+    <p><strong>Pace.</strong> Cash on hand as a share of what this seat is expected to cost for the full cycle, measured against a bar set at <em>the higher of</em> two things: what campaigns in this chamber typically had banked at this same filing in the last midterm (24% House, 40% Senate), or whatever the opponent is actually sitting on. A war chest in July is under construction; pace asks whether it's being built fast enough to be competitive — and being level with a historical average is no comfort if the person across the aisle has three times as much.</p>
     <p><strong>Head-to-head.</strong> The opponent's share of the two campaigns' combined war chest — because what decides the closing months is simply who still has money to spend.</p>
     <p class="fine">Why both, rather than the head-to-head alone: a ratio is blind to scale. Two campaigns with $90k each and two with $8M each are both "evenly matched," but $3,500 is a meaningful fraction of the first race and a rounding error in the second — and across these races the combined war chests span a 1,900-fold range. Pace supplies the missing sense of size, seat by seat, so a modest war chest in a cheap district isn't mistaken for poverty.</p>
     <p class="fine">The pace reference is a soft number — the middle half of 2022 campaigns fell between 12% and 44% — but it's a single constant per chamber, so it cannot reorder races within a chamber. It only sets calibration and makes the House and Senate comparable.</p>

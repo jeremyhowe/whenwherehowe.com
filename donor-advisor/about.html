@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>About the Donor Impact Advisor</title>
+<style>
+:root{
+  --paper:#f9f8f5;
+  --ink:#1c1c1a;
+  --ink-2:#44443f;
+  --ink-3:#5f5f58;
+  --rule:#dedcd5;
+  --rule-2:#e9e7e1;
+}
+*{box-sizing:border-box;}
+html{-webkit-text-size-adjust:100%;}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'EB Garamond',Georgia,serif;font-size:19px;line-height:1.75;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:680px;margin:0 auto;padding:2.5rem 1.5rem 6rem;}
+.wordmark{font-family:system-ui,sans-serif;font-size:11px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#706f68;text-decoration:none;display:block;margin-bottom:2.5rem;}
+.wordmark:hover{color:var(--ink);}
+.site-nav{font-family:system-ui,sans-serif;font-size:13px;display:flex;gap:1.5rem;margin-bottom:3rem;flex-wrap:wrap;}
+.site-nav a{color:var(--ink-3);text-decoration:none;}
+.site-nav a:hover{color:var(--ink);}
+
+h1{font-size:clamp(28px,5vw,38px);font-weight:400;line-height:1.15;letter-spacing:-0.015em;margin:0 0 1.25rem;text-wrap:balance;}
+h2{font-size:24px;font-weight:400;margin:3rem 0 0.75rem;letter-spacing:-0.01em;text-wrap:balance;}
+h3{font-size:19px;font-weight:600;margin:2rem 0 0.5rem;}
+p{margin:0 0 1.1rem;text-wrap:pretty;}
+.lede{font-size:21px;line-height:1.6;color:var(--ink-2);margin-bottom:1.5rem;}
+a{color:var(--ink);text-decoration:underline;text-decoration-color:#bbb9b1;text-underline-offset:2px;}
+a:hover{text-decoration-color:var(--ink);}
+.back{font-family:system-ui,sans-serif;font-size:14px;display:inline-block;margin-bottom:2.5rem;}
+ul,ol{margin:0 0 1.2rem;padding-left:1.3rem;}
+li{margin-bottom:0.5rem;}
+strong{font-weight:600;}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:15px;background:#f0eee8;padding:0.1em 0.3em;border-radius:2px;}
+.formula{
+  font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;line-height:1.7;
+  background:#f4f2ec;border:1px solid var(--rule);border-radius:3px;
+  padding:1rem 1.1rem;margin:0 0 1.3rem;overflow-x:auto;white-space:pre;
+}
+.tablewrap{overflow-x:auto;margin:0 0 1.3rem;}
+table{border-collapse:collapse;width:100%;font-family:system-ui,sans-serif;font-size:14.5px;min-width:420px;}
+th{text-align:left;font-size:11px;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;color:var(--ink-3);border-bottom:1px solid var(--rule);padding:0.5rem 0.6rem 0.5rem 0;}
+td{border-bottom:1px solid var(--rule-2);padding:0.55rem 0.6rem 0.55rem 0;vertical-align:top;line-height:1.5;}
+td:first-child{white-space:nowrap;font-weight:600;}
+.note{font-family:system-ui,sans-serif;font-size:15px;line-height:1.65;color:var(--ink-2);
+  border-left:0;background:#f4f2ec;border:1px solid var(--rule);border-radius:3px;padding:1rem 1.1rem;margin:0 0 1.3rem;}
+.note strong{color:var(--ink);}
+.foot{font-family:system-ui,sans-serif;font-size:13px;color:var(--ink-3);line-height:1.65;margin-top:3.5rem;padding-top:1.5rem;border-top:1px solid var(--rule);}
+@media (max-width:640px){ .wrap{padding:2rem 1rem 4rem;} body{font-size:18px;} }
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="wordmark" href="/">when where howe</a>
+<nav class="site-nav">
+  <a href="/">writings</a>
+  <a href="/nowplaying.html">now playing</a>
+  <a href="/autobiodiscography.html">autobiodiscography</a>
+</nav>
+
+<a class="back" href="/donor-advisor/">← Back to the rankings</a>
+
+<h1>About the Donor Impact Advisor</h1>
+
+<p class="lede">A tool for answering one narrow question: if you are going to give money to a 2026 congressional campaign, where does a single donation do the most work?</p>
+
+<h2>The goal, and what it is not</h2>
+
+<p>Most campaign coverage tells you who is likely to win. That is a different question from where your money matters, and often the opposite answer. A race someone will win by twelve points is settled; your dollar changes nothing. A race decided by a few hundred votes, where one side is short of money, is where a marginal contribution has any claim to mattering at all.</p>
+
+<p>So this ranks races against each other on three things: <strong>how close the race is</strong>, <strong>how much the seat matters to control of the chamber</strong>, and <strong>how short of money the candidate is</strong>. It covers all 435 House seats and the 35 Senate seats on the 2026 ballot, from either party's point of view.</p>
+
+<div class="note">
+<p style="margin:0"><strong>What it is not.</strong> It is not a forecast, and it is not a claim that your donation changes an outcome. It cannot be: a lawful individual contribution is a rounding error against a race costing millions. The score is an <em>ordinal ranking</em> — a way of comparing races to each other under one consistent set of assumptions. Anyone who tells you they can quantify the effect of your $200 is selling something.</p>
+</div>
+
+<h2>How a race gets scored</h2>
+
+<p>Four factors, each bounded between 0 and 1, multiplied together and scaled to 100:</p>
+
+<div class="formula">score = 100 × closeness × control tier × cash need × viability</div>
+
+<p>Because it multiplies four sub-1.0 numbers, real scores cluster well below 100. A 55 is a strong result, not a mediocre one. Each factor is worth explaining on its own.</p>
+
+<h3>1. Closeness</h3>
+
+<p>Not the probability of winning — the probability the race is <em>decided at the margin</em>. Computed as <code>4 × p × (1 − p)</code>, which peaks at 1.0 for a perfect coin flip and falls toward 0 as a race becomes certain in either direction.</p>
+
+<p>This is deliberately different from what a forecast shows you. A candidate with a 90% chance of winning is in a nearly settled race, so money moves it very little; so is one at 10%. Using raw win probability would have ranked safe victories at the top, which is exactly backwards for a donor.</p>
+
+<h3>2. Control tier</h3>
+
+<p>Whether winning the seat would actually change who runs the chamber. Every seat still in doubt is ranked by closeness, then placed in a band relative to the number of seats the party still needs for a majority:</p>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Tier</th><th>Multiplier</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>Pivot</td><td>×1.00</td><td>Falls inside the number of seats still needed</td></tr>
+<tr><td>Near-pivot</td><td>×0.85</td><td>Just outside it — strengthens a majority</td></tr>
+<tr><td>Cushion</td><td>×0.70</td><td>Insurance if races nearer the threshold fail</td></tr>
+<tr><td>Supplemental</td><td>×0.50</td><td>Beyond any realistic path to control</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>Seats a party already <em>holds</em> are in this ranking too, which is why a well-placed defensive race can outrank a flip opportunity. Chamber control only cares about the final seat count, so a coin-flip seat you might lose is exactly as pivotal as one you might gain. Rows are labelled <strong>Flip</strong> or <strong>Defend</strong> accordingly.</p>
+
+<p>If a party's near-certain seats alone already reach the threshold, there is no pivot to be had and the bands switch to margin-building (×0.70 / ×0.50 / ×0.30). The Senate calculation includes the 65 seats not on the 2026 ballot, since they still count toward 51.</p>
+
+<h3>3. Cash need</h3>
+
+<p>This one went through four rewrites, and the current version measures <strong>cash on hand and nothing else</strong> — money still in the bank, not money already raised and spent.</p>
+
+<p>The reason is worth stating plainly. Everything a campaign has already spent has done its work: the ads it ran, the name recognition it built. All of that is <em>already reflected in the win probability</em> — the forecast model even takes fundraising as an input. Counting past money again as an available resource would be counting it twice. What is not yet reflected anywhere is what remains to be spent.</p>
+
+<p>Two readings of that balance, averaged:</p>
+
+<div class="formula">completion = cash on hand ÷ seat's anticipated full-cycle cost
+required   = max(chamber norm at this point, opponent's completion)
+pace       = 1 − completion ÷ required
+
+head-to-head = opponent's cash ÷ (both candidates' cash)
+
+cash need  = ½ × pace + ½ × head-to-head</div>
+
+<p><strong>Pace</strong> asks whether a war chest is being built fast enough. A July balance is a war chest under construction, so the bar is set at the higher of two things: what campaigns in that chamber typically had banked at the same filing in the last midterm (24% of eventual spending in the House, 40% in the Senate), or whatever the opponent is actually sitting on. Being level with a historical average is no comfort if the person across the aisle has three times as much.</p>
+
+<p><strong>Head-to-head</strong> is the opponent's share of the two campaigns' combined cash. Expressed as a share rather than a ratio, so an opponent with no filings can't send it to infinity.</p>
+
+<p>Why both, rather than the head-to-head alone — which would be simpler and needs no historical data at all? Because a ratio is blind to scale, and scale is the whole point. Two campaigns with $90,000 each and two with $8 million each are both "evenly matched," but $3,500 is a meaningful slice of the first race and a rounding error in the second. Across competitive races the combined war chests span a range of roughly <strong>1,900 to one</strong>. Pace supplies the missing sense of size, seat by seat — so a modest war chest in a cheap rural district isn't mistaken for poverty, and a large one in an expensive media market isn't mistaken for comfort.</p>
+
+<h3>4. Viability</h3>
+
+<p>A damper on campaigns that have raised almost nothing. Without it, a candidate with $0 raised scores highest of all — maximum shortfall, maximum need — which is backwards. That is usually not a bargain; it is a candidacy that never got going.</p>
+
+<p>This is the one place <em>total raised</em> is used rather than cash on hand, and deliberately: money raised is never un-raised, so it measures whether a real campaign exists, while cash on hand measures what is left to spend. A candidate who raised $1.2 million and spent it winning a primary is viable but cash-poor, and the score should register both facts.</p>
+
+<h3>Outside spending</h3>
+
+<p>Independent expenditures — super PAC money, reported to the FEC within 24 to 48 hours — adjust cash need by up to ±25%, discounted by half because outside groups pay market advertising rates while candidates are entitled to the lowest unit charge.</p>
+
+<p>The adjustment is deliberately bounded rather than dominant, for three reasons: cumulative outside spending and current cash on hand are different kinds of quantity and don't add together honestly; a capped individual donation cannot counter a super PAC anyway; and this money is lumpy and back-loaded, so an early zero doesn't mean zero. Where it exceeds half a seat's anticipated cost, the row is flagged — it is often the most decision-relevant fact about a race, and money you cannot affect.</p>
+
+<h2>Where the numbers come from</h2>
+
+<div class="tablewrap">
+<table>
+<thead><tr><th>Source</th><th>Supplies</th><th>Updated</th></tr></thead>
+<tbody>
+<tr><td>ElectIndex</td><td>Win probabilities, race ratings, candidate names and status, cash on hand, outside spending, polling averages</td><td>Nightly</td></tr>
+<tr><td>FEC bulk filings</td><td>What campaigns actually spent in 2022, giving each seat's anticipated cost; and the filing period behind the cash figures</td><td>Static / conditional</td></tr>
+</tbody>
+</table>
+</div>
+
+<p>The pipeline runs once nightly and needs no API keys or logins. Nothing paywalled is scraped.</p>
+
+<p><strong>Three different dates matter and the page states each separately.</strong> When the snapshot was built; when candidate cash on hand was last reported to the FEC (quarterly, so normally weeks old and static between deadlines); and outside spending, which is 24–48 hours fresh. Conflating them is how three-week-old figures get read as today's.</p>
+
+<h2>What it gets wrong</h2>
+
+<p>The honest list, because a number you cannot interrogate is worse than no number.</p>
+
+<ul>
+<li><strong>One forecast source.</strong> Every probability comes from a single model, so there is no cross-model disagreement to flag. That model also uses fundraising as an input, which means the score double-counts money to some unknown degree.</li>
+<li><strong>Most races have no polling at all.</strong> About half of competitive races have zero polls; those forecasts rest entirely on fundamentals. Even the best-polled Senate race gives polling only ~28% of the model's weight. Rows without polls are marked.</li>
+<li><strong>Dark money is invisible.</strong> Only filed independent expenditures are counted — not issue advocacy that never triggers a filing, nor coordinated party spending.</li>
+<li><strong>Anticipated seat cost is an estimate.</strong> It comes from what two campaigns spent in a different election. Redistricting, retirements and nationalised races all break the comparison.</li>
+<li><strong>The pace norm is soft.</strong> The middle half of 2022 campaigns fell between 12% and 44% of eventual spending banked. It is a single constant per chamber, so it cannot reorder races within a chamber — it only calibrates, and makes the House and Senate comparable — but it is not precise.</li>
+<li><strong>Independents are an assumption.</strong> Where a major party has no nominee but a serious independent is running, that candidate is counted toward the caucus of the party whose ballot line is empty. An independent is not bound to caucus with anyone.</li>
+<li><strong>Some races can't be ranked at all.</strong> Seats where a top-two primary advanced two candidates of the same party have no opponent to fund against. They still count toward the seat totals, since someone wins them.</li>
+<li><strong>Candidate quality is not modelled</strong>, and neither is anything about the candidates' politics beyond party.</li>
+</ul>
+
+<h2>What it doesn't do</h2>
+
+<p>No accounts, no tracking, no stored history, no payment processing. It collects nothing and handles no money. Links go to the FEC's own records so you can check the finance figures yourself, and any donation happens elsewhere, through the campaign.</p>
+
+<p>Contribution limits are worth knowing before you give: federal law caps individuals per candidate per election, and primary and general count separately.</p>
+
+<div class="foot">
+<p>Built as a personal project, unaffiliated with any campaign, party or committee. The party toggle works both ways by design — the same arithmetic runs whichever side you pick. Nothing here is advice about who to support.</p>
+<p><a href="/donor-advisor/">← Back to the rankings</a></p>
+</div>
+</div>
+</body>
+</html>
