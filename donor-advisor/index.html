@@ -176,12 +176,6 @@ tr.detail>td{background:#f4f2ec;border-bottom:1px solid var(--rule);padding:1.25
 .mathline{font-size:12px;color:var(--ink-3);font-variant-numeric:tabular-nums;margin-top:0.9rem;padding-top:0.75rem;border-top:1px solid var(--rule);}
 .mathline code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px;color:var(--ink-2);}
 
-/* ---------- allocation ---------- */
-.alloc{background:#f4f2ec;border:1px solid var(--rule);border-radius:2px;padding:1.5rem;margin-top:1rem;}
-.alloc ol{margin:1rem 0 0;padding-left:1.4rem;font-size:14px;}
-.alloc li{margin-bottom:0.35rem;}
-.alloc li .amt{font-weight:600;font-variant-numeric:tabular-nums;}
-.alloc .leftover{font-size:13px;color:var(--ink-3);margin-top:0.9rem;}
 
 .note{font-size:13px;color:var(--ink-3);max-width:72ch;}
 .foot{margin-top:4rem;padding-top:1.5rem;border-top:1px solid var(--rule);font-size:12.5px;color:var(--ink-3);}
@@ -254,11 +248,7 @@ details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1
         <option value="state">State A–Z</option>
       </select>
     </div>
-    <div class="ctl">
-      <label for="f-budget">Budget ($)</label>
-      <input id="f-budget" type="number" min="0" step="100" placeholder="e.g. 1000">
     </div>
-  </div>
 </div>
 
 <div class="summary" id="summary"></div>
@@ -272,7 +262,7 @@ details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1
       <th>Seat</th>
       <th>Posture<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="posture" aria-label="What does posture mean?">i</button></th>
       <th class="num">Win prob.<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="prob" aria-label="How is win probability calculated?">i</button></th>
-      <th class="num">Funding gap<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="gap" aria-label="How is the funding gap calculated?">i</button></th>
+      <th class="num">Cash position<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="gap" aria-label="How is the cash position calculated?">i</button></th>
       <th>Control tier<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="tier" aria-label="What is the control tier?">i</button></th>
       <th class="num">Score<button class="why" type="button" aria-expanded="false" aria-haspopup="dialog" data-why="score" aria-label="How is the score calculated?">i</button></th>
     </tr></thead>
@@ -280,8 +270,6 @@ details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1
   </table>
 </div>
 <p class="empty" id="empty" style="display:none">No races match these filters.</p>
-
-<div id="alloc-host"></div>
 
 <h2>How the score works</h2>
 <p class="note">Every factor is bounded 0–1, so the product is a real 0–100 index that is comparable across chambers and across days. Scores cluster well below 100 by construction — a 55 is a strong result, not a mediocre one.</p>
@@ -291,7 +279,7 @@ details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1
     <li><strong>"Seats in doubt"</strong> — every House seat is contested every two years, so this is not a count of elections. From the selected party's point of view each seat is sorted by forecast win probability into <em>near-certain</em> (95% or better), <em>in doubt</em> (between 5% and 95%), or <em>out of reach</em> (5% or less). Only the middle group can realistically change the arithmetic, and only those are ranked here. The Senate figure also folds in the 65 seats not on the 2026 ballot, since they still count toward 51.</li>
     <li><strong>Closeness</strong> — <code>4 × p × (1 − p)</code>, peaking at a 50/50 race. Raw win probability would reward near-certain outcomes, where money changes nothing.</li>
     <li><strong>Control tier</strong> — every seat is ranked by closeness, then banded by where it falls relative to the number still needed for a majority. Seats a party already holds are included, so defending a coin-flip seat counts exactly as much as winning one.</li>
-    <li><strong>Funding need</strong> — half from how far behind the pace the campaign is (cash on hand now against what the leading campaigns in this seat had banked at the equivalent filing two years ago, inflation-adjusted), half from how it compares to its opponent's cash on hand today. The second half is expressed as a share rather than a ratio, so an unfunded opponent can't send it to infinity. Measuring at the same point in both cycles matters: any comparison of a July balance to a full cycle's spending overstates the gap early and shrinks through the year, drifting for reasons unrelated to the races.</li>
+    <li><strong>Cash need</strong> — both halves measure <em>cash on hand</em> and nothing else, because money already spent has already done its work and is priced into the win probability. Half is <em>pace</em>: the bank balance as a share of the seat's anticipated full-cycle cost, divided by the share campaigns in that chamber typically had banked at this same filing in the last midterm. Half is the <em>head-to-head</em>: the opponent's share of the combined war chest, expressed as a share rather than a ratio so an unfunded opponent can't send it to infinity. Pace exists because a head-to-head alone is blind to scale — two campaigns with $90k apiece and two with $8M apiece are both "even," but a donation means something very different in each.</li>
     <li><strong>Outside spending</strong> — independent expenditures adjust funding need by ±25–50%, discounted by half because outside groups pay market ad rates while candidates get the lowest unit charge. Bounded deliberately: it's money you cannot affect, cumulative spending rather than cash in hand, and heavily back-loaded.</li>
     <li><strong>Viability</strong> — damps candidates who have raised almost nothing. Without it, a campaign with $0 raised scores highest of all, which is backwards: that's usually a non-campaign, not a bargain. This one deliberately uses <em>total raised</em> rather than cash on hand, because money raised is never un-raised — it measures whether a real campaign exists, while cash on hand measures what's left to spend.</li>
     <li><strong>Not included:</strong> dark money and issue advocacy that never triggers a filing, party coordinated spending, candidate quality, or anything about the candidates' politics beyond party.</li>
@@ -302,9 +290,8 @@ details.method ul{font-size:13px;color:var(--ink-3);max-width:74ch;line-height:1
 </div>
 
 <script>
-const CAP = 3500; // assumed 2026 individual per-candidate, per-election limit
 const IE_EFFICIENCY = 0.5, W_OWN = 0.5, W_REL = 0.5, VIA_FLOOR = 0.10;
-const state = {party:'D', chamber:'both', posture:'', tier:'', st:'', sort:'score', budget:null};
+const state = {party:'D', chamber:'both', posture:'', tier:'', st:'', sort:'score'};
 let DATA = null;
 
 const fmtM = v => v>=1e6 ? '$'+(v/1e6).toFixed(1)+'M' : v>=1e3 ? '$'+Math.round(v/1e3)+'k' : '$'+Math.round(v);
@@ -324,35 +311,34 @@ function factors(r, party){
   const raiO = party==='D' ? r.raised_rep : r.raised_dem;
   const ieUs = party==='D' ? r.out_dem : r.out_rep;
   const ieTh = party==='D' ? r.out_rep : r.out_dem;
-  // own_shortfall is measured against a POINT-IN-TIME benchmark: what the two
-  // leading campaigns in this seat had banked at the equivalent FEC filing two
-  // years earlier, inflation-adjusted. Cash on hand now vs cash on hand then is
-  // genuinely like-for-like.
+  // Both halves of funding need now have CASH ON HAND in the numerator, and
+  // nothing else. Money already raised and spent is sunk, and its effect is
+  // already priced into the win probability — counting it again here would be
+  // double-counting. What is not yet in the forecast is money still in the bank.
   //
-  // Both earlier versions were unit mismatches. Cash on hand against a
-  // full-cycle spending total compared a single moment to a whole cycle, and
-  // punished anyone who had just spent money winning a primary. Total raised
-  // against that same total was milder but still wrong: in July a campaign has
-  // banked only part of what it ever will, so the shortfall was overstated
-  // early and shrank as the cycle ran, drifting for reasons unrelated to the
-  // races.
+  // 1. completion / pace — how far along this campaign is toward the seat's
+  //    anticipated full-cycle cost, divided by how far along campaigns in this
+  //    chamber typically were at this same filing. The pace reference is a
+  //    chamber-wide constant, so it cannot reorder races within a chamber; it
+  //    only calibrates, and makes House and Senate comparable.
+  // 2. share — the head-to-head. What decides the closing months is simply who
+  //    still has money to spend.
   //
-  // `bench` is null for seats with no usable prior filing (new or redistricted),
-  // where we fall back to receipts against the full-cycle target.
-  const benchBasis = r.bench > 0;
-  const aOwn = benchBasis ? clamp(cohS/r.bench, 0, 2) : clamp(raiS/tgt, 0, 2);
-  // relative_deficit stays a head-to-head on CASH ON HAND: what decides the
-  // closing months is who still has money to spend. Being a ratio between the
-  // two candidates, it is internally consistent either way.
+  // History supplies exactly two things: the seat's anticipated total, and the
+  // pace constant. Total raised survives only in the viability floor below.
+  const completion = tgt > 0 ? cohS / tgt : 0;
+  const paceRef = r.pace_ref || null;
+  const pace = paceRef ? completion / paceRef : null;
+  const own = pace === null ? clamp(1 - clamp(raiS/tgt,0,2), 0, 1)
+                            : clamp(1 - clamp(pace, 0, 2), 0, 1);
   const aS = clamp(cohS/tgt,0,2), aO = clamp(cohO/tgt,0,2);
-  const own = clamp(1-aOwn,0,1);
-  const rel = (aS+aO)===0 ? 0.5 : aO/(aS+aO);
+  const rel = (cohS+cohO)===0 ? 0.5 : cohO/(cohS+cohO);
   const rawNeed = W_OWN*own + W_REL*rel;
   const ieNet = IE_EFFICIENCY*(ieTh-ieUs)/tgt;
   const ieAdj = clamp(1+0.5*ieNet, 0.75, 1.5);
   const need = clamp(rawNeed*ieAdj, 0, 1);
   const via = Math.sqrt(clamp(raiS/(VIA_FLOOR*tgt),0,1));
-  return {p, lev, need, rawNeed, ieAdj, ieNet, via, aS, aO, aOwn, benchBasis, own, rel, tgt,
+  return {p, lev, need, rawNeed, ieAdj, ieNet, via, aS, aO, completion, pace, paceRef, own, rel, tgt,
           cohS, cohO, raiS, ieUs, ieTh,
           raiO,
           defend: r.held_by===party,
@@ -478,11 +464,9 @@ function renderRows(rows){
     const {r,f} = x;
     const ourName = state.party==='D' ? r.dem : r.rep;
     const oppName = state.party==='D' ? r.rep : r.dem;
-    // Shortfall against whichever basis actually scored the race, so the number
-    // in the column and the number in the score never disagree.
-    const gapDollars = f.benchBasis
-      ? Math.max(0, r.bench - f.cohS)
-      : Math.max(0, f.tgt - f.raiS);
+    // Behind the opponent, in dollars of cash on hand — a present-tense number
+    // that matches what the score's head-to-head half measures.
+    const gapDollars = Math.max(0, f.cohO - f.cohS);
     const ieFlag = Math.abs(f.ieTh-f.ieUs) > 0.5*f.tgt;
     const ourInd = r.ind_side === state.party;
     return `<tr class="race" data-i="${i}" tabindex="0" role="button" aria-expanded="false">
@@ -490,7 +474,9 @@ function renderRows(rows){
       <td><span class="seat">${esc(seatLabel(r))}</span>${r.ind_side?' <span class="tag ind">Ind.</span>':''}<br><span class="cands">${esc(ourName)}${ourInd?' (I)':''} vs. ${esc(oppName)}${r.ind_side && !ourInd?' (I)':''}</span></td>
       <td class="posture"><span class="tag ${f.defend?'defend':'flip'}">${f.defend?'Defend':'Flip'}</span></td>
       <td class="num">${pct(f.p)}${r.polls===0?'<br><span class="soft">no polls</span>':''}</td>
-      <td class="num">${f.gap ? '<span class="warn">no data</span>' : fmtM(gapDollars)+' short'}${ieFlag?'<br><span class="warn">outside $</span>':''}</td>
+      <td class="num">${f.gap ? '<span class="warn">no data</span>'
+        : gapDollars > 0 ? fmtM(gapDollars)+' behind'
+        : '<span class="soft">ahead</span>'}${ieFlag?'<br><span class="warn">outside $</span>':''}</td>
       <td><span class="tier"><b>${x.tier}</b></span></td>
       <td class="num"><span class="scorecell" style="color:${colour}">
         <span class="sparkline"><i style="width:${(x.score/max*100).toFixed(0)}%"></i></span>
@@ -513,19 +499,18 @@ function detailHTML(x){
   return `${indNote}<div class="dgrid">
     <dl>
       <dt>${esc(ourName)}${r.ind_side===state.party?' (independent)':''} — the candidate you'd fund</dt>
-      <dd>Cash on hand <span class="n">${fmtD(f.cohS)}</span> · raised <span class="n">${fmtD(f.raiS)}</span> this cycle${ourStatus && ourStatus!=='confirmed' ? ` · <em>${esc(ourStatus)} nominee</em>` : ''}</dd>
-      <dd>${f.benchBasis
-        ? `That's <strong><span class="n">${pct(f.aOwn)}</span> of the pace</strong> set here last cycle — the two leading campaigns in this seat held <span class="n">${fmtD(r.bench)}</span> at the same point in 2024, in today's dollars.`
-        : `<em>No comparable 2024 filing for this seat</em>, so pace is unavailable; measured instead against the full-cycle target below, where it sits at <span class="n">${pct(f.aOwn)}</span>.`}</dd>
+      <dd>Cash on hand <span class="n">${fmtD(f.cohS)}</span>${ourStatus && ourStatus!=='confirmed' ? ` · <em>${esc(ourStatus)} nominee</em>` : ''}</dd>
+      <dd>${f.pace===null
+        ? `<em>No pace reference for this chamber</em>, so the shortfall falls back to receipts against the anticipated total.`
+        : `That's <strong><span class="n">${pct(f.completion)}</span></strong> of this seat's anticipated cost banked. Campaigns in the ${r.chamber==='senate'?'Senate':'House'} typically held <span class="n">${pct(f.paceRef)}</span> by this point in the last midterm — <strong>${f.pace>=1.15?'ahead of':f.pace>=0.85?'about level with':f.pace>=0.5?'behind':'well behind'} the usual pace</strong> (<span class="n">${f.pace.toFixed(2)}×</span>).`}</dd>
+      <dd style="color:var(--ink-3)">Raised <span class="n">${fmtD(f.raiS)}</span> this cycle — shown for context; it doesn't enter the shortfall.</dd>
       <dt>${esc(oppName)}</dt>
-      <dd>Cash on hand <span class="n">${fmtD(f.cohO)}</span> · raised <span class="n">${fmtD(f.raiO)}</span></dd>
+      <dd>Cash on hand <span class="n">${fmtD(f.cohO)}</span> — <span class="n">${pct(f.rel)}</span> of the two campaigns' combined war chest</dd>
     </dl>
     <dl>
-      <dt>What this seat costs</dt>
-      <dd><strong>Pace benchmark:</strong> ${f.benchBasis
-        ? `<span class="n">${fmtD(r.bench)}</span> banked at this point in 2024 — the measure used to score the shortfall, because cash on hand now against cash on hand then is a like-for-like comparison.`
-        : `<em>unavailable for this seat</em>.`}</dd>
-      <dd><strong>Full cycle:</strong> <span class="n">${fmtD(f.tgt)}</span>, from the top two spenders here in 2022 and 2024, inflated to 2026 and weighted for how competitive the seat is (${esc(r.rating)}).${r.no_history?' <em>No history for this seat — chamber median used.</em>':''}</dd>
+      <dt>What this seat is expected to cost</dt>
+      <dd><span class="n">${fmtD(f.tgt)}</span> for the full cycle — what the top two spenders here actually spent in 2022, in today's dollars. 2022 rather than 2024 because 2026 is a midterm, and presidential-year money behaves differently.${r.no_history?' <em>No history for this seat — chamber median used.</em>':''}</dd>
+      <dd style="color:var(--ink-3)">Rated ${esc(r.rating)}. The rating no longer scales this figure: how close the race is already enters the score through closeness, so scaling the cost by it too was counting the same fact twice.</dd>
       <dt>Outside spending</dt>
       <dd>${(f.ieUs+f.ieTh)===0
         ? 'None reported yet. Most independent expenditure lands after Labor Day.'
@@ -553,34 +538,12 @@ function detailHTML(x){
   <p class="mathline"><code>${x.score.toFixed(1)} = 100 × ${f.lev.toFixed(2)} closeness × ${x.mult.toFixed(2)} tier × ${f.need.toFixed(2)} need × ${f.via.toFixed(2)} viability</code></p>`;
 }
 
-function renderAlloc(rows){
-  const host = document.getElementById('alloc-host');
-  const b = state.budget;
-  if (!b || b<=0 || !rows.length){ host.innerHTML=''; return; }
-  let remaining = b; const plan = [];
-  for (const x of rows){
-    if (remaining<=0) break;
-    const give = Math.min(CAP, remaining);
-    plan.push([x, give]); remaining -= give;
-  }
-  host.innerHTML = `<h2>Putting ${fmtD(b)} to work</h2>
-  <div class="alloc">
-    <p class="note" style="margin-top:0">Because any lawful individual donation is small next to what these races cost, a dollar's value doesn't fall off within a race — so the arithmetic favors filling the top-ranked race to the legal maximum, then the next. Splitting more widely is a perfectly reasonable choice; it just isn't what the score optimizes.</p>
-    <ol>${plan.map(([x,give]) => {
-      const nm = state.party==='D' ? x.r.dem : x.r.rep;
-      return `<li><span class="amt">${fmtD(give)}</span> — ${esc(nm)}, ${esc(seatLabel(x.r))} <span style="color:var(--ink-3)">(score ${x.score.toFixed(0)}${give===CAP?', at the per-candidate cap':''})</span></li>`;
-    }).join('')}</ol>
-    ${remaining>0?`<p class="leftover">${fmtD(remaining)} left over — you've reached the cap on every race matching your filters. Widen the filters to place the rest.</p>`:''}
-    <p class="leftover">Assumes a ${fmtD(CAP)} per-candidate, per-election federal limit for 2026 — <strong>verify the current indexed figure before giving</strong>, and note the primary and general count separately. This page processes nothing and collects nothing; it just points.</p>
-  </div>`;
-}
 
 function render(){
   const per = computeAll();
   renderSummary(per);
   const rows = visibleRows(per);
   renderRows(rows);
-  renderAlloc(rows);
 }
 
 /* One plain-English sentence naming why a race scores what it does.
@@ -625,9 +588,7 @@ function verdict(x){
         ? `even losing this seat wouldn't decide who controls the chamber, so it matters less than races nearer the threshold.`
         : `even winning this seat wouldn't decide who controls the chamber, so it matters less than races nearer the threshold.`);
     case 'need':
-      return cap(f.benchBasis
-        ? `your candidate is at or ahead of the pace winning campaigns here set at this point last cycle, so an extra dollar buys less than it would somewhere still behind.`
-        : `your candidate has already raised close to what this seat historically costs to win, so an extra dollar buys less here than somewhere starved of it.`);
+      return cap(`your candidate already has a healthy war chest — at or ahead of the usual pace for this chamber, and not badly outgunned — so an extra dollar buys less here than somewhere still short of money.`);
     case 'via':
       return cap(`this campaign has raised so little so far that it isn't clear it's a functioning operation — the shortfall may reflect a candidacy that never got going rather than an opportunity.`);
   }
@@ -643,11 +604,14 @@ const WHY = {
     <p>The chance that <em>the party you selected</em> wins this seat — the chance of holding it for a seat they already have, of flipping it for one they don't.</p>
     <p>It comes from ElectIndex's 2026 model, which blends a recency- and quality-weighted polling average with race fundamentals. Expand any row to see the poll count behind it; several races rest on one poll or none.</p>
     <p class="fine">This is <em>not</em> what drives the score. A 90% race is nearly settled, so money moves it less — the score uses closeness instead, which peaks at 50/50. Two caveats worth carrying: every probability here comes from a single model, so there's no cross-model disagreement to flag, and that model already uses fundraising as an input — meaning the score double-counts money to some unknown degree.</p>`},
-  gap: {t:'Funding gap', h:`
-    <p>How far behind <strong>the pace</strong> this campaign is: its cash on hand now, against what the two leading campaigns in the same seat had banked at the <em>equivalent FEC filing two years earlier</em>, in today's dollars.</p>
-    <p>Measuring at the same point in both cycles is the whole trick. A July balance means nothing against a full cycle's spending — a campaign in July has raised only part of what it ever will, so any comparison to a cycle total overstates the shortfall early and quietly shrinks as the year goes on, moving the rankings for reasons that have nothing to do with the races. Against a July-to-July benchmark, a campaign 40% of the way to its eventual total is compared with one that was also 40% of the way.</p>
-    <p>The score's second half is a <strong>head-to-head on cash on hand</strong> against the opponent, because what decides the closing months is simply who still has money to spend.</p>
-    <p class="fine">The benchmark comes from the top two spenders in that seat, not the winner: the FEC's election-result field is unpopulated in bulk data, so winners can't be identified reliably. For a handful of new or redistricted seats with no comparable 2024 filing, the score falls back to total raised against a full-cycle target, and the row says so.</p>
+  gap: {t:'Cash position', h:`
+    <p>The column shows how far behind the opponent this campaign is in <strong>cash on hand</strong> — money still in the bank, not money already raised and spent.</p>
+    <p>That distinction is the point. Everything a campaign has already spent has done its work, and its effect is <em>already inside the win probability</em> — this model even takes fundraising as an input. Counting past money again as a resource would be double-counting it. What isn't yet reflected anywhere is what's still in the bank.</p>
+    <p>The score combines two readings of that balance:</p>
+    <p><strong>Pace.</strong> Cash on hand as a share of what this seat is expected to cost for the full cycle, divided by the share campaigns in this chamber typically had banked at this same filing in the last midterm (24% in the House, 40% in the Senate). A war chest in July is under construction; pace asks whether it's being built at a rate that historically produced a competitive campaign.</p>
+    <p><strong>Head-to-head.</strong> The opponent's share of the two campaigns' combined war chest — because what decides the closing months is simply who still has money to spend.</p>
+    <p class="fine">Why both, rather than the head-to-head alone: a ratio is blind to scale. Two campaigns with $90k each and two with $8M each are both "evenly matched," but $3,500 is a meaningful fraction of the first race and a rounding error in the second — and across these races the combined war chests span a 1,900-fold range. Pace supplies the missing sense of size, seat by seat, so a modest war chest in a cheap district isn't mistaken for poverty.</p>
+    <p class="fine">The pace reference is a soft number — the middle half of 2022 campaigns fell between 12% and 44% — but it's a single constant per chamber, so it cannot reorder races within a chamber. It only sets calibration and makes the House and Senate comparable.</p>
     <p class="fine">An <strong>outside $</strong> flag means independent expenditure in this race exceeds half the seat's target — often the most important fact about a race, and money no individual donation can counter. Candidate cash on hand is only as current as the last FEC filing deadline (the exact date is in the footer), so it is normally weeks old and static between deadlines; outside spending is reported within 24–48 hours and moves far faster.</p>`},
   tier: {t:'Control tier', h:`
     <p>Where this seat sits on the path to a majority — the part of the score that asks whether winning it would actually change who runs the chamber.</p>
@@ -745,7 +709,6 @@ function toggle(row){
 const bind = (id, key, cast=v=>v) =>
   document.getElementById(id).addEventListener('input', e => { state[key]=cast(e.target.value); render(); });
 bind('f-posture','posture'); bind('f-tier','tier'); bind('f-state','st'); bind('f-sort','sort');
-bind('f-budget','budget', v => v===''?null:Number(v));
 
 /* ---------- boot ---------- */
 // cache:'no-cache' revalidates against the server (ETag) instead of trusting a
