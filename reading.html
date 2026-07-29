@@ -14,31 +14,43 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 .site-nav a{color:#bbb;text-decoration:none;}
 .site-nav a:hover{color:#1c1c1a;}
 .reading-intro{font-size:17px;line-height:1.7;color:#666;margin-bottom:3rem;}
-.shelf-label{font-family:system-ui,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin:0 0 1.5rem;}
-.book{display:flex;gap:1.25rem;padding:1.75rem 0;border-top:1px solid #e5e1d9;}
-.book-cover{width:64px;flex-shrink:0;}
-.book-cover img{width:100%;border-radius:2px;box-shadow:0 1px 4px rgba(0,0,0,0.12);display:block;}
+.shelf-label{font-family:system-ui,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin:0 0 1.25rem;}
+.book{display:flex;gap:1.5rem;padding:2rem 0;border-top:1px solid #e5e1d9;}
+.book:last-child{border-bottom:1px solid #e5e1d9;}
+.book-cover{width:120px;flex-shrink:0;}
+.book-cover img{width:100%;border-radius:2px;box-shadow:0 2px 8px rgba(0,0,0,0.14);display:block;}
 .book-cover .no-cover{width:100%;aspect-ratio:2/3;background:#eeeae2;border-radius:2px;}
 .book-main{flex:1;min-width:0;}
-.book-title{font-size:20px;line-height:1.3;margin:0 0 0.2rem;}
-.book-author{font-size:16px;color:#777;font-style:italic;margin:0 0 0.5rem;}
+.book-title{font-size:21px;line-height:1.3;margin:0 0 0.2rem;font-weight:400;}
+.book-author{font-size:16px;color:#888;font-style:italic;margin:0 0 0.5rem;}
 .book-meta{font-family:system-ui,sans-serif;font-size:11px;color:#bbb;letter-spacing:0.04em;margin:0;}
-.progress{height:2px;background:#e5e1d9;margin:0.75rem 0 0;max-width:180px;}
+.progress{height:2px;background:#e5e1d9;margin:0.8rem 0 0;max-width:180px;}
 .progress span{display:block;height:100%;background:#c9c2b4;}
-.book-section{margin-top:1.5rem;}
+.book-section{margin-top:1.4rem;}
 .book-section h3{font-family:system-ui,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#bbb;margin:0 0 0.6rem;}
 .book-section p{font-size:17px;line-height:1.75;margin-bottom:1em;}
+.book-section p:last-child{margin-bottom:0;}
+/* Highlights fold away, because a book with a dozen of them would otherwise
+   push every entry after it off the page. The row itself stays whole. */
+.highlights{margin-top:0.8rem;}
+/* The vertical padding is the tap target, not decoration: the label alone is
+   13px tall, which is far too small to hit reliably on a phone. */
+.highlights>summary{font-family:system-ui,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#bbb;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:0.45rem;padding:0.6rem 0.9rem 0.6rem 0;}
+.highlights>summary::-webkit-details-marker{display:none;}
+.highlights>summary::marker{content:"";}
+.highlights>summary:hover{color:#1c1c1a;}
+.highlights>summary::after{content:"+";font-size:13px;line-height:1;color:#ccc;}
+.highlights[open]>summary::after{content:"\2013";}
+.highlights-body{margin-top:0.9rem;}
 .highlight{margin:0 0 1.1rem;padding-left:1.1rem;border-left:2px solid #e5e1d9;}
+.highlight:last-child{margin-bottom:0;}
 .highlight p{font-size:16px;line-height:1.7;color:#444;font-style:italic;margin:0;}
 .highlight .hl-loc{font-family:system-ui,sans-serif;font-size:10px;font-style:normal;color:#ccc;letter-spacing:0.04em;margin-top:0.3rem;}
 .highlight .hl-note{font-size:15px;font-style:normal;color:#888;margin-top:0.4rem;}
 .empty-note{font-size:16px;color:#bbb;font-style:italic;}
-.read-list{list-style:none;margin-top:0.5rem;}
-.read-item{display:flex;align-items:baseline;justify-content:space-between;padding:0.7rem 0;border-bottom:1px solid #e5e1d9;}
-.read-item:first-child{border-top:1px solid #e5e1d9;}
-.read-title{font-size:16px;}
-.read-title em{color:#888;font-size:15px;}
-.read-date{font-family:system-ui,sans-serif;font-size:11px;color:#ccc;white-space:nowrap;margin-left:1.5rem;flex-shrink:0;}
+@media (max-width:560px){.book{gap:1.1rem;padding:1.6rem 0;}
+.book-cover{width:88px;}
+.book-title{font-size:19px;}}
 </style>
 </head>
 <body>
@@ -55,9 +67,27 @@ notes added whenever I have some. Less a review shelf than a record.</p>
 <p class="book-author">Ocean Vuong</p>
 <p class="book-meta">started June 12, 2025 · epub</p>
 <div class="progress"><span style="width:14%"></span></div>
-<p class="empty-note">No notes yet.</p></div>
+</div>
 </article>
-<p class="shelf-label" style="margin-top:4rem">Read</p>
+<p class="shelf-label" style="margin-top:3.5rem">Read</p>
+<article class="book">
+<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1450653428l/25893709.jpg" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">My Name Is Lucy Barton</h2>
+<p class="book-author">Elizabeth Strout</p>
+<p class="book-meta">finished July 28, 2026</p>
+
+</div>
+</article>
+<article class="book">
+<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1636978687l/58784475._SY475_.jpg" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Tomorrow, and Tomorrow, and Tomorrow</h2>
+<p class="book-author">Gabrielle Zevin</p>
+<p class="book-meta">finished July 23, 2026 · epub</p>
+
+</div>
+</article>
 <article class="book">
 <div class="book-cover"><img src="https://readwise-assets.s3.amazonaws.com/media/reader/parsed_document_assets/474880167/h4fQ2_K5BISkYESqHzuSWwgFUURaKs_OQyPoA3GjXLA-cove_syrKRgy.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
@@ -65,8 +95,7 @@ notes added whenever I have some. Less a review shelf than a record.</p>
 <p class="book-author">Solvej Balle</p>
 <p class="book-meta">finished July 13, 2026 · epub</p>
 
-<div class="book-section"><h3>Highlights</h3><blockquote class="highlight"><p>Those were strange days. We woke in the morning, we went for walks, we sat down and had coffee somewhere on the eighteenth of November. For most of the day as intimately aware of one another as couples in the first flush of love or nearsighted creatures. We made the horizon vanish. We sought this giddy feeling. The distance between us was dispelled in the fog. We made the giddiness a part of our day. Created a bright space out of dazed, gray confusion.</p><p class="hl-loc">loc. 91829</p></blockquote></div>
-</div>
+<details class="highlights"><summary>1 highlight</summary><div class="highlights-body"><blockquote class="highlight"><p>Those were strange days. We woke in the morning, we went for walks, we sat down and had coffee somewhere on the eighteenth of November. For most of the day as intimately aware of one another as couples in the first flush of love or nearsighted creatures. We made the horizon vanish. We sought this giddy feeling. The distance between us was dispelled in the fog. We made the giddiness a part of our day. Created a bright space out of dazed, gray confusion.</p><p class="hl-loc">loc. 91829</p></blockquote></div></details></div>
 </article>
 <article class="book">
 <div class="book-cover"><img src="https://readwise-assets.s3.amazonaws.com/media/reader/parsed_document_assets/474880184/wxbNc19ZDid2OgAGmfOnOeB11GaX62uBTcQP-t-6IjM-cove_lCh4ASh.jpg" alt="" loading="lazy"></div>
@@ -75,20 +104,64 @@ notes added whenever I have some. Less a review shelf than a record.</p>
 <p class="book-author">Oliver Harris</p>
 <p class="book-meta">finished July 11, 2026 · epub</p>
 
-<div class="book-section"><h3>Highlights</h3><blockquote class="highlight"><p>“A city changes faster than a human heart,”</p><p class="hl-loc">loc. 461198</p></blockquote>
+<details class="highlights"><summary>3 highlights</summary><div class="highlights-body"><blockquote class="highlight"><p>“A city changes faster than a human heart,”</p><p class="hl-loc">loc. 461198</p></blockquote>
 <blockquote class="highlight"><p>You could measure where you were in Central Asia by the noodles, which thinned as you approached the Altai Mountains and China.</p><p class="hl-loc">loc. 471771</p></blockquote>
-<blockquote class="highlight"><p>I had joined as a gesture against the comfort of the college, the equation of learning with physical ease. And because it seemed an entirely unlikely thing to do. The training felt like the shedding of skin, which reminded me of learning a language.</p><p class="hl-loc">loc. 476779</p></blockquote></div>
+<blockquote class="highlight"><p>I had joined as a gesture against the comfort of the college, the equation of learning with physical ease. And because it seemed an entirely unlikely thing to do. The training felt like the shedding of skin, which reminded me of learning a language.</p><p class="hl-loc">loc. 476779</p></blockquote></div></details></div>
+</article>
+<article class="book">
+<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1352997328l/5826.jpg" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Bel Canto</h2>
+<p class="book-author">Ann Patchett</p>
+<p class="book-meta">finished June 23, 2026 · epub</p>
+
 </div>
 </article>
-<p class="shelf-label" style="margin-top:4rem">Also read</p>
-<ul class="read-list"><li class="read-item"><span class="read-title">My Name Is Lucy Barton <em>Elizabeth Strout</em></span><span class="read-date">July 28, 2026</span></li>
-<li class="read-item"><span class="read-title">Tomorrow, and Tomorrow, and Tomorrow <em>Gabrielle Zevin</em></span><span class="read-date">July 23, 2026</span></li>
-<li class="read-item"><span class="read-title">Bel Canto <em>Ann Patchett</em></span><span class="read-date">June 23, 2026</span></li>
-<li class="read-item"><span class="read-title">My Brilliant Friend <em>Elena Ferrante</em></span><span class="read-date">June 23, 2026</span></li>
-<li class="read-item"><span class="read-title">The Maidens <em>Alex Michaelides</em></span><span class="read-date">June 21, 2026</span></li>
-<li class="read-item"><span class="read-title">The Plot Against America <em>Philip Roth</em></span><span class="read-date">June 11, 2026</span></li>
-<li class="read-item"><span class="read-title">The Year of Magical Thinking <em>Joan Didion</em></span><span class="read-date">June 11, 2026</span></li>
-<li class="read-item"><span class="read-title">Stone Yard Devotional <em>Charlotte  Wood</em></span><span class="read-date">June 1, 2026</span></li></ul>
+<article class="book">
+<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1493655783l/35036409.jpg" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">My Brilliant Friend</h2>
+<p class="book-author">Elena Ferrante</p>
+<p class="book-meta">finished June 23, 2026 · audiobook</p>
+
+</div>
+</article>
+<article class="book">
+<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1608557750l/45300567.jpg" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">The Maidens</h2>
+<p class="book-author">Alex Michaelides</p>
+<p class="book-meta">finished June 21, 2026 · audiobook</p>
+
+</div>
+</article>
+<article class="book">
+<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1385379350l/18944260.jpg" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">The Plot Against America</h2>
+<p class="book-author">Philip Roth</p>
+<p class="book-meta">finished June 11, 2026 · print</p>
+
+</div>
+</article>
+<article class="book">
+<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1703310133l/7815._SY475_.jpg" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">The Year of Magical Thinking</h2>
+<p class="book-author">Joan Didion</p>
+<p class="book-meta">finished June 11, 2026 · audiobook</p>
+
+</div>
+</article>
+<article class="book">
+<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1725821632l/168632462._SY475_.jpg" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Stone Yard Devotional</h2>
+<p class="book-author">Charlotte  Wood</p>
+<p class="book-meta">finished June 1, 2026 · epub</p>
+
+</div>
+</article>
 </div>
 </body>
 </html>
