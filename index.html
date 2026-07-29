@@ -19,12 +19,22 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 .post-title{font-size:17px;font-weight:400;color:#1c1c1a;text-decoration:none;line-height:1.35;}
 .post-title:hover{color:#999;}
 .post-date{font-family:system-ui,sans-serif;font-size:11px;color:#ccc;white-space:nowrap;margin-left:2rem;flex-shrink:0;}
+.now-reading{margin-bottom:3rem;padding-bottom:1.75rem;border-bottom:1px solid #e5e1d9;}
+.now-reading .shelf-label{font-family:system-ui,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin:0 0 0.9rem;}
+.nr-item{display:flex;align-items:baseline;gap:0.5rem;font-size:16px;line-height:1.6;}
+.nr-item + .nr-item{margin-top:0.35rem;}
+.nr-item em{color:#888;font-size:15px;}
+.nr-more{font-family:system-ui,sans-serif;font-size:11px;color:#ccc;text-decoration:none;letter-spacing:0.04em;display:inline-block;margin-top:0.9rem;}
+.nr-more:hover{color:#1c1c1a;}
 </style>
 </head>
 <body>
 <div class="page">
 <a class="wordmark" href="/">when where howe</a>
-<nav class="site-nav"><a href="/">writings</a><a href="/nowplaying.html">now playing</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
+<nav class="site-nav"><a href="/">writings</a><a href="/reading.html">reading</a><a href="/nowplaying.html">now playing</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
+<section class="now-reading"><p class="shelf-label">Now reading</p>
+<p class="nr-item">On Earth We&#x27;re Briefly Gorgeous <em>Ocean Vuong</em></p>
+<a class="nr-more" href="/reading.html">the shelf →</a></section>
 <ul class="post-list">
 
 </ul>
