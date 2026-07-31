@@ -14,6 +14,18 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 .site-nav a{color:#bbb;text-decoration:none;}
 .site-nav a:hover{color:#1c1c1a;}
 .reflection-art{width:100%;max-width:320px;display:block;margin-bottom:2rem;image-rendering:pixelated;}
+.reflection-art-wrap{position:relative;width:100%;max-width:320px;margin-bottom:2rem;}
+.reflection-art-wrap .reflection-art{margin-bottom:0;}
+.reflection-art-full{position:absolute;inset:0;max-width:none;height:100%;image-rendering:auto;opacity:0;transition:opacity 0.45s ease;pointer-events:none;}
+/* One square of the pixel grid, top right. Sized inline, from PIXEL_GRID.
+   Deliberately unmarked — no ring, no tint. The square is found by
+   wandering the cursor over the art, and an outline that blinks on as you
+   pass through reads as a rendering artifact rather than an invitation. */
+.reflection-art-hotspot{position:absolute;top:0;right:0;z-index:2;padding:0;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.reflection-art-hotspot:hover~.reflection-art-full,
+.reflection-art-hotspot:focus-visible~.reflection-art-full{opacity:1;}
+.reflection-art-wrap.revealed .reflection-art-full{opacity:1;}
+@media (prefers-reduced-motion: reduce){.reflection-art-full{transition:none;}}
 .essay-meta{font-family:system-ui,sans-serif;font-size:12px;color:#bbb;margin-bottom:1.25rem;letter-spacing:0.04em;}
 .essay-title{font-size:30px;font-weight:400;line-height:1.25;margin-bottom:2rem;color:#1c1c1a;}
 .rule{border:none;border-top:1px solid #e5e1d9;margin-bottom:2.5rem;}
@@ -27,8 +39,13 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 <body>
 <div class="page">
 <a class="wordmark" href="/">when where howe</a>
-<nav class="site-nav"><a href="/reading.html">reading</a><a href="/nowplaying.html">now playing</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
+<nav class="site-nav"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
+<div class="reflection-art-wrap">
 <img class="reflection-art" src="/autobiodiscography/boards-of-canada-geogaddi.jpg" alt="Boards Of Canada — Geogaddi">
+<button class="reflection-art-hotspot" type="button" style="width:10.0%;height:10.0%"
+        aria-label="Reveal the cover for Boards Of Canada — Geogaddi" title="Reveal the cover"></button>
+<img class="reflection-art reflection-art-full" src="/autobiodiscography/boards-of-canada-geogaddi-full.jpg" alt="" aria-hidden="true">
+</div>
 <p class="essay-meta">Boards Of Canada</p>
 <h1 class="essay-title">Geogaddi</h1>
 <hr class="rule">
@@ -40,5 +57,17 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 </div>
 <a class="back-link" href="/autobiodiscography.html">autobiodiscography</a>
 </div>
+<script>
+// Hover on the hotspot handles the mouse; this handles tap, where there's no
+// hover to lean on. Toggling rather than press-and-hold, so a tap that
+// reveals the cover can be undone with a second tap. The button element
+// covers the keyboard on its own (Enter and Space both fire click).
+document.querySelectorAll('.reflection-art-hotspot').forEach(function (hotspot) {
+  hotspot.addEventListener('click', function (e) {
+    e.preventDefault();
+    hotspot.closest('.reflection-art-wrap').classList.toggle('revealed');
+  });
+});
+</script>
 </body>
 </html>
