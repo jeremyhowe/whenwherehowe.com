@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" shape-rendering="crispEdges">
+<!--
+  when where howe — one pixel, taken apart.
+
+  Drawn on a 16-unit grid because that is a favicon's native resolution:
+  every edge lands on a whole pixel at 16x16, so nothing blurs. The four
+  squares are inset to 12 of 16, leaving a 2-unit margin of paper — the
+  site's ground colour — so the mark reads as something printed rather
+  than as a bare coloured chip.
+
+  The four fills are muted red/green/blue plus ink, ordered by relative
+  luminance (148, 108, 72, 28) so they descend top-left to bottom-right
+  in reading order and stay distinguishable with hue removed. Do not
+  "brighten" one without re-checking that ladder; the spacing is the
+  reason this survives greyscale and colour-vision deficiency.
+-->
+<style>
+  .paper { fill: #f9f8f5 }
+  .ink   { fill: #1c1c1a }
+  @media (prefers-color-scheme: dark) {
+    .paper { fill: #1c1c1a }
+    .ink   { fill: #f9f8f5 }
+  }
+</style>
+<rect class="paper" width="16" height="16"/>
+<rect x="2" y="2" width="6" height="6" fill="#8A9A72"/>
+<rect x="8" y="2" width="6" height="6" fill="#A55E52"/>
+<rect x="2" y="8" width="6" height="6" fill="#3A4A63"/>
+<rect class="ink" x="8" y="8" width="6" height="6"/>
+</svg>
