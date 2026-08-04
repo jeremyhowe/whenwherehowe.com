@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanlines — Mixed Emotions — when where howe</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-webkit-font-smoothing:antialiased;}
+.page{max-width:620px;margin:0 auto;padding:2.75rem 2rem 6rem;}
+.wordmark{font-family:system-ui,sans-serif;font-size:11px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;text-decoration:none;display:block;margin-bottom:2.5rem;}
+.site-nav{font-family:system-ui,sans-serif;font-size:13px;color:#bbb;display:flex;gap:1.5rem;margin-bottom:2.5rem;}
+.site-nav a{color:#bbb;text-decoration:none;}
+.site-nav a:hover{color:#1c1c1a;}
+.reflection-art{width:100%;max-width:320px;display:block;margin-bottom:2rem;image-rendering:pixelated;}
+.reflection-art-wrap{position:relative;width:100%;max-width:320px;margin-bottom:2rem;}
+.reflection-art-wrap .reflection-art{margin-bottom:0;}
+.reflection-art-full{position:absolute;inset:0;max-width:none;height:100%;image-rendering:auto;opacity:0;transition:opacity 0.45s ease;pointer-events:none;}
+/* One square of the pixel grid, top right. Sized inline, from PIXEL_GRID.
+   Deliberately unmarked — no ring, no tint. The square is found by
+   wandering the cursor over the art, and an outline that blinks on as you
+   pass through reads as a rendering artifact rather than an invitation. */
+.reflection-art-hotspot{position:absolute;top:0;right:0;z-index:2;padding:0;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+/* Hover reveal is for real pointers only. iOS Safari leaves :hover stuck on
+   the last-tapped element until you tap elsewhere, so without this gate a
+   tap to dismiss would come straight back as hover and read as a dead tap.
+   Touch goes through .revealed alone. */
+@media (hover: hover){
+  .reflection-art-hotspot:hover~.reflection-art-full{opacity:1;}
+}
+.reflection-art-hotspot:focus-visible~.reflection-art-full{opacity:1;}
+.reflection-art-wrap.revealed .reflection-art-full{opacity:1;}
+@media (prefers-reduced-motion: reduce){.reflection-art-full{transition:none;}}
+.essay-meta{font-family:system-ui,sans-serif;font-size:12px;color:#bbb;margin-bottom:1.25rem;letter-spacing:0.04em;}
+.essay-title{font-size:30px;font-weight:400;line-height:1.25;margin-bottom:2rem;color:#1c1c1a;}
+.rule{border:none;border-top:1px solid #e5e1d9;margin-bottom:2.5rem;}
+.essay-body{font-size:19px;line-height:1.85;color:#1c1c1a;}
+.essay-body p{margin-bottom:1.6em;}
+.back-link{font-family:system-ui,sans-serif;font-size:12px;color:#aaa;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;margin-top:3.5rem;padding-top:2rem;border-top:1px solid #e5e1d9;width:100%;letter-spacing:0.04em;}
+.back-link::before{content:'←';}
+.back-link:hover{color:#1c1c1a;}
+</style>
+</head>
+<body>
+<div class="page">
+<a class="wordmark" href="/">when where howe</a>
+<nav class="site-nav"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
+<div class="reflection-art-wrap">
+<img class="reflection-art" src="/autobiodiscography/tanlines-mixed-emotions.jpg" alt="Tanlines — Mixed Emotions">
+<button class="reflection-art-hotspot" type="button" style="width:10.0%;height:10.0%"
+        aria-label="Reveal the cover for Tanlines — Mixed Emotions" title="Reveal the cover"></button>
+<img class="reflection-art reflection-art-full" src="/autobiodiscography/tanlines-mixed-emotions-full.jpg" alt="" aria-hidden="true">
+</div>
+<p class="essay-meta">Tanlines</p>
+<h1 class="essay-title">Mixed Emotions</h1>
+<hr class="rule">
+<div class="essay-body">
+<p>When I was a resident, we had to do some of our rotations on the military base. Being a civilian wasn&#x27;t a big deal on the base, like they didn&#x27;t expect you to salute or follow the rules about when you are or aren&#x27;t wearing a hat, but even though as a doctor I had some sense of belonging and authority, I always had a small sense of not quite belonging there, like I was out of place and that was evident to everyone who was supposed to be there.</p>
+<p>I did my OB/Gyn rotation there on base and one of preceptor was Dr. Snow. He was, notably, a fun and cool guy; I sort of felt like even though he was part of the Air Force he, also, wasn&#x27;t fully part of the military. Like something about the way he wore his fatigues, his posture in his chair while we&#x27;d present him patients communicated &quot;doctor just here for the tuition subsidy&quot;. Maybe this informed my perception of him, or maybe my perception of the completeness of his dedication to the military was shaped by this ease and informality. Regardless, he was a fun and cool guy and I liked working with him. I felt that he liked me as well.</p>
+<p>For one thing, he gave me the pretty excellent nickname &quot;Howitzer&quot;, and as I&#x27;m thinking about it now I don&#x27;t really understand why I&#x27;m not trying to make that nickname happen way more often. &quot;Howitzer!&quot; he might say in greeting when I showed up in the morning. &quot;Let&#x27;s see what patients Howitzer has,&quot; as a way of breaking off a conversation to hear me present if I&#x27;d been standing quietly waiting too long. I don&#x27;t know why Howitzer hasn&#x27;t really stuck in the rest of my life, but I do know that a skillfully applied nickname will make anyone--even a thoroughly non-military civilian on an Air Force base--feel just a bit more like they belong. And will imbue in the nicknamed a great deal of affection for the nickname bestower.</p>
+<p>But anyway, Dr. Snow was into music, and somehow it came out that I was a music nerd (but I say &quot;nerd&quot; because it would be embarrassing to say I was a indie music hipster/snob), so he wanted to know about all the cool bands. We used to talk about them a lot between patients, trade recommendations, talk about shows, things like that. It was really nice, I enjoyed it a lot, and I liked feeling comfortable with an attending. I suspect he liked feeling comfortable with me; now that I&#x27;m about the age he was then I have experienced the specific pleasure that comes from connecting with what you should under no circumstances refer, in person, to their faces, as &quot;young people&quot;. Maybe giving a good nickname also helps you feel like you belong as well as receiving one does.</p>
+<p>I remember that I&#x27;d recommended a small crateful of albums and bands he ought to check out, and he was actually listening to them and really enjoying the majority of them, which was obviously gratifying for me; there were days in residency that I felt like I had a much greater expertise about early 00&#x27;s NYC bands than I did the first-line options for pharmaceutical management of heart failure. And it was great to stand on the more solid ground of expertise about anything after the long periods of medical training when it can feel as if you somehow less than you did a month ago. But while most of the recommendations had come from me, <em>Mixed Emotions</em> was his recommendation to me one afternoon. He was excited to learn I hadn&#x27;t heard it and he insisted I check them out.</p>
+<p>It&#x27;s pretty common in residency that in the course of the day an attending will discover in his residents various important gaps in medical knowledge, which will result in a reading assignment: &quot;why don&#x27;t you read up on the diagnosis of endometriosis and tell me about it tomorrow&quot;. This can be tricky because for a given attending physician, on any given day, that might mean an expectation of a brief presentation about that topic, or it might mean you should be ready to answer a few questions on the matter the next day or at some point in the week. You couldn&#x27;t really be sure, if the next day endometriosis didn&#x27;t come up, that that meant it wouldn&#x27;t come up later; this was at times frustrating because just as often your assignment to read up on a topic will have been forgotten, seemingly in the moment it was mentioned, and you&#x27;ll never be asked about it again. (Now that I have been an attending I also understand <em>this</em> phenomenon, how hard it is to be a good manager of the physician for whose training you are temporarily responsible while also managing your day and all the patients that walk into that day, all the problems they bring with them, for you to fix.)</p>
+<p>But I was saying, <em>Mixed Emotions</em>. This was not an assignment I struggled to complete on time. I loved this album, and was excited to tell Dr. Snow the next time we worked together. He was of course delighted I liked it; there&#x27;s a special feeling of accomplishment when you connect someone with something they&#x27;d love, but it&#x27;s much better if you also love that something. And I guess Snow and I enjoyed a brief moment of connection, of belonging, in that little fluorescent lit painted cinder block clinic office tucked somewhere in the bowels of an Air Force base that neither of us particularly felt we belonged to.</p>
+</div>
+<a class="back-link" href="/autobiodiscography.html">autobiodiscography</a>
+</div>
+<script>
+// Hover on the hotspot handles the mouse; this handles tap, where there's no
+// hover to lean on. Asymmetric on purpose: the corner square reveals, but
+// ANY touch on the art puts the pixels back. Finding one square in ten by
+// touch is fine when you're looking for it and a nuisance when you just want
+// out, and after the reveal that square sits over a photo with nothing to
+// mark it. One delegated listener, because the corner tap bubbles here too.
+document.querySelectorAll('.reflection-art-wrap').forEach(function (wrap) {
+  wrap.addEventListener('click', function (e) {
+    if (wrap.classList.contains('revealed')) {
+      wrap.classList.remove('revealed');  // anywhere on the art dismisses
+    } else if (e.target.closest('.reflection-art-hotspot')) {
+      e.preventDefault();
+      wrap.classList.add('revealed');
+    }
+  });
+});
+</script>
+</body>
+</html>
