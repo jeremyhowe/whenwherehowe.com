@@ -16,8 +16,16 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 .site-nav a:hover{color:#1c1c1a;}
 .reading-intro{font-size:17px;line-height:1.7;color:#666;margin-bottom:3rem;}
 .shelf-label{font-family:system-ui,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin:0 0 1.25rem;}
-.book{display:flex;gap:1.5rem;padding:2rem 0;border-top:1px solid #e5e1d9;}
+.book{display:block;border-top:1px solid #e5e1d9;}
 .book:last-child{border-bottom:1px solid #e5e1d9;}
+/* The whole row is the control, so the padding lives here rather than on
+   .book — a summary that only covered the title would leave most of the row
+   looking clickable without being clickable. */
+.book-head{display:flex;gap:1.5rem;padding:2rem 0;list-style:none;}
+.book-head::-webkit-details-marker{display:none;}
+.book-head::marker{content:"";}
+details.book>.book-head{cursor:pointer;}
+details.book>.book-head:focus-visible{outline:2px solid #1c1c1a;outline-offset:-3px;}
 .book-cover{width:120px;flex-shrink:0;}
 .book-cover img{width:100%;border-radius:2px;box-shadow:0 2px 8px rgba(0,0,0,0.14);display:block;}
 .book-cover .no-cover{width:100%;aspect-ratio:2/3;background:#eeeae2;border-radius:2px;}
@@ -27,31 +35,47 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 .book-meta{font-family:system-ui,sans-serif;font-size:11px;color:#bbb;letter-spacing:0.04em;margin:0;}
 .progress{height:2px;background:#e5e1d9;margin:0.8rem 0 0;max-width:180px;}
 .progress span{display:block;height:100%;background:#c9c2b4;}
+/* The expand affordance. A bordered pill rather than a bare label: the row
+   has to announce that there is more behind it even when nothing is hovered,
+   and #bbb micro-type (the rest of this page's furniture) neither reads as a
+   control nor clears 4.5:1 on this background. */
+.book-more{display:inline-flex;align-items:center;gap:0.45rem;margin-top:0.95rem;
+font-family:system-ui,sans-serif;font-size:12px;letter-spacing:0.02em;color:#6b6455;
+border:1px solid #ddd7ca;border-radius:999px;padding:0.35rem 0.8rem;
+transition:background-color 0.18s ease,border-color 0.18s ease,color 0.18s ease;}
+.book-head:hover .book-more{background:#f1ede3;border-color:#c3bbaa;color:#1c1c1a;}
+.book-more::after{content:"+";font-size:13px;line-height:1;color:#9c9484;}
+.book[open] .book-more::after{content:"\2013";}
+.book-head:hover .book-more::after{color:#1c1c1a;}
+.more-hide{display:none;}
+.book[open] .more-show{display:none;}
+.book[open] .more-hide{display:inline;}
+.book-body{padding:0 0 2rem 0;}
+/* The cover column is empty in the body, so the prose lines up under the
+   text rather than restarting at the page edge. */
+@media (min-width:561px){.book-body{margin-left:calc(120px + 1.5rem);}}
 .book-section{margin-top:1.4rem;}
+.book-body>.book-section:first-child{margin-top:0;}
 .book-section h3{font-family:system-ui,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#bbb;margin:0 0 0.6rem;}
 .book-section p{font-size:17px;line-height:1.75;margin-bottom:1em;}
 .book-section p:last-child{margin-bottom:0;}
-/* Highlights fold away, because a book with a dozen of them would otherwise
-   push every entry after it off the page. The row itself stays whole. */
-.highlights{margin-top:0.8rem;}
-/* The vertical padding is the tap target, not decoration: the label alone is
-   13px tall, which is far too small to hit reliably on a phone. */
-.highlights>summary{font-family:system-ui,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#bbb;cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:0.45rem;padding:0.6rem 0.9rem 0.6rem 0;}
-.highlights>summary::-webkit-details-marker{display:none;}
-.highlights>summary::marker{content:"";}
-.highlights>summary:hover{color:#1c1c1a;}
-.highlights>summary::after{content:"+";font-size:13px;line-height:1;color:#ccc;}
-.highlights[open]>summary::after{content:"\2013";}
-.highlights-body{margin-top:0.9rem;}
 .highlight{margin:0 0 1.1rem;padding-left:1.1rem;border-left:2px solid #e5e1d9;}
 .highlight:last-child{margin-bottom:0;}
 .highlight p{font-size:16px;line-height:1.7;color:#444;font-style:italic;margin:0;}
 .highlight .hl-loc{font-family:system-ui,sans-serif;font-size:10px;font-style:normal;color:#ccc;letter-spacing:0.04em;margin-top:0.3rem;}
 .highlight .hl-note{font-size:15px;font-style:normal;color:#888;margin-top:0.4rem;}
 .empty-note{font-size:16px;color:#bbb;font-style:italic;}
-@media (max-width:560px){.book{gap:1.1rem;padding:1.6rem 0;}
+/* Opening is the one moment on this page where something moves, so it gets a
+   short settle rather than appearing all at once. An animation, not a
+   transition: <details> has no open/closed intermediate state to transition
+   between without script. */
+@media (prefers-reduced-motion:no-preference){
+.book[open]>.book-body{animation:book-open 0.32s cubic-bezier(0.22,1,0.36,1);}}
+@keyframes book-open{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:none;}}
+@media (max-width:560px){.book-head{gap:1.1rem;padding:1.6rem 0;}
 .book-cover{width:88px;}
-.book-title{font-size:19px;}}
+.book-title{font-size:19px;}
+.book-body{padding-bottom:1.6rem;}}
 </style>
 </head>
 <body>
@@ -61,53 +85,57 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 <p class="reading-intro">What I'm reading and what I've read</p>
 <p class="shelf-label">Now reading</p>
 <article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1687768233l/112976332.jpg" alt="" loading="lazy"></div>
+<div class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1687768233l/112976332.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">World Within a Song: Music That Changed My Life and Life That Changed My Music</h2>
 <p class="book-author">Jeff Tweedy</p>
 <p class="book-meta">started August 8, 2026</p>
 
-</div>
+</div></div>
 </article>
-<article class="book">
-<div class="book-cover"><img src="https://readwise-assets.s3.amazonaws.com/media/reader/parsed_document_assets/474812512/aWHRQgC301fhryTTz1IIDCO4cF55BjO7tnCN5qcCnMc-cove_yoLG1ut.jpg" alt="" loading="lazy"></div>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://readwise-assets.s3.amazonaws.com/media/reader/parsed_document_assets/474812512/aWHRQgC301fhryTTz1IIDCO4cF55BjO7tnCN5qcCnMc-cove_yoLG1ut.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">On Earth We&#x27;re Briefly Gorgeous</h2>
 <p class="book-author">Ocean Vuong</p>
 <p class="book-meta">started June 12, 2025 · epub</p>
 <div class="progress"><span style="width:15%"></span></div>
-<details class="highlights"><summary>1 highlight</summary><div class="highlights-body"><blockquote class="highlight"><p>We abandoned the oxtail, the bún bò huế. You grabbed a loaf of Wonder Bread and a jar of mayonnaise. None of us spoke as we checked out, our words suddenly wrong everywhere, even in our mouths.</p><p class="hl-loc">loc. 44118</p></blockquote></div></details></div>
-</article>
+<span class="book-more"><span class="more-show">Show 1 highlight</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>1 highlight</h3><blockquote class="highlight"><p>We abandoned the oxtail, the bún bò huế. You grabbed a loaf of Wonder Bread and a jar of mayonnaise. None of us spoke as we checked out, our words suddenly wrong everywhere, even in our mouths.</p><p class="hl-loc">loc. 44118</p></blockquote></div></div>
+</details>
 <p class="shelf-label" style="margin-top:3.5rem">Read</p>
-<article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1751978801l/13456414.jpg" alt="" loading="lazy"></div>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1751978801l/13456414.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">A Short Stay in Hell</h2>
 <p class="book-author">Steven L. Peck</p>
 <p class="book-meta">finished August 8, 2026</p>
 
-<div class="book-section"><h3>Reflections</h3><p>Fascinating little novella. Had me thinking about religion and faith and the afterlife, the way that we think of our choosing a religion and how staying devoted to it is a reflection of something moral and good within us, or that leaving a religion is a failure. Does thinking that we choose our religion and whether we stay with it say more about us or our religions?</p></div><details class="highlights"><summary>1 highlight</summary><div class="highlights-body"><blockquote class="highlight"><p>Did I know her only for so short a time? Strange, how a moment of existence can cut so deeply into our being that while ages pass unnoticed, a brief love can structure and define the very topology of our consciousness ever after.</p><p class="hl-loc">loc. 32</p></blockquote></div></details></div>
-</article>
-<article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1568871230l/74034.jpg" alt="" loading="lazy"></div>
+<span class="book-more"><span class="more-show">Show notes and 1 highlight</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>Reflections</h3><p>Fascinating little novella. Had me thinking about religion and faith and the afterlife, the way that we think of our choosing a religion and how staying devoted to it is a reflection of something moral and good within us, or that leaving a religion is a failure. Does thinking that we choose our religion and whether we stay with it say more about us or our religions?</p></div><div class="book-section"><h3>1 highlight</h3><blockquote class="highlight"><p>Did I know her only for so short a time? Strange, how a moment of existence can cut so deeply into our being that while ages pass unnoticed, a brief love can structure and define the very topology of our consciousness ever after.</p><p class="hl-loc">loc. 32</p></blockquote></div></div>
+</details>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1568871230l/74034.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">Amusing Ourselves to Death: Public Discourse in the Age of Show Business</h2>
 <p class="book-author">Neil Postman</p>
 <p class="book-meta">finished August 7, 2026 · audiobook</p>
 
-<div class="book-section"><h3>Reflections</h3><p>A disturbing book. At several points he compares his present unfavorably to some point in the past when people had better habits of mind, and even though it&#x27;s only 40 years later it&#x27;s pretty rough to compare his present to ours. At one point he talks about how &quot;our current president&quot; would be unlikely to be able to deliver a particular complex argument (I think he was comparing him to Abraham Lincoln), saying <em>he</em> (Reagan) was a former actor and more concerned with the visuals of television etc. than rhetoric. Buddy, get a load of <em>our</em> current president.</p>
+<span class="book-more"><span class="more-show">Show notes</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>Reflections</h3><p>A disturbing book. At several points he compares his present unfavorably to some point in the past when people had better habits of mind, and even though it&#x27;s only 40 years later it&#x27;s pretty rough to compare his present to ours. At one point he talks about how &quot;our current president&quot; would be unlikely to be able to deliver a particular complex argument (I think he was comparing him to Abraham Lincoln), saying <em>he</em> (Reagan) was a former actor and more concerned with the visuals of television etc. than rhetoric. Buddy, get a load of <em>our</em> current president.</p>
 <p>I can see how it might be thought of as tiresome but I think it does a good job of not being longer than it needs to be, which is obviously rare. (Also, I mean...Mr. Postman would probably note that people used to be able to read long books.)</p>
 <p>I thought as I listened to the book about when there is new technology and a group of people will say a version of &quot;well people said the same thing about the invention of [a previous technology]&quot;. That is such a frustrating and tired argument, mostly because it is the kind of argument that is true until it isn&#x27;t any more. Things can be similar but also have differences that matter, differences that should change our understanding and calculus about the risk or benefits or dangers something offers. This feels especially important in 2026 (and maybe, by now, also obvious), but Plato being worried that printed language would cause the downfall of society might be effectively invoked when someone offers a similar argument about the printing press, but obviously people being wrong about those advances didn&#x27;t mean people worried about the brain-warping power of algorithmic social media were wrong, even if at the time almost everyone brushed them off as one more Luddite.</p></div></div>
-</article>
-<article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1479326752l/32080126.jpg" alt="" loading="lazy"></div>
+</details>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1479326752l/32080126.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">Anything Is Possible</h2>
 <p class="book-author">Elizabeth Strout</p>
 <p class="book-meta">finished August 7, 2026</p>
 
-<div class="book-section"><h3>Reflections</h3><p>Reading Strout I&#x27;m always wondering if very specific interior parts are seen specifically by the author--do we share some similarity of being, does she know, has she observed, people who are similar to me?--or are these interior, private spaces actually common interior places to all of us?</p>
-<p>(This book is excellent, I love this author and everything she writes.)</p></div><details class="highlights"><summary>20 highlights</summary><div class="highlights-body"><blockquote class="highlight"><p>After a few moments, Tommy glanced in his rearview mirror, and what he saw was Pete Barton hitting the sign with the sledgehammer. Something about the way he hit it—the force—made Tommy watch carefully as he drove down the road. He saw the boy—the man—hit the sign again and again with what seemed to be increasing force, and as Tommy’s car dipped down just slightly, losing sight for a moment, he thought: Wait. And when his car came back up he looked again in the rearview mirror and he saw again this boy-man hitting that sign with rage, with a ferocity that astonished Tommy, it was astonishing, the rage with which that man was hitting that sign. It seemed indecent to Tommy that he was witnessing it, for it felt as private in its anguish as what the boy’s father had been doing out behind Tommy’s barns that day. And then as Tommy drove he realized: Oh, it was the mother. It was the mother. She must have been the really dangerous one.</p><p class="hl-loc">loc. 368</p></blockquote>
+<span class="book-more"><span class="more-show">Show notes and 20 highlights</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>Reflections</h3><p>Reading Strout I&#x27;m always wondering if very specific interior parts are seen specifically by the author--do we share some similarity of being, does she know, has she observed, people who are similar to me?--or are these interior, private spaces actually common interior places to all of us?</p>
+<p>(This book is excellent, I love this author and everything she writes.)</p></div><div class="book-section"><h3>20 highlights</h3><blockquote class="highlight"><p>After a few moments, Tommy glanced in his rearview mirror, and what he saw was Pete Barton hitting the sign with the sledgehammer. Something about the way he hit it—the force—made Tommy watch carefully as he drove down the road. He saw the boy—the man—hit the sign again and again with what seemed to be increasing force, and as Tommy’s car dipped down just slightly, losing sight for a moment, he thought: Wait. And when his car came back up he looked again in the rearview mirror and he saw again this boy-man hitting that sign with rage, with a ferocity that astonished Tommy, it was astonishing, the rage with which that man was hitting that sign. It seemed indecent to Tommy that he was witnessing it, for it felt as private in its anguish as what the boy’s father had been doing out behind Tommy’s barns that day. And then as Tommy drove he realized: Oh, it was the mother. It was the mother. She must have been the really dangerous one.</p><p class="hl-loc">loc. 368</p></blockquote>
 <blockquote class="highlight"><p>“I’m an old man,” said Tommy. “I think if we’re going to have talks like this one I should stop by more often. How about I see you two Saturdays from now?” Tommy was surprised to see Pete’s hands become fists that he banged down on his knees. “No,” Pete said. “No. You don’t have to. No.” “I want to,” said Tommy, and he thought—then he knew—as he said this that it was not true. But did that matter? It didn’t matter. “I don’t need someone coming to see me out of obligation.” Pete said this quietly. The pain deep in Tommy’s chest increased. “I don’t blame you for that,” he said. They sat together in the car, which was now warm, and the smell, to Tommy, was palpable. In a moment Pete spoke again, “Well, I guess I thought you were coming here to torture me, and I was wrong about that. So I guess maybe I’d be wrong to think you were just obliging me.” “I think you’d be wrong,” said Tommy. But he was aware, again, that this was not true. The truth was that he did not really want to visit this poor boy-man seated next to him ever again. They sat in silence for a few moments more; then Pete turned to Tommy, gave him a nod. “All right, I’ll see you then,” said Pete, getting out of the car. “Thanks, Tommy,” he said, and Tommy said, “Thank you.”</p><p class="hl-loc">loc. 417</p></blockquote>
 <blockquote class="highlight"><p>And then Tommy understood: that what he had kept from her their whole lives was, in fact, easily acceptable to her, and what he would keep from her now—his doubt (his sudden belief that God had never come to him)—was a new secret replacing the first. He took his hand from hers. “You might be right,” he said. A paltry thing he added, but it was true: He said, “I love you, Shirley.” And then he looked at the ceiling; he could not look at her for a moment or two.</p><p class="hl-loc">loc. 452</p></blockquote>
 <blockquote class="highlight"><p>Sebastian had become interested; she saw his keenness as he listened to this story. In a few minutes he asked some questions, for example, had Lucy seemed different from her brother and sister? Patty said she didn’t know; she hadn’t known any of them, really. But—here was something odd: Lucy’s parents had been asked to the wedding of Patty’s oldest sister, Linda, and Patty had never figured that out, she couldn’t imagine Lucy’s father had even owned a suit, why would they have been at her sister’s wedding? Sebastian said, Maybe your mother didn’t have anyone else who would talk to her at that point, and Patty realized he was exactly right. Patty’s face had turned bright red as she saw the truth to this. Sweetheart, said Sebastian, and reached for her hand. A few months later Sebastian was gone. Having met in their late thirties, they’d had only eight years together. No children. Patty had never known a better man.</p><p class="hl-loc">loc. 477</p></blockquote>
@@ -126,17 +154,18 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 <blockquote class="highlight"><p>She had never liked being angry; she didn’t know what to do with it.</p><p class="hl-loc">loc. 1665</p></blockquote>
 <blockquote class="highlight"><p>They had grown up on shame; it was the nutrient of their soil. Yet, oddly, it was her father she felt she understood the best. And for a moment Annie wondered at this, that her brother and sister, good, responsible, decent, fair-minded, had never known the passion that caused a person to risk everything they had, everything they held dear heedlessly put in danger—simply to be near the white dazzle of the sun that somehow for those moments seemed to leave the earth behind.</p><p class="hl-loc">loc. 2725</p></blockquote>
 <blockquote class="highlight"><p>forgot but then lived with anyway—like phantom limbs, he supposed. Because he could not honestly say anymore what he’d felt when he’d found food in a dumpster. Gladness, perhaps, when he discovered large parts of a steak that could be scraped clean. It gets terribly practical, he told his wife many years later. Then came the moment of her ill-concealed horror: Weren’t you ashamed? And the answer—the understanding—so immediate that it was coming to him even as she spoke: Well, then you’ve never been hungry, Elaine. He did not say it. But he did become ashamed, once his wife asked him that question. Then he surely became ashamed. She requested that he never tell their children how their father had been so poor as to eat from garbage cans.</p><p class="hl-loc">loc. 2943</p></blockquote>
-<blockquote class="highlight"><p>When word came that Keith had died of cancer, Abel was astonished. That astonishment had to do with death, with the wiping out of a person, with the puzzlement that the man was simply gone. The simplicity of the goneness was something Abel was familiar with; he was not a young man, he had known the death of others, starting with the goneness of his own father. But what followed this astonishment was a searing sense of shame, as though Abel had done something unsavory all those years by having Keith build his clothes. He found himself murmuring the words out loud, when he was in his car, or alone in his office, or getting dressed in the morning, “I’m sorry. God, I’m so sorry.” Even while he voted as a conservative, even while he took his annual bonus from the board, even while he ate in the best restaurants Chicago offered, and even while most of him thought what he had thought for years, I will not apologize for being rich, he did apologize, but to whom precisely he did not know. Waves of shame would suddenly pour over him, the way his wife had endured hot flashes for years, her face instantly bright red, rivulets of perspiration forming on the sides of her face. She could not be jovial about these incidents, the way he saw some women at the office were. But he felt he understood better now, the uncontrolled assault she must have felt, just as he felt the uncontrolled assault of his shame, which, he was perfectly aware, had no basis in anything real. Keith had had a job. He had done his job well. He had been paid well. (He had not really been paid that well.)</p><p class="hl-loc">loc. 2996</p></blockquote></div></details></div>
-</article>
-<article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1450653428l/25893709.jpg" alt="" loading="lazy"></div>
+<blockquote class="highlight"><p>When word came that Keith had died of cancer, Abel was astonished. That astonishment had to do with death, with the wiping out of a person, with the puzzlement that the man was simply gone. The simplicity of the goneness was something Abel was familiar with; he was not a young man, he had known the death of others, starting with the goneness of his own father. But what followed this astonishment was a searing sense of shame, as though Abel had done something unsavory all those years by having Keith build his clothes. He found himself murmuring the words out loud, when he was in his car, or alone in his office, or getting dressed in the morning, “I’m sorry. God, I’m so sorry.” Even while he voted as a conservative, even while he took his annual bonus from the board, even while he ate in the best restaurants Chicago offered, and even while most of him thought what he had thought for years, I will not apologize for being rich, he did apologize, but to whom precisely he did not know. Waves of shame would suddenly pour over him, the way his wife had endured hot flashes for years, her face instantly bright red, rivulets of perspiration forming on the sides of her face. She could not be jovial about these incidents, the way he saw some women at the office were. But he felt he understood better now, the uncontrolled assault she must have felt, just as he felt the uncontrolled assault of his shame, which, he was perfectly aware, had no basis in anything real. Keith had had a job. He had done his job well. He had been paid well. (He had not really been paid that well.)</p><p class="hl-loc">loc. 2996</p></blockquote></div></div>
+</details>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1450653428l/25893709.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">My Name Is Lucy Barton</h2>
 <p class="book-author">Elizabeth Strout</p>
 <p class="book-meta">finished July 28, 2026</p>
 
-<div class="book-section"><h3>Reflections</h3><p>I was delighted by this short book. The intimacy of the scene, the humble premise both small in scale but grand in ambition: each character who walks onto the stage has only a brief moment, but you sense, even in this book, that you are being introduced to each of them to revisit them, that though they speak no or few lines while on the page, they carry a rich history worth visiting.</p>
-<p>But this book isn&#x27;t only valuable as a prequel or introduction to a series, it&#x27;s such wonderful writing, and the richness of this one relationship--a mother and daughter--so vivid, so detailed and considered.</p></div><details class="highlights"><summary>22 highlights</summary><div class="highlights-body"><blockquote class="highlight"><p>But there are times, too—unexpected—when walking down a sunny sidewalk, or watching the top of a tree bend in the wind, or seeing a November sky close down over the East River, I am suddenly filled with the knowledge of darkness so deep that a sound might escape from my mouth, and I will step into the nearest clothing store and talk with a stranger about the shape of sweaters newly arrived. This must be the way most of us maneuver through the world, half knowing, half not, visited by memories that can’t possibly be true. But when I see others walking with confidence down the sidewalk, as though they are free completely from terror, I realize I don’t know how others are. So much of life seems speculation.</p><p class="hl-loc">loc. 201</p></blockquote>
+<span class="book-more"><span class="more-show">Show notes and 22 highlights</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>Reflections</h3><p>I was delighted by this short book. The intimacy of the scene, the humble premise both small in scale but grand in ambition: each character who walks onto the stage has only a brief moment, but you sense, even in this book, that you are being introduced to each of them to revisit them, that though they speak no or few lines while on the page, they carry a rich history worth visiting.</p>
+<p>But this book isn&#x27;t only valuable as a prequel or introduction to a series, it&#x27;s such wonderful writing, and the richness of this one relationship--a mother and daughter--so vivid, so detailed and considered.</p></div><div class="book-section"><h3>22 highlights</h3><blockquote class="highlight"><p>But there are times, too—unexpected—when walking down a sunny sidewalk, or watching the top of a tree bend in the wind, or seeing a November sky close down over the East River, I am suddenly filled with the knowledge of darkness so deep that a sound might escape from my mouth, and I will step into the nearest clothing store and talk with a stranger about the shape of sweaters newly arrived. This must be the way most of us maneuver through the world, half knowing, half not, visited by memories that can’t possibly be true. But when I see others walking with confidence down the sidewalk, as though they are free completely from terror, I realize I don’t know how others are. So much of life seems speculation.</p><p class="hl-loc">loc. 201</p></blockquote>
 <blockquote class="highlight"><p>He asked what we ate when I was growing up. I did not say, “Mostly molasses on bread.” I did say, “We had baked beans a lot.” And he said, “What did you do after that, all hang around and fart?” Then I understood I would never marry him. It’s funny how one thing can make you realize something like that. One can be ready to give up the children one always wanted, one can be ready to withstand remarks about one’s past, or one’s clothes, but then—a tiny remark and the soul deflates and says: Oh.</p><p class="hl-loc">loc. 322</p></blockquote>
 <blockquote class="highlight"><p>It was not until many years later, long after, that I learned from my brother how my father, in a German town, had come upon two young men who startled him, and my father had shot them in the back, he did not think they were soldiers, they were not dressed like soldiers, but he had shot them, and when he kicked one over he saw how young he was. My brother told me that William had seemed to my father an older version of this person, a young man who had come back to taunt him, to take away his daughter. My father had murdered two German boys, and as my father lay dying he told my brother that not a day had gone by when he did not think of them, and feel that he should have taken his own life in exchange.</p><p class="hl-loc">loc. 363</p></blockquote>
 <blockquote class="highlight"><p>Maybe it was the darkness with only the pale crack of light that came through the door, the constellation of the magnificent Chrysler Building right beyond us, that allowed us to speak in ways we never had. “People,” I said. “People,” my mother said. I was so happy. Oh, I was happy speaking with my mother this way!</p><p class="hl-loc">loc. 397</p></blockquote>
@@ -157,49 +186,53 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 <blockquote class="highlight"><p>I think of Jeremy telling me I had to be ruthless to be a writer. And I think how I did not go visit my brother and sister and my parents because I was always working on a story and there was never enough time. (But I didn’t want to go either.) There never was enough time, and then later I knew if I stayed in my marriage I would not write another book, not the kind I wanted to, and there is that as well. But really, the ruthlessness, I think, comes in grabbing onto myself, in saying: This is me, and I will not go where I can’t bear to go—to Amgash, Illinois—and I will not stay in a marriage when I don’t want to, and I will grab myself and hurl onward through life, blind as a bat, but on I go! This is the ruthlessness, I think.</p><p class="hl-loc">loc. 1467</p></blockquote>
 <blockquote class="highlight"><p>The rage of my girls during those years! There are moments I try to forget, but I will never forget. I worry about what it is they will never forget.</p><p class="hl-loc">loc. 1513</p></blockquote>
 <blockquote class="highlight"><p>When I am alone in the apartment these days, not often, but sometimes, I will say softly out loud, “Mommy!” And I don’t know what it is—if I am calling for my own mother, or if I am hearing Becka’s cry to me that day when she saw the second plane go into the second tower. Both, I think. But this is my story. And yet it is the story of many. It is Molla’s story, my college roommate’s, it may be the story of the Pretty Nicely Girls. Mommy. Mom! But this one is my story. This one. And my name is Lucy Barton.</p><p class="hl-loc">loc. 1533</p></blockquote>
-<blockquote class="highlight"><p>Chrissie said, not long ago, about the husband I have now: “I love him, Mom, but I hope he dies in his sleep and then my stepmom can die too, and you and Dad will get back together.” I kissed the top of her head. I thought: I did this to my child. Do I understand that hurt my children feel? I think I do, though they might claim otherwise. But I think I know so well the pain we children clutch to our chests, how it lasts our whole lifetime, with longings so large you can’t even weep. We hold it tight, we do, with each seizure of the beating heart: This is mine, this is mine, this is mine.</p><p class="hl-loc">loc. 1539</p></blockquote></div></details></div>
-</article>
-<article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1636978687l/58784475._SY475_.jpg" alt="" loading="lazy"></div>
+<blockquote class="highlight"><p>Chrissie said, not long ago, about the husband I have now: “I love him, Mom, but I hope he dies in his sleep and then my stepmom can die too, and you and Dad will get back together.” I kissed the top of her head. I thought: I did this to my child. Do I understand that hurt my children feel? I think I do, though they might claim otherwise. But I think I know so well the pain we children clutch to our chests, how it lasts our whole lifetime, with longings so large you can’t even weep. We hold it tight, we do, with each seizure of the beating heart: This is mine, this is mine, this is mine.</p><p class="hl-loc">loc. 1539</p></blockquote></div></div>
+</details>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1636978687l/58784475._SY475_.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">Tomorrow, and Tomorrow, and Tomorrow</h2>
 <p class="book-author">Gabrielle Zevin</p>
 <p class="book-meta">finished July 23, 2026 · epub</p>
 
-<details class="highlights"><summary>5 highlights</summary><div class="highlights-body"><blockquote class="highlight"><p>“Promise me, we won’t ever do this again,” Sadie said. “Promise me, that no matter what happens, no matter what dumb thing we supposedly perpetrate on each other, we won’t ever go six years without talking to each other. Promise me you’ll always forgive me, and I promise I’ll always forgive you.” These, of course, are the kinds of vows young people feel comfortable making when they have no idea what life has in store for them.</p><p class="hl-loc">loc. 1123</p></blockquote>
+<span class="book-more"><span class="more-show">Show 5 highlights</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>5 highlights</h3><blockquote class="highlight"><p>“Promise me, we won’t ever do this again,” Sadie said. “Promise me, that no matter what happens, no matter what dumb thing we supposedly perpetrate on each other, we won’t ever go six years without talking to each other. Promise me you’ll always forgive me, and I promise I’ll always forgive you.” These, of course, are the kinds of vows young people feel comfortable making when they have no idea what life has in store for them.</p><p class="hl-loc">loc. 1123</p></blockquote>
 <blockquote class="highlight"><p>The alternative to appropriation is a world where white European people make art about white European people, with only white European references in it. Swap African or Asian or Latin or whatever culture you want for European. A world where everyone is blind and deaf to any culture or experience that is not their own. I hate that world, don’t you? I’m terrified of that world, and I don’t want to live in that world, and as a mixed-race person, I literally don’t exist in it. My dad, who I barely knew, was Jewish. My mom was an American-born Korean. I was raised by Korean immigrant grandparents in Koreatown, Los Angeles. And as any mixed-race person will tell you—to be half of two things is to be whole of nothing. And, by the way, I don’t own or have a particularly rich understanding of the references of Jewishness or Koreanness because I happen to be those things. But if Ichigo had been fucking Korean, it wouldn’t be a problem for you, I guess?</p><p class="hl-loc">loc. 1400</p></blockquote>
 <blockquote class="highlight"><p>But for Marx, the world was like a breakfast at a five-star hotel in an Asian country—the abundance of it was almost overwhelming. Who wouldn’t want a pineapple smoothie, a roast pork bun, an omelet, pickled vegetables, sushi, and a green-tea-flavored croissant? They were all there for the taking and delicious, in their own way.</p><p class="hl-loc">loc. 1653</p></blockquote>
 <blockquote class="highlight"><p>“That love is all there is; is all we know of love. It is enough; the freight should be proportioned to the groove.”</p><p class="hl-loc">loc. 1866</p></blockquote>
-<blockquote class="highlight"><p>The next day, or the next week, or the next month, she apologizes, but the apology lacks the conviction of the attack.</p><p class="hl-loc">loc. 5160</p></blockquote></div></details></div>
-</article>
-<article class="book">
-<div class="book-cover"><img src="https://readwise-assets.s3.amazonaws.com/media/reader/parsed_document_assets/474880167/h4fQ2_K5BISkYESqHzuSWwgFUURaKs_OQyPoA3GjXLA-cove_syrKRgy.jpg" alt="" loading="lazy"></div>
+<blockquote class="highlight"><p>The next day, or the next week, or the next month, she apologizes, but the apology lacks the conviction of the attack.</p><p class="hl-loc">loc. 5160</p></blockquote></div></div>
+</details>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://readwise-assets.s3.amazonaws.com/media/reader/parsed_document_assets/474880167/h4fQ2_K5BISkYESqHzuSWwgFUURaKs_OQyPoA3GjXLA-cove_syrKRgy.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">On the Calculation of Volume (Book I)</h2>
 <p class="book-author">Solvej Balle</p>
 <p class="book-meta">finished July 13, 2026 · epub</p>
 
-<details class="highlights"><summary>1 highlight</summary><div class="highlights-body"><blockquote class="highlight"><p>Those were strange days. We woke in the morning, we went for walks, we sat down and had coffee somewhere on the eighteenth of November. For most of the day as intimately aware of one another as couples in the first flush of love or nearsighted creatures. We made the horizon vanish. We sought this giddy feeling. The distance between us was dispelled in the fog. We made the giddiness a part of our day. Created a bright space out of dazed, gray confusion.</p><p class="hl-loc">loc. 91829</p></blockquote></div></details></div>
-</article>
-<article class="book">
-<div class="book-cover"><img src="https://readwise-assets.s3.amazonaws.com/media/reader/parsed_document_assets/474880184/wxbNc19ZDid2OgAGmfOnOeB11GaX62uBTcQP-t-6IjM-cove_lCh4ASh.jpg" alt="" loading="lazy"></div>
+<span class="book-more"><span class="more-show">Show 1 highlight</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>1 highlight</h3><blockquote class="highlight"><p>Those were strange days. We woke in the morning, we went for walks, we sat down and had coffee somewhere on the eighteenth of November. For most of the day as intimately aware of one another as couples in the first flush of love or nearsighted creatures. We made the horizon vanish. We sought this giddy feeling. The distance between us was dispelled in the fog. We made the giddiness a part of our day. Created a bright space out of dazed, gray confusion.</p><p class="hl-loc">loc. 91829</p></blockquote></div></div>
+</details>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://readwise-assets.s3.amazonaws.com/media/reader/parsed_document_assets/474880184/wxbNc19ZDid2OgAGmfOnOeB11GaX62uBTcQP-t-6IjM-cove_lCh4ASh.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">A Shadow Intelligence</h2>
 <p class="book-author">Oliver Harris</p>
 <p class="book-meta">finished July 11, 2026 · epub</p>
 
-<div class="book-section"><h3>Reflections</h3><p>Just a fun, twisty, completely serviceable espionage novel. A little confusing (I&#x27;m not sure I followed some of the key plot points until later; it might be fair to say that at points I was pretty well lost, though I wonder if this was partly a question of paying attention, of reading this book in short 10 minute bursts on a cruise ship, between seeing friends or glaciers or humpback whales), and not much to say about the human condition (though I suppose a thing or two about the ethics and morals of geopolitical struggles and the people in it, which isn&#x27;t devoid of a human element. And also, you know, the human desire to not die at the hands of bad guys and their guns.)</p></div><details class="highlights"><summary>3 highlights</summary><div class="highlights-body"><blockquote class="highlight"><p>“A city changes faster than a human heart,”</p><p class="hl-loc">loc. 461198</p></blockquote>
+<span class="book-more"><span class="more-show">Show notes and 3 highlights</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>Reflections</h3><p>Just a fun, twisty, completely serviceable espionage novel. A little confusing (I&#x27;m not sure I followed some of the key plot points until later; it might be fair to say that at points I was pretty well lost, though I wonder if this was partly a question of paying attention, of reading this book in short 10 minute bursts on a cruise ship, between seeing friends or glaciers or humpback whales), and not much to say about the human condition (though I suppose a thing or two about the ethics and morals of geopolitical struggles and the people in it, which isn&#x27;t devoid of a human element. And also, you know, the human desire to not die at the hands of bad guys and their guns.)</p></div><div class="book-section"><h3>3 highlights</h3><blockquote class="highlight"><p>“A city changes faster than a human heart,”</p><p class="hl-loc">loc. 461198</p></blockquote>
 <blockquote class="highlight"><p>You could measure where you were in Central Asia by the noodles, which thinned as you approached the Altai Mountains and China.</p><p class="hl-loc">loc. 471771</p></blockquote>
-<blockquote class="highlight"><p>I had joined as a gesture against the comfort of the college, the equation of learning with physical ease. And because it seemed an entirely unlikely thing to do. The training felt like the shedding of skin, which reminded me of learning a language.</p><p class="hl-loc">loc. 476779</p></blockquote></div></details></div>
-</article>
-<article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1352997328l/5826.jpg" alt="" loading="lazy"></div>
+<blockquote class="highlight"><p>I had joined as a gesture against the comfort of the college, the equation of learning with physical ease. And because it seemed an entirely unlikely thing to do. The training felt like the shedding of skin, which reminded me of learning a language.</p><p class="hl-loc">loc. 476779</p></blockquote></div></div>
+</details>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1352997328l/5826.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">Bel Canto</h2>
 <p class="book-author">Ann Patchett</p>
 <p class="book-meta">finished June 23, 2026 · epub</p>
 
-<div class="book-section"><h3>Reflections</h3><p>I loved this book! I loved the way it evoked the claustrophobic delights of a closed off world, the surprised delight of a slower world, a world with a narrowed focus. Or maybe the isolated life serving to jolt us, return us to a truer life, maybe something closer to what we&#x27;d always intended. It&#x27;s a beautiful story and I was sad it ended, sad to leave the world and its characters but also the way it spoke of the power of beauty and love.</p></div><details class="highlights"><summary>18 highlights</summary><div class="highlights-body"><blockquote class="highlight"><p>He never thought that he had somehow transferred what should have filled his daily life into opera. Instead he knew that without opera, this part of himself would have vanished altogether.</p><p class="hl-loc">loc. 99</p></blockquote>
+<span class="book-more"><span class="more-show">Show notes and 18 highlights</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>Reflections</h3><p>I loved this book! I loved the way it evoked the claustrophobic delights of a closed off world, the surprised delight of a slower world, a world with a narrowed focus. Or maybe the isolated life serving to jolt us, return us to a truer life, maybe something closer to what we&#x27;d always intended. It&#x27;s a beautiful story and I was sad it ended, sad to leave the world and its characters but also the way it spoke of the power of beauty and love.</p></div><div class="book-section"><h3>18 highlights</h3><blockquote class="highlight"><p>He never thought that he had somehow transferred what should have filled his daily life into opera. Instead he knew that without opera, this part of himself would have vanished altogether.</p><p class="hl-loc">loc. 99</p></blockquote>
 <blockquote class="highlight"><p>She was enormously pleased to have done something so right. The music praised her. Mr. Hosokawa closed his eyes. He dreamed.</p><p class="hl-loc">loc. 121</p></blockquote>
 <blockquote class="highlight"><p>But the men and women did not part quickly. Instead they clung to one another, arms around necks. Couples who had not held each other this way for years, who had perhaps never held each other this way in public, embraced deeply.</p><p class="hl-loc">loc. 979</p><p class="hl-note">how this made me want to.text.kim.and.tellher i love her</p></blockquote>
 <blockquote class="highlight"><p>For what seemed like a long time but could not have been a whole minute, Edith and Simon Thibault said nothing to each other. Then she kissed him and he said, “I like to think of you outside.” He could have said anything, it made no difference. He was thinking of those first twenty years they were married, years when he had loved her without any kind of real understanding. This would be his punishment now, for all his time wasted. Dear Edith.</p><p class="hl-loc">loc. 999</p></blockquote>
@@ -216,52 +249,52 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 <blockquote class="highlight"><p>Roxane stepped away, stepped back towards Gen, and Messner felt the air cooling all around him.</p><p class="hl-loc">loc. 3583</p></blockquote>
 <blockquote class="highlight"><p>Mr. Hosokawa nodded slowly. He had the distinct sensation that the living room was tilting, that the living room had become a boat in a gently tilting sea. He had stopped thinking of what he wanted most so many years ago, even when he was a child perhaps. He disciplined himself to only want the things that were possible to have: an enormous industry, a productive family, an understanding of music. And now, a few months after his fifty-third birthday, in a country he had never really seen, he felt desire in the deepest part of himself, the kind of wanting that can only come when the thing you want is very close to you. When he was a child he dreamed of love, not only to witness it, the way he saw love in the opera, but to feel it himself. But that, he decided, was madness. That was wanting too much. Tonight he wished for little things, the chance to take a hot bath, a reasonable suit of clothing, a gift to bring, at the very least some flowers, but then the room tilted slightly in the other direction and he opened up his hands and all of that fell away from him and he wanted nothing. He had been asked to come to her room at two A.M. and there was nothing more in the world to want, ever.</p><p class="hl-loc">loc. 3859</p></blockquote>
 <blockquote class="highlight"><p>Her skin, the night, the grass, to be outside and then to be inside Carmen. He doesn’t know to want for more because nothing in his life has been as much as this. At the very moment he could have been taking her away, he is pulling her closer. Her hair is tangled around his neck. On that night he thinks that no one has ever had so much and only later will he know that he should have asked for more. His fingers slip into the soft indentations between her ribs, the delicate gullies carved out by hunger. He feels her teeth, takes her tongue. Carmen, Carmen, Carmen, Carmen. In the future, he will try to say her name enough, but he never can.</p><p class="hl-loc">loc. 3980</p></blockquote>
-<blockquote class="highlight"><p>He was in love, and never had he felt such kindness towards another person. Never had he received such kindness. Maybe the private life wasn’t forever. Maybe everyone got it for a little while and then spent the rest of their lives remembering.</p><p class="hl-loc">loc. 4431</p></blockquote></div></details></div>
-</article>
+<blockquote class="highlight"><p>He was in love, and never had he felt such kindness towards another person. Never had he received such kindness. Maybe the private life wasn’t forever. Maybe everyone got it for a little while and then spent the rest of their lives remembering.</p><p class="hl-loc">loc. 4431</p></blockquote></div></div>
+</details>
 <article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1493655783l/35036409.jpg" alt="" loading="lazy"></div>
+<div class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1493655783l/35036409.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">My Brilliant Friend</h2>
 <p class="book-author">Elena Ferrante</p>
 <p class="book-meta">finished June 23, 2026 · audiobook</p>
 
-</div>
+</div></div>
 </article>
 <article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1608557750l/45300567.jpg" alt="" loading="lazy"></div>
+<div class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1608557750l/45300567.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">The Maidens</h2>
 <p class="book-author">Alex Michaelides</p>
 <p class="book-meta">finished June 21, 2026 · audiobook</p>
 
-</div>
+</div></div>
 </article>
 <article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1385379350l/18944260.jpg" alt="" loading="lazy"></div>
+<div class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1385379350l/18944260.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">The Plot Against America</h2>
 <p class="book-author">Philip Roth</p>
 <p class="book-meta">finished June 11, 2026 · print</p>
 
-</div>
+</div></div>
 </article>
 <article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1703310133l/7815._SY475_.jpg" alt="" loading="lazy"></div>
+<div class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1703310133l/7815._SY475_.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">The Year of Magical Thinking</h2>
 <p class="book-author">Joan Didion</p>
 <p class="book-meta">finished June 11, 2026 · audiobook</p>
 
-</div>
+</div></div>
 </article>
 <article class="book">
-<div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1725821632l/168632462._SY475_.jpg" alt="" loading="lazy"></div>
+<div class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1725821632l/168632462._SY475_.jpg" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">Stone Yard Devotional</h2>
 <p class="book-author">Charlotte  Wood</p>
 <p class="book-meta">finished June 1, 2026 · epub</p>
 
-</div>
+</div></div>
 </article>
 </div>
 </body>
