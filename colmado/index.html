@@ -293,6 +293,70 @@
   .toggles button[aria-pressed="true"] { background: var(--crit-soft); color: var(--crit);
     border-color: color-mix(in srgb, var(--crit) 35%, transparent); font-weight: 600; }
 
+  /* day list — the default way to pick a patient: no typing */
+  .daylist { display: flex; flex-direction: column; gap: 7px; }
+  .pcard {
+    display: flex; align-items: center; gap: 11px; width: 100%; text-align: left;
+    padding: 12px 13px; border-radius: 12px; cursor: pointer; font: inherit;
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink);
+  }
+  .pcard:hover { border-color: var(--brand); background: var(--brand-soft); }
+  .pcard .ini {
+    width: 40px; height: 40px; border-radius: 50%; flex: none; display: grid; place-items: center;
+    background: var(--brand-soft); color: var(--brand); font-weight: 700; font-size: 15px;
+    border: 1px solid color-mix(in srgb, var(--brand) 28%, transparent);
+  }
+  .pcard .nm { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+  .pcard .sub { font-size: 12px; color: var(--ink-3); }
+  .pcard.done { opacity: .5; }
+  .pcard.done .nm { text-decoration: line-through; }
+  .pcard .tick { margin-left: auto; color: var(--ok); font-weight: 700; }
+  .listhead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; }
+  .listhead .count { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .searchtoggle {
+    width: 100%; margin-top: 10px; padding: 11px; font: inherit; font-size: 13.5px;
+    background: none; border: 1px dashed var(--line-strong); border-radius: 10px;
+    color: var(--ink-2); cursor: pointer;
+  }
+  .searchtoggle:hover { border-color: var(--brand); color: var(--brand); }
+
+  /* quantity presets — nobody types a number */
+  .qchips { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
+  .qchips button {
+    min-width: 40px; padding: 7px 9px; font: inherit; font-size: 13.5px; font-weight: 600;
+    border-radius: 9px; border: 1px solid var(--line-strong); background: var(--surface);
+    color: var(--ink-2); cursor: pointer; font-variant-numeric: tabular-nums;
+  }
+  .qchips button:hover { border-color: var(--brand); }
+  .qchips button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
+  :root[data-theme="dark"] .qchips button[aria-pressed="true"] { color: #0E1116; }
+
+  /* change to give, broken into notes */
+  .devolver {
+    margin: 12px 0 0; padding: 14px 16px; border-radius: 13px;
+    background: color-mix(in srgb, var(--ok) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent);
+  }
+  .devolver .top { display: flex; justify-content: space-between; align-items: baseline; }
+  .devolver .k { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase;
+    font-weight: 700; color: var(--ok); }
+  .devolver .v { font-size: 34px; font-weight: 650; color: var(--ok);
+    font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .notes-give { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .bill {
+    display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 8px;
+    background: var(--surface); border: 1px solid color-mix(in srgb, var(--ok) 30%, transparent);
+    font-size: 13.5px; font-variant-numeric: tabular-nums;
+  }
+  .bill b { font-weight: 700; }
+
+  /* denomination counter */
+  .denoms { display: flex; flex-direction: column; gap: 6px; }
+  .denom { display: grid; grid-template-columns: 74px 1fr auto; align-items: center; gap: 10px; }
+  .denom .face { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+  .denom .sum { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums;
+    text-align: right; min-width: 66px; }
+
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 
@@ -376,6 +440,28 @@
     { cedula:"402-1122934-5560", nombre:"Mariela Santana",     carry:120, saldo:300,  cuota:1500 }
   ];
 
+  /* Loaded each morning by clinic staff, who know who is coming.
+     A volunteer taps a name; typing is only for the unexpected walk-in. */
+  const LISTA_HOY = [
+    "402-1938291-4821", "001-7729183-1093", "402-8871209-7756",
+    "001-3320918-3312", "402-1122934-5560"
+  ];
+
+  const DENOMS = [2000, 1000, 500, 200, 100, 50, 25, 10, 5, 1];
+
+  /* Which notes to hand back. Removes the mental arithmetic that loses cash. */
+  function desglose(monto) {
+    const out = [];
+    let resto = Math.round(monto);
+    for (const d of DENOMS) {
+      const n = Math.floor(resto / d);
+      if (n > 0) { out.push({ d, n }); resto -= n * d; }
+    }
+    return out;
+  }
+
+  const iniciales = nombre => nombre.split(/\s+/).slice(0, 2).map(w => w[0]).join("");
+
   /* ---------------- state ---------------- */
   const S = {
     screen: "venta",
@@ -383,11 +469,14 @@
     pendientes: 0,
     patient: null,
     query: "",
+    buscando: false,          // search is the exception now, not the default
+    atendidos: {},            // cedula -> true, set by completing a sale
     cart: {},              // id -> cantidad
     verTodos: false,
     efectivo: 500,
     lastSale: null,        // { total, antes, ahora, earned, saldo, carry }
-    contado: 4820,
+    contado: 0,
+    conteo: {},   // denominación -> cantidad contada
     canjeApplied: false,
     canjePatient: PATIENTS[0]
   };
@@ -497,6 +586,28 @@
           <span><b>${S.patient.nombre}</b> <span class="ced" style="color:var(--ink-3);font-size:13px">…${S.patient.cedula.slice(-4)}</span></span>
           <button class="swap" data-clear="1">Cambiar</button>
         </div>`;
+    } else if (!S.buscando) {
+      const hoy = LISTA_HOY.map(c => PATIENTS.find(p => p.cedula === c));
+      const faltan = hoy.filter(p => !S.atendidos[p.cedula]).length;
+      patientHTML = `
+        <div class="listhead">
+          <span class="sect-label" style="margin:0">Pacientes de hoy</span>
+          <span class="count">${faltan} sin atender</span>
+        </div>
+        <div class="daylist">
+          ${hoy.map(p => {
+            const done = !!S.atendidos[p.cedula];
+            return `<button class="pcard ${done ? "done" : ""}" data-pat="${p.cedula}">
+                      <span class="ini">${iniciales(p.nombre)}</span>
+                      <span>
+                        <span class="nm">${p.nombre}</span><br>
+                        <span class="sub">…${p.cedula.slice(-4)}</span>
+                      </span>
+                      ${done ? '<span class="tick">✓</span>' : ""}
+                    </button>`;
+          }).join("")}
+        </div>
+        <button class="searchtoggle" data-buscar="1">No está en la lista — buscar</button>`;
     } else {
       const q = S.query.trim().toLowerCase();
       let results = "";
@@ -512,7 +623,8 @@
         results = `<div class="note" style="padding:10px 0 0">Escribe al menos 3 letras.</div>`;
       }
       patientHTML = `<input type="text" id="q" placeholder="buscar nombre o cédula…" value="${S.query}"
-                       aria-label="Buscar paciente" autocomplete="off">${results}`;
+                       aria-label="Buscar paciente" autocomplete="off">${results}
+        <button class="searchtoggle" data-buscar="0">← Volver a la lista de hoy</button>`;
     }
 
     b.insertAdjacentHTML("beforeend", `
@@ -525,10 +637,10 @@
           ${shown.map(p => {
             const q = S.cart[p.id] || 0;
             const ctrl = p.entrada === "decimal"
-              ? `<div class="stepper">
+              ? `<div class="qchips">
+                   ${[0.5, 1, 2, 5].map(v => `<button data-qty="${p.id}:${v}"
+                       aria-pressed="${q === v}">${v === 0.5 ? "½" : v}</button>`).join("")}
                    <button data-dec="${p.id}" ${q <= 0 ? "disabled" : ""} aria-label="Quitar">−</button>
-                   <input class="dec tnum" type="text" inputmode="decimal" data-set="${p.id}"
-                          value="${q ? plain(q) : "0"}" aria-label="${p.nombre} cantidad">
                    <button data-inc="${p.id}" aria-label="Agregar">+</button>
                  </div>`
               : `<div class="stepper">
@@ -578,11 +690,15 @@
           <div style="height:10px"></div>
           <div class="sect-label">Efectivo recibido</div>
           <input type="text" inputmode="numeric" id="efectivo" class="tnum" value="${plain(S.efectivo)}" aria-label="Efectivo recibido">
-          <div class="kv big" style="margin-top:12px">
-            <span class="k">DEVOLVER</span>
-            <span class="v" style="color:${cambio < 0 ? "var(--crit)" : "var(--ok)"}">${money(Math.max(cambio, 0))}</span>
-          </div>
-          ${cambio < 0 ? `<div class="note" style="padding:6px 0 0;color:var(--crit)">Falta ${money(-cambio)}.</div>` : ""}
+          ${cambio < 0
+            ? `<div class="note" style="padding:10px 0 0;color:var(--crit);font-weight:600">
+                 Falta ${money(-cambio)}.</div>`
+            : `<div class="devolver">
+                 <div class="top"><span class="k">Devolver</span><span class="v">${money(cambio)}</span></div>
+                 ${cambio > 0 ? `<div class="notes-give">
+                   ${desglose(cambio).map(b => `<span class="bill"><b>${b.n}</b> × ${b.d}</span>`).join("")}
+                 </div>` : ""}
+               </div>`}
         </div>
       </div>
       <div class="foot">
@@ -649,8 +765,23 @@
             <span class="k"><b>Debe haber en caja</b></span><span class="v">${money(esperado)}</span></div>
         </div>
         <div class="sect">
-          <div class="sect-label">¿Cuánto contaste?</div>
-          <input type="text" inputmode="numeric" id="contado" class="tnum" value="${plain(S.contado)}" aria-label="Efectivo contado">
+          <div class="sect-label">Cuenta los billetes — la app suma</div>
+          <div class="denoms">
+            ${DENOMS.filter(d => d >= 25).map(d => {
+              const n = S.conteo[d] || 0;
+              return `<div class="denom">
+                <span class="face">${d}</span>
+                <span class="stepper">
+                  <button data-dmin="${d}" ${n <= 0 ? "disabled" : ""} aria-label="Menos de ${d}">−</button>
+                  <span class="qty">${n}</span>
+                  <button data-dmas="${d}" aria-label="Más de ${d}">+</button>
+                </span>
+                <span class="sum">${n ? plain(n * d) : ""}</span>
+              </div>`;
+            }).join("")}
+          </div>
+          <div class="kv big" style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
+            <span class="k"><b>Contaste</b></span><span class="v">${money(S.contado)}</span></div>
           <div class="variance ${diff === 0 ? "zero" : "off"}">
             <span>${diff === 0 ? "Cuadra exacto" : diff > 0 ? "Sobra" : "Falta"}</span>
             <span class="v">${diff === 0 ? "—" : money(Math.abs(diff))}</span>
@@ -714,9 +845,10 @@
       "The PIN returns the signed session token from <code>§5.1</code> — every row from here on is stamped with this volunteer and this shift, and the roster search only works while the shift is open."
     ]},
     venta: { h: "Venta — §7.2", items: [
-      "Search needs 3 characters and returns at most 5 patients. Try <code>mar</code>, <code>jos</code>, or <code>4821</code>.",
+      "<b>The day's list is the default.</b> Clinic staff load who is expected each morning; the volunteer taps a name and never types. Served patients grey out, so the list shortens visibly through the day.",
+      "Search is the fallback for someone not on the list — 3 characters, at most 5 results. Try <code>mar</code>, <code>jos</code>, or <code>4821</code>.",
       "Top 12 products by 30-day volume; <b>Ver todos</b> opens the full 26. A flat scroll of everything does not hit the 30-second target.",
-      "No prices on this screen — they are on the wall. Weights like <code>1.5 lb</code> type straight into the field; countables use ± .",
+      "<b>Nothing is typed.</b> Weighed goods use ½ / 1 / 2 / 5 chips (tap the same chip again to clear); countables use ± .",
       "COBRAR stays disabled until there is a patient and a total. Every sale belongs to someone."
     ]},
     confirm: { h: "Confirmar — §7.3", items: [
@@ -731,7 +863,7 @@
       "Anular is available until the shift closes — a void, never an edit."
     ]},
     cerrar: { h: "Cerrar turno — §7.5", items: [
-      "Expected vs. counted. Edit the counted figure and watch the variance move.",
+      "<b>Count notes, not money.</b> Tap how many of each denomination; the app does the addition. Counting objects is far easier than summing currency at the end of a long shift.",
       "This does not fix cash control, it <i>measures</i> it — variance data CCI has never had.",
       "With the power out, close is still allowed. A volunteer at 5pm with no wifi must be able to count and go home; the shift settles when the queue drains."
     ]},
@@ -778,6 +910,22 @@
     if (t.dataset.pat)     { S.patient = PATIENTS.find(p => p.cedula === t.dataset.pat); S.query = ""; return render(); }
     if (t.dataset.clear)   { S.patient = null; return render(); }
     if (t.dataset.toggleTodos) { S.verTodos = !S.verTodos; return render(); }
+    if (t.dataset.buscar !== undefined) {
+      S.buscando = t.dataset.buscar === "1"; S.query = ""; return render();
+    }
+    if (t.dataset.qty) {
+      const [id, v] = t.dataset.qty.split(":");
+      const val = parseFloat(v);
+      S.cart[id] = (S.cart[id] === val) ? 0 : val;   // tapping the same chip clears it
+      return render();
+    }
+    if (t.dataset.dmas || t.dataset.dmin) {
+      const d = t.dataset.dmas || t.dataset.dmin;
+      const step = t.dataset.dmas ? 1 : -1;
+      S.conteo[d] = Math.max(0, (S.conteo[d] || 0) + step);
+      S.contado = DENOMS.reduce((a, k) => a + (S.conteo[k] || 0) * k, 0);
+      return render();
+    }
 
     if (t.dataset.inc) {
       const p = PRODUCTS.find(x => x.id === t.dataset.inc);
@@ -800,17 +948,23 @@
       S.patient.saldo = res.saldo;
       S.lastSale = { total: tot, antes: before, earned: res.earned,
                      saldo: res.saldo, carry: res.carry, nombre: S.patient.nombre };
+      S.atendidos[S.patient.cedula] = true;
       if (S.offline) S.pendientes++;
       S.screen = "recibo";
       return render();
     }
-    if (t.dataset.nueva)  { S.cart = {}; S.patient = null; S.verTodos = false; S.screen = "venta"; return render(); }
+    if (t.dataset.nueva)  {
+      S.cart = {}; S.patient = null; S.verTodos = false; S.buscando = false;
+      S.screen = "venta"; return render();
+    }
     if (t.dataset.anular) {
       const r = S.lastSale;
       S.patient = PATIENTS.find(p => p.nombre === r.nombre);
       S.patient.carry = r.antes;                       // rebuild_credit, §6.2
       S.patient.saldo = r.saldo - r.earned * 100;
+      delete S.atendidos[S.patient.cedula];
       if (S.offline && S.pendientes > 0) S.pendientes--;
+      S.buscando = false;
       S.screen = "venta";
       return render();
     }
@@ -832,25 +986,11 @@
       if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); }
       return;
     }
-    if (t.dataset.set) {
-      const v = parseFloat(t.value.replace(",", ".")) || 0;
-      S.cart[t.dataset.set] = Math.max(0, v);
-      const foot = document.querySelector(".totalrow .amt");
-      if (foot) foot.textContent = money(total());
-      const btn = document.querySelector('[data-go="confirm"]');
-      if (btn) btn.disabled = !S.patient || total() <= 0;
-      return;
-    }
     if (t.id === "efectivo") {
       S.efectivo = parseFloat(t.value.replace(/[^\d.]/g, "")) || 0;
       const pos = t.selectionStart; render();
       const box = el("efectivo"); if (box) { box.focus(); box.setSelectionRange(pos, pos); }
       return;
-    }
-    if (t.id === "contado") {
-      S.contado = parseFloat(t.value.replace(/[^\d.]/g, "")) || 0;
-      const pos = t.selectionStart; render();
-      const box = el("contado"); if (box) { box.focus(); box.setSelectionRange(pos, pos); }
     }
   });
 
@@ -863,6 +1003,7 @@
   });
   el("tg-reset").addEventListener("click", function () {
     S.cart = {}; S.patient = null; S.verTodos = false; S.pendientes = 0;
+    S.buscando = false; S.atendidos = {}; S.conteo = {}; S.contado = 0;
     PATIENTS[0].carry = 710; PATIENTS[0].saldo = 200;
     PATIENTS[1].carry = 340; PATIENTS[1].saldo = 500;
     PATIENTS[2].carry = 0;   PATIENTS[2].saldo = 1200;
