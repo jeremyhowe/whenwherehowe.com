@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/favicon-32.png" sizes="32x32">
+<title>Colmado — Prototipo de interfaz</title>
+
+<style>
+  :root {
+    --ground:      #F2F4F7;
+    --surface:     #FFFFFF;
+    --surface-2:   #E9ECF2;
+    --line:        #D3D9E3;
+    --line-strong: #B4BDCC;
+    --ink:         #171A21;
+    --ink-2:       #4A5364;
+    --ink-3:       #7A8494;
+    --brand:       #1B3A6B;
+    --brand-soft:  #E3EAF5;
+    --credit:      #A9721A;
+    --credit-soft: #FBF0DA;
+    --ok:          #1B6B4A;
+    --warn:        #A55A08;
+    --crit:        #A32A2A;
+    --crit-soft:   #FBE7E7;
+    --shadow: 0 1px 2px rgba(16,22,38,.06), 0 8px 24px rgba(16,22,38,.08);
+    --mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, Consolas, monospace;
+    --sans: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --ground:      #0E1116;
+      --surface:     #171B23;
+      --surface-2:   #202632;
+      --line:        #2C3340;
+      --line-strong: #3D4655;
+      --ink:         #EDF0F5;
+      --ink-2:       #A9B3C2;
+      --ink-3:       #78838F;
+      --brand:       #7DA6E8;
+      --brand-soft:  #1B2536;
+      --credit:      #E0AC53;
+      --credit-soft: #2A2113;
+      --ok:          #5BC08D;
+      --warn:        #E0A055;
+      --crit:        #E88A8A;
+      --crit-soft:   #2E1A1A;
+      --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+  :root[data-theme="light"] {
+    --ground:#F2F4F7; --surface:#FFFFFF; --surface-2:#E9ECF2; --line:#D3D9E3;
+    --line-strong:#B4BDCC; --ink:#171A21; --ink-2:#4A5364; --ink-3:#7A8494;
+    --brand:#1B3A6B; --brand-soft:#E3EAF5; --credit:#A9721A; --credit-soft:#FBF0DA;
+    --ok:#1B6B4A; --warn:#A55A08; --crit:#A32A2A; --crit-soft:#FBE7E7;
+    --shadow:0 1px 2px rgba(16,22,38,.06), 0 8px 24px rgba(16,22,38,.08);
+  }
+  :root[data-theme="dark"] {
+    --ground:#0E1116; --surface:#171B23; --surface-2:#202632; --line:#2C3340;
+    --line-strong:#3D4655; --ink:#EDF0F5; --ink-2:#A9B3C2; --ink-3:#78838F;
+    --brand:#7DA6E8; --brand-soft:#1B2536; --credit:#E0AC53; --credit-soft:#2A2113;
+    --ok:#5BC08D; --warn:#E0A055; --crit:#E88A8A; --crit-soft:#2E1A1A;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: var(--sans); font-size: 15px; line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .tnum { font-variant-numeric: tabular-nums; }
+
+  /* ---------- page chrome ---------- */
+  .page { max-width: 1180px; margin: 0 auto; padding: 32px 20px 80px; }
+  header.masthead { display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: baseline;
+    border-bottom: 1px solid var(--line); padding-bottom: 20px; margin-bottom: 28px; }
+  .masthead h1 { font-size: 22px; margin: 0; letter-spacing: -.01em; }
+  .masthead p { margin: 0; color: var(--ink-2); font-size: 14px; max-width: 60ch; }
+  .eyebrow { font-size: 11px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 600; }
+
+  .workbench { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 40px; align-items: start; }
+  @media (max-width: 900px) { .workbench { grid-template-columns: 1fr; } }
+
+  .stage { display: flex; flex-direction: column; align-items: center; gap: 20px; }
+
+  /* ---------- screen switcher ---------- */
+  .switcher { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+  .switcher button {
+    font: inherit; font-size: 12.5px; padding: 6px 11px; border-radius: 999px;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
+    cursor: pointer; transition: background .12s, color .12s, border-color .12s;
+  }
+  .switcher button:hover { border-color: var(--line-strong); color: var(--ink); }
+  .switcher button[aria-current="true"] {
+    background: var(--brand); border-color: var(--brand); color: var(--surface); font-weight: 600;
+  }
+  :root[data-theme="dark"] .switcher button[aria-current="true"],
+  @media (prefers-color-scheme: dark) { }
+  .switcher button:focus-visible, .phone button:focus-visible, .toggles button:focus-visible {
+    outline: 2px solid var(--brand); outline-offset: 2px;
+  }
+
+  /* ---------- phone ---------- */
+  .phone {
+    width: 390px; max-width: 100%; background: var(--surface);
+    border: 1px solid var(--line); border-radius: 26px; box-shadow: var(--shadow);
+    overflow: hidden; display: flex; flex-direction: column;
+    min-height: 720px;
+  }
+  .phone .statusbar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 18px 5px; font-size: 11px; color: var(--ink-3);
+    font-variant-numeric: tabular-nums;
+  }
+  .appbar {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 10px 16px; border-bottom: 1px solid var(--line); background: var(--surface);
+  }
+  .appbar .who { font-size: 13.5px; font-weight: 600; letter-spacing: -.005em; }
+  .appbar .who span { font-weight: 400; color: var(--ink-3); }
+  .screenbody { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+  .scroll { flex: 1; overflow-y: auto; }
+
+  .banner {
+    display: flex; align-items: center; gap: 8px; padding: 8px 16px;
+    font-size: 12.5px; font-weight: 600;
+    background: var(--crit-soft); color: var(--crit);
+    border-bottom: 1px solid var(--line);
+  }
+  .banner .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; flex: none; }
+
+  .sect { padding: 14px 16px; border-bottom: 1px solid var(--line); }
+  .sect-label { font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 600; margin-bottom: 8px; }
+
+  input[type="text"], input[type="number"] {
+    font: inherit; width: 100%; padding: 11px 12px; border-radius: 10px;
+    border: 1px solid var(--line-strong); background: var(--surface-2); color: var(--ink);
+  }
+  input:focus-visible { outline: 2px solid var(--brand); outline-offset: 1px; border-color: var(--brand); }
+
+  .result {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 10px 12px; margin-top: 6px; border-radius: 10px; cursor: pointer;
+    border: 1px solid transparent; background: var(--surface-2); font-size: 14px;
+  }
+  .result:hover { border-color: var(--line-strong); }
+  .result .ced { color: var(--ink-3); font-size: 13px; }
+  .chosen {
+    display: flex; justify-content: space-between; align-items: center; gap: 10px;
+    padding: 11px 12px; border-radius: 10px; background: var(--brand-soft);
+    border: 1px solid color-mix(in srgb, var(--brand) 30%, transparent); font-size: 14.5px;
+  }
+  .chosen b { font-weight: 600; }
+  .chosen .swap { font-size: 12px; color: var(--brand); background: none; border: 0;
+    font-family: inherit; cursor: pointer; text-decoration: underline; padding: 0; }
+
+  /* product rows */
+  .prow {
+    display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 8px;
+    padding: 9px 16px; border-bottom: 1px solid var(--line);
+  }
+  .prow:last-child { border-bottom: 0; }
+  .prow.active { background: var(--brand-soft); }
+  .pname { font-size: 15px; letter-spacing: -.005em; }
+  .punit { font-size: 11.5px; color: var(--ink-3); text-transform: lowercase; }
+  .stepper { display: flex; align-items: center; gap: 4px; }
+  .stepper button {
+    width: 34px; height: 34px; border-radius: 9px; font: inherit; font-size: 18px; line-height: 1;
+    border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink);
+    cursor: pointer; display: grid; place-items: center;
+  }
+  .stepper button:hover { background: var(--surface-2); }
+  .stepper button:disabled { opacity: .35; cursor: default; }
+  .stepper .qty { min-width: 34px; text-align: center; font-size: 16px; font-weight: 600;
+    font-variant-numeric: tabular-nums; }
+  .stepper input.dec {
+    width: 62px; text-align: center; padding: 7px 4px; font-size: 15px; font-weight: 600;
+    border-radius: 9px; font-variant-numeric: tabular-nums;
+  }
+  .vertodos {
+    width: 100%; padding: 13px; font: inherit; font-size: 14px; font-weight: 600;
+    background: none; border: 0; border-top: 1px solid var(--line);
+    color: var(--brand); cursor: pointer;
+  }
+  .vertodos:hover { background: var(--surface-2); }
+
+  /* totals + primary action */
+  .foot { border-top: 1px solid var(--line-strong); background: var(--surface); padding: 12px 16px 16px; }
+  .totalrow { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .totalrow .lbl { font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 600; }
+  .totalrow .amt { font-size: 30px; font-weight: 650; letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums; }
+  .approx { font-size: 11px; color: var(--warn); font-weight: 600; }
+
+  .btn {
+    width: 100%; padding: 15px; font: inherit; font-size: 17px; font-weight: 650;
+    border-radius: 13px; border: 0; cursor: pointer; letter-spacing: .01em;
+    background: var(--brand); color: #fff;
+  }
+  :root[data-theme="dark"] .btn { color: #0E1116; }
+  @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn { color: #0E1116; } }
+  .btn:disabled { opacity: .4; cursor: default; }
+  .btn.ghost { background: var(--surface-2); color: var(--ink); border: 1px solid var(--line-strong); }
+  .btn.danger { background: var(--crit-soft); color: var(--crit); border: 1px solid color-mix(in srgb, var(--crit) 35%, transparent); }
+  .btnrow { display: flex; gap: 10px; }
+  .btnrow .btn { font-size: 15px; }
+
+  /* confirm list */
+  .cline {
+    display: grid; grid-template-columns: 1fr auto auto; gap: 10px; align-items: baseline;
+    padding: 9px 16px; font-size: 14.5px; border-bottom: 1px solid var(--line);
+  }
+  .cline .qty { color: var(--ink-2); font-size: 13px; font-variant-numeric: tabular-nums; }
+  .cline .calc { color: var(--ink-3); font-size: 12.5px; font-variant-numeric: tabular-nums;
+    font-family: var(--mono); }
+  .cline .sub { font-weight: 600; font-variant-numeric: tabular-nums; min-width: 62px; text-align: right; }
+
+  .kv { display: flex; justify-content: space-between; gap: 12px; padding: 4px 0; font-size: 14.5px; }
+  .kv .k { color: var(--ink-2); }
+  .kv .v { font-variant-numeric: tabular-nums; font-weight: 600; }
+  .kv.big .v { font-size: 20px; }
+  .kv.quiet .k, .kv.quiet .v { color: var(--ink-3); font-weight: 400; }
+
+  /* receipt */
+  .stamp { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 26px 16px 18px; }
+  .stamp .check {
+    width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center;
+    background: color-mix(in srgb, var(--ok) 16%, transparent); color: var(--ok);
+    font-size: 24px; font-weight: 700;
+  }
+  .stamp .t { font-size: 17px; font-weight: 650; letter-spacing: .01em; }
+
+  .creditbox {
+    margin: 0 16px 14px; padding: 14px 16px; border-radius: 13px;
+    background: var(--credit-soft); border: 1px solid color-mix(in srgb, var(--credit) 32%, transparent);
+  }
+  .creditbox .arith { font-family: var(--mono); font-size: 13px; color: var(--ink-2);
+    display: flex; flex-direction: column; gap: 5px; }
+  .creditbox .arith div { display: flex; justify-content: space-between; gap: 10px; }
+  .creditbox .arith b { color: var(--ink); font-weight: 600; }
+  .creditbox hr { border: 0; border-top: 1px solid color-mix(in srgb, var(--credit) 30%, transparent); margin: 11px 0; }
+  .creditbox .total { display: flex; justify-content: space-between; align-items: baseline; }
+  .creditbox .total .k { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase;
+    font-weight: 700; color: var(--credit); }
+  .creditbox .total .v { font-size: 25px; font-weight: 650; color: var(--credit);
+    font-variant-numeric: tabular-nums; }
+  .creditbox .next { margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+  .earned-pill {
+    display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px;
+    background: var(--credit); color: var(--surface); font-size: 12px; font-weight: 700;
+  }
+  :root[data-theme="dark"] .earned-pill { color: #17130A; }
+
+  /* meter */
+  .meter { height: 7px; border-radius: 999px; background: color-mix(in srgb, var(--credit) 22%, transparent);
+    overflow: hidden; margin-top: 10px; }
+  .meter i { display: block; height: 100%; background: var(--credit); border-radius: 999px;
+    transition: width .5s cubic-bezier(.2,.7,.3,1); }
+
+  /* variance */
+  .variance {
+    display: flex; justify-content: space-between; align-items: baseline; padding: 13px 14px;
+    border-radius: 12px; font-size: 15px; margin-top: 4px;
+  }
+  .variance.zero { background: color-mix(in srgb, var(--ok) 13%, transparent); color: var(--ok); }
+  .variance.off  { background: var(--crit-soft); color: var(--crit); }
+  .variance .v { font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
+
+  .note { padding: 10px 16px 16px; font-size: 12.5px; color: var(--ink-3); }
+
+  /* ---------- annotations ---------- */
+  .notes { position: sticky; top: 24px; display: flex; flex-direction: column; gap: 14px; }
+  .notecard { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; padding: 14px 16px; }
+  .notecard h3 { margin: 0 0 8px; font-size: 13px; letter-spacing: -.005em; }
+  .notecard ul { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 7px; }
+  .notecard li { font-size: 13px; color: var(--ink-2); line-height: 1.45; }
+  .notecard code { font-family: var(--mono); font-size: 11.5px; background: var(--surface-2);
+    padding: 1px 4px; border-radius: 4px; color: var(--ink); }
+  .ref { font-size: 11px; color: var(--ink-3); font-weight: 600; }
+
+  .toggles { display: flex; flex-wrap: wrap; gap: 8px; }
+  .toggles button {
+    font: inherit; font-size: 12.5px; padding: 7px 12px; border-radius: 9px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--surface); color: var(--ink-2);
+  }
+  .toggles button[aria-pressed="true"] { background: var(--crit-soft); color: var(--crit);
+    border-color: color-mix(in srgb, var(--crit) 35%, transparent); font-weight: 600; }
+
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+</head>
+<body>
+<div class="page">
+  <header class="masthead">
+    <div style="flex:1 1 320px">
+      <div class="eyebrow">CCI · Comedero &amp; Sabana Rey</div>
+      <h1>Colmado — prototipo de interfaz</h1>
+    </div>
+    <p>Clickable prototype of the <code>venta</code> and <code>recepción</code> flows from the build spec.
+       The credit arithmetic is the real §6.1 algorithm, so the numbers respond honestly as you ring up a sale.</p>
+  </header>
+
+  <div class="workbench">
+    <div class="stage">
+      <nav class="switcher" id="switcher" aria-label="Pantallas"></nav>
+
+      <div class="phone" lang="es">
+        <div class="statusbar">
+          <span id="clock">9:41</span>
+          <span id="netlabel">wifi · 89%</span>
+        </div>
+        <div class="appbar">
+          <div class="who" id="appbar-who">Comedero · Roselio</div>
+          <button class="swap" id="appbar-action" style="font-size:13px;background:none;border:0;color:var(--brand);font-family:inherit;cursor:pointer">Cerrar</button>
+        </div>
+        <div class="screenbody" id="screenbody"></div>
+      </div>
+
+      <div class="toggles">
+        <button id="tg-offline" aria-pressed="false">Simular corte de energía</button>
+        <button id="tg-reset" aria-pressed="false">Reiniciar venta</button>
+      </div>
+    </div>
+
+    <aside class="notes" id="notes"></aside>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------------- data ---------------- */
+  const PRODUCTS = [
+    { id:"arroz",   nombre:"Arroz",            unidad:"libra",   precio:45,  entrada:"decimal", top:1 },
+    { id:"habich",  nombre:"Habichuelas",      unidad:"libra",   precio:65,  entrada:"decimal", top:1 },
+    { id:"huevos",  nombre:"Huevos",           unidad:"huacal",  precio:200, entrada:"stepper", top:1 },
+    { id:"aceite",  nombre:"Aceite",           unidad:"litro",   precio:180, entrada:"stepper", top:1 },
+    { id:"azucar",  nombre:"Azúcar",           unidad:"libra",   precio:40,  entrada:"decimal", top:1 },
+    { id:"cafe",    nombre:"Café",             unidad:"libra",   precio:250, entrada:"decimal", top:1 },
+    { id:"salami",  nombre:"Salami",           unidad:"libra",   precio:120, entrada:"decimal", top:1 },
+    { id:"espag",   nombre:"Espaguetis",       unidad:"unidad",  precio:35,  entrada:"stepper", top:1 },
+    { id:"leche",   nombre:"Leche",            unidad:"litro",   precio:95,  entrada:"stepper", top:1 },
+    { id:"pan",     nombre:"Pan",              unidad:"unidad",  precio:15,  entrada:"stepper", top:1 },
+    { id:"jabon",   nombre:"Jabón de cuaba",   unidad:"unidad",  precio:45,  entrada:"stepper", top:1 },
+    { id:"papel",   nombre:"Papel higiénico",  unidad:"unidad",  precio:30,  entrada:"stepper", top:1 },
+    { id:"sal",     nombre:"Sal",              unidad:"libra",   precio:25,  entrada:"stepper", top:0 },
+    { id:"cebolla", nombre:"Cebolla",          unidad:"libra",   precio:55,  entrada:"decimal", top:0 },
+    { id:"ajo",     nombre:"Ajo",              unidad:"libra",   precio:140, entrada:"decimal", top:0 },
+    { id:"platano", nombre:"Plátano",          unidad:"unidad",  precio:20,  entrada:"stepper", top:0 },
+    { id:"yuca",    nombre:"Yuca",             unidad:"libra",   precio:35,  entrada:"decimal", top:0 },
+    { id:"avena",   nombre:"Avena",            unidad:"libra",   precio:70,  entrada:"decimal", top:0 },
+    { id:"sardina", nombre:"Sardina",          unidad:"unidad",  precio:75,  entrada:"stepper", top:0 },
+    { id:"maiz",    nombre:"Maíz enlatado",    unidad:"unidad",  precio:65,  entrada:"stepper", top:0 },
+    { id:"deterg",  nombre:"Detergente",       unidad:"unidad",  precio:110, entrada:"stepper", top:0 },
+    { id:"cloro",   nombre:"Cloro",            unidad:"litro",   precio:60,  entrada:"stepper", top:0 },
+    { id:"pasta",   nombre:"Pasta dental",     unidad:"unidad",  precio:85,  entrada:"stepper", top:0 },
+    { id:"galleta", nombre:"Galletas",         unidad:"unidad",  precio:40,  entrada:"stepper", top:0 },
+    { id:"harina",  nombre:"Harina",           unidad:"libra",   precio:38,  entrada:"decimal", top:0 },
+    { id:"bacalao", nombre:"Bacalao",          unidad:"libra",   precio:320, entrada:"decimal", top:0 }
+  ];
+
+  const PATIENTS = [
+    { cedula:"402-1938291-4821", nombre:"María Rodríguez",     carry:710, saldo:200,  cuota:1500 },
+    { cedula:"001-7729183-1093", nombre:"José Almonte",        carry:340, saldo:500,  cuota:1500 },
+    { cedula:"402-8871209-7756", nombre:"Altagracia Peña",     carry:0,   saldo:1200, cuota:1500 },
+    { cedula:"001-3320918-3312", nombre:"Ramón Díaz",          carry:880, saldo:0,    cuota:500  },
+    { cedula:"402-1122934-5560", nombre:"Mariela Santana",     carry:120, saldo:300,  cuota:1500 }
+  ];
+
+  /* ---------------- state ---------------- */
+  const S = {
+    screen: "venta",
+    offline: false,
+    pendientes: 0,
+    patient: null,
+    query: "",
+    cart: {},              // id -> cantidad
+    verTodos: false,
+    efectivo: 500,
+    lastSale: null,        // { total, antes, ahora, earned, saldo, carry }
+    contado: 4820,
+    canjeApplied: false,
+    canjePatient: PATIENTS[0]
+  };
+
+  const money = n => "RD$ " + Number(n).toLocaleString("es-DO", { maximumFractionDigits: 2 });
+  const plain = n => Number(n).toLocaleString("es-DO", { maximumFractionDigits: 2 });
+  const el = document.getElementById.bind(document);
+
+  const lines = () => Object.entries(S.cart)
+    .filter(([, q]) => q > 0)
+    .map(([id, q]) => {
+      const p = PRODUCTS.find(x => x.id === id);
+      return { p, cantidad: q, subtotal: Math.round(p.precio * q * 100) / 100 };
+    });
+  const total = () => lines().reduce((a, l) => a + l.subtotal, 0);
+
+  /* The switcher can land on Confirmar or Recibo before a sale exists.
+     Seed a plausible one so the screen is reviewable instead of blank. */
+  function seedSale() {
+    if (!S.patient) S.patient = PATIENTS[0];
+    if (total() <= 0) S.cart = { arroz: 2, huevos: 1 };
+  }
+  function seedRecibo() {
+    seedSale();
+    const tot = total();
+    const res = aplicarCredito(S.patient.carry, S.patient.saldo, tot);
+    S.lastSale = { total: tot, antes: S.patient.carry, earned: res.earned,
+                   saldo: res.saldo, carry: res.carry, nombre: S.patient.nombre };
+  }
+
+  /* §6.1 — the real algorithm */
+  function aplicarCredito(carry, saldo, monto) {
+    let c = carry + monto;
+    const earned = Math.floor(c / 1000);
+    c = c - earned * 1000;
+    return { carry: c, saldo: saldo + earned * 100, earned };
+  }
+
+  /* ---------------- screens ---------------- */
+  const SCREENS = {
+    abrir:   { label: "Abrir turno",  who: "Comedero",            action: "" },
+    venta:   { label: "Venta",        who: "Comedero · Roselio",  action: "Cerrar" },
+    confirm: { label: "Confirmar",    who: "Comedero · Roselio",  action: "" },
+    recibo:  { label: "Recibo",       who: "Comedero · Roselio",  action: "" },
+    cerrar:  { label: "Cerrar turno", who: "Comedero · Roselio",  action: "" },
+    canje:   { label: "Recepción",    who: "Comedero · Recepción",action: "" }
+  };
+
+  function render() {
+    const body = el("screenbody");
+    body.innerHTML = "";
+    const s = SCREENS[S.screen];
+    el("appbar-who").textContent = s.who;
+    const act = el("appbar-action");
+    act.textContent = s.action;
+    act.style.visibility = s.action ? "visible" : "hidden";
+    el("netlabel").textContent = S.offline ? "sin conexión · 89%" : "wifi · 89%";
+
+    if (S.offline && S.pendientes > 0 && S.screen !== "abrir") {
+      body.insertAdjacentHTML("beforeend",
+        `<div class="banner"><span class="dot"></span>${S.pendientes} venta${S.pendientes > 1 ? "s" : ""} sin enviar</div>`);
+    }
+    try {
+      VIEWS[S.screen](body);
+    } catch (err) {
+      body.insertAdjacentHTML("beforeend",
+        `<div class="note" style="padding:24px 16px">No se pudo mostrar esta pantalla.
+         <br><span style="font-family:var(--mono);font-size:11px">${err.message}</span></div>`);
+    }
+    paintSwitcher();
+    paintNotes();
+  }
+
+  const VIEWS = {};
+
+  /* ---- abrir turno ---- */
+  VIEWS.abrir = function (b) {
+    b.insertAdjacentHTML("beforeend", `
+      <div class="scroll">
+        <div class="sect">
+          <div class="sect-label">¿Quién abre el turno?</div>
+          <div class="result" data-vol="Roselio"><span>Roselio Matos</span><span class="ced">venta</span></div>
+          <div class="result" data-vol="Dorothy"><span>Dorothy Jiménez</span><span class="ced">venta</span></div>
+          <div class="result" data-vol="Vidal"><span>Vidal Ureña</span><span class="ced">venta</span></div>
+          <div class="result" data-vol="Dolores"><span>Dolores Castillo</span><span class="ced">venta</span></div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Tu clave de 4 números</div>
+          <input type="text" inputmode="numeric" maxlength="4" value="••••" aria-label="Clave">
+        </div>
+        <div class="sect" style="border-bottom:0">
+          <div class="sect-label">Efectivo con que abres</div>
+          <input type="text" inputmode="numeric" value="1,500" aria-label="Efectivo inicial">
+        </div>
+      </div>
+      <div class="foot"><button class="btn" data-go="venta">ABRIR TURNO</button></div>`);
+  };
+
+  /* ---- venta ---- */
+  VIEWS.venta = function (b) {
+    const t = total();
+    const shown = S.verTodos ? PRODUCTS : PRODUCTS.filter(p => p.top);
+
+    let patientHTML;
+    if (S.patient) {
+      patientHTML = `<div class="chosen">
+          <span><b>${S.patient.nombre}</b> <span class="ced" style="color:var(--ink-3);font-size:13px">…${S.patient.cedula.slice(-4)}</span></span>
+          <button class="swap" data-clear="1">Cambiar</button>
+        </div>`;
+    } else {
+      const q = S.query.trim().toLowerCase();
+      let results = "";
+      if (q.length >= 3) {
+        const hits = PATIENTS.filter(p =>
+          p.nombre.toLowerCase().includes(q) || p.cedula.replace(/-/g, "").includes(q)
+        ).slice(0, 5);
+        results = hits.length
+          ? hits.map(p => `<div class="result" data-pat="${p.cedula}">
+               <span>${p.nombre}</span><span class="ced">…${p.cedula.slice(-4)}</span></div>`).join("")
+          : `<div class="note" style="padding:10px 0 0">Sin resultados. Revisa el nombre o la cédula.</div>`;
+      } else if (q.length > 0) {
+        results = `<div class="note" style="padding:10px 0 0">Escribe al menos 3 letras.</div>`;
+      }
+      patientHTML = `<input type="text" id="q" placeholder="buscar nombre o cédula…" value="${S.query}"
+                       aria-label="Buscar paciente" autocomplete="off">${results}`;
+    }
+
+    b.insertAdjacentHTML("beforeend", `
+      <div class="scroll">
+        <div class="sect">
+          <div class="sect-label">Paciente</div>
+          ${patientHTML}
+        </div>
+        <div id="plist">
+          ${shown.map(p => {
+            const q = S.cart[p.id] || 0;
+            const ctrl = p.entrada === "decimal"
+              ? `<div class="stepper">
+                   <button data-dec="${p.id}" ${q <= 0 ? "disabled" : ""} aria-label="Quitar">−</button>
+                   <input class="dec tnum" type="text" inputmode="decimal" data-set="${p.id}"
+                          value="${q ? plain(q) : "0"}" aria-label="${p.nombre} cantidad">
+                   <button data-inc="${p.id}" aria-label="Agregar">+</button>
+                 </div>`
+              : `<div class="stepper">
+                   <button data-dec="${p.id}" ${q <= 0 ? "disabled" : ""} aria-label="Quitar">−</button>
+                   <span class="qty">${q}</span>
+                   <button data-inc="${p.id}" aria-label="Agregar">+</button>
+                 </div>`;
+            return `<div class="prow ${q > 0 ? "active" : ""}">
+                      <div><div class="pname">${p.nombre}</div><div class="punit">${p.unidad}</div></div>
+                      ${ctrl}
+                    </div>`;
+          }).join("")}
+          <button class="vertodos" data-toggle-todos="1">
+            ${S.verTodos ? "Ver menos" : `Ver todos (${PRODUCTS.length})`}
+          </button>
+        </div>
+      </div>
+      <div class="foot">
+        <div class="totalrow">
+          <span class="lbl">Total ${S.offline ? '<span class="approx">aprox.</span>' : ""}</span>
+          <span class="amt">${money(t)}</span>
+        </div>
+        <button class="btn" data-go="confirm" ${(!S.patient || t <= 0) ? "disabled" : ""}>COBRAR</button>
+      </div>`);
+  };
+
+  /* ---- confirmar ---- */
+  VIEWS.confirm = function (b) {
+    if (!S.patient || total() <= 0) seedSale();
+    const ls = lines(), t = total();
+    const cambio = S.efectivo - t;
+    b.insertAdjacentHTML("beforeend", `
+      <div class="scroll">
+        <div class="sect" style="padding-bottom:10px">
+          <div class="sect-label">Confirmar venta</div>
+          <div class="chosen"><span><b>${S.patient.nombre}</b>
+            <span style="color:var(--ink-3);font-size:13px">…${S.patient.cedula.slice(-4)}</span></span></div>
+        </div>
+        ${ls.map(l => `<div class="cline">
+            <div><span class="pname" style="font-size:14.5px">${l.p.nombre}</span>
+                 <span class="qty"> ${plain(l.cantidad)} ${l.p.unidad}</span></div>
+            <div class="calc">${l.p.precio} ×</div>
+            <div class="sub tnum">${plain(l.subtotal)}</div>
+          </div>`).join("")}
+        <div class="sect" style="border-bottom:0">
+          <div class="kv big"><span class="k">TOTAL</span><span class="v">${money(t)}</span></div>
+          <div style="height:10px"></div>
+          <div class="sect-label">Efectivo recibido</div>
+          <input type="text" inputmode="numeric" id="efectivo" class="tnum" value="${plain(S.efectivo)}" aria-label="Efectivo recibido">
+          <div class="kv big" style="margin-top:12px">
+            <span class="k">DEVOLVER</span>
+            <span class="v" style="color:${cambio < 0 ? "var(--crit)" : "var(--ok)"}">${money(Math.max(cambio, 0))}</span>
+          </div>
+          ${cambio < 0 ? `<div class="note" style="padding:6px 0 0;color:var(--crit)">Falta ${money(-cambio)}.</div>` : ""}
+        </div>
+      </div>
+      <div class="foot">
+        <div class="btnrow">
+          <button class="btn ghost" data-go="venta" style="flex:0 0 38%">← Corregir</button>
+          <button class="btn" data-commit="1" style="flex:1" ${cambio < 0 ? "disabled" : ""}>CONFIRMAR</button>
+        </div>
+      </div>`);
+  };
+
+  /* ---- recibo ---- */
+  VIEWS.recibo = function (b) {
+    if (!S.lastSale) seedRecibo();
+    const r = S.lastSale;
+    const falta = 1000 - r.carry;
+    b.insertAdjacentHTML("beforeend", `
+      <div class="scroll">
+        <div class="stamp">
+          <div class="check">✓</div>
+          <div class="t">REGISTRADO${S.offline ? " — SE ENVIARÁ" : ""}</div>
+          <div style="font-size:13px;color:var(--ink-3)">${r.nombre}</div>
+        </div>
+        <div class="creditbox">
+          <div class="arith">
+            <div><span>Total de la compra</span><b>${money(r.total)}</b></div>
+            <div><span>Antes tenía</span><b>${money(r.antes)} acumulado</b></div>
+            <div><span>Ahora</span><b>${money(r.antes + r.total)}${r.earned ? " →" : ""}</b></div>
+            ${r.earned ? `<div style="justify-content:flex-end;margin-top:2px">
+              <span class="earned-pill">${r.earned} crédito${r.earned > 1 ? "s" : ""} · ${money(r.earned * 100)}</span></div>` : ""}
+          </div>
+          <hr>
+          <div class="total">
+            <span class="k">Crédito total</span>
+            <span class="v">${money(r.saldo)}${S.offline ? ' <span class="approx">aprox.</span>' : ""}</span>
+          </div>
+          <div class="meter"><i style="width:${(r.carry / 1000 * 100).toFixed(1)}%"></i></div>
+          <div class="next">Le faltan <b>${money(falta)}</b> para el próximo crédito.</div>
+        </div>
+        <div class="note" style="padding-top:0">
+          ${S.offline
+            ? "Sin conexión. La venta está guardada en el teléfono y se enviará sola cuando vuelva el wifi."
+            : "Enviado al servidor. El crédito ya está disponible en recepción."}
+        </div>
+      </div>
+      <div class="foot">
+        <div class="btnrow">
+          <button class="btn" data-nueva="1" style="flex:1">Nueva venta</button>
+          <button class="btn danger" data-anular="1" style="flex:0 0 34%">Anular</button>
+        </div>
+      </div>`);
+  };
+
+  /* ---- cerrar turno ---- */
+  VIEWS.cerrar = function (b) {
+    const ventas = 4230, inicial = 1500, esperado = inicial + ventas;
+    const diff = S.contado - esperado;
+    b.insertAdjacentHTML("beforeend", `
+      <div class="scroll">
+        <div class="sect">
+          <div class="sect-label">Turno de hoy · Roselio</div>
+          <div class="kv"><span class="k">Abriste con</span><span class="v">${money(inicial)}</span></div>
+          <div class="kv"><span class="k">Ventas del turno (17)</span><span class="v">${money(ventas)}</span></div>
+          <div class="kv" style="border-top:1px solid var(--line);margin-top:6px;padding-top:8px">
+            <span class="k"><b>Debe haber en caja</b></span><span class="v">${money(esperado)}</span></div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">¿Cuánto contaste?</div>
+          <input type="text" inputmode="numeric" id="contado" class="tnum" value="${plain(S.contado)}" aria-label="Efectivo contado">
+          <div class="variance ${diff === 0 ? "zero" : "off"}">
+            <span>${diff === 0 ? "Cuadra exacto" : diff > 0 ? "Sobra" : "Falta"}</span>
+            <span class="v">${diff === 0 ? "—" : money(Math.abs(diff))}</span>
+          </div>
+        </div>
+        <div class="sect" style="border-bottom:0">
+          <div class="sect-label">Nota (opcional)</div>
+          <input type="text" placeholder="ej. le di cambio de más a un cliente" aria-label="Nota">
+        </div>
+        ${S.offline && S.pendientes > 0 ? `<div class="note" style="color:var(--warn)">
+          Hay ${S.pendientes} venta${S.pendientes > 1 ? "s" : ""} sin enviar. Puedes cerrar igual — se enviarán solas
+          cuando vuelva el wifi y el turno se completa después.</div>` : ""}
+      </div>
+      <div class="foot">
+        <button class="btn" data-go="abrir">CERRAR TURNO</button>
+      </div>`);
+  };
+
+  /* ---- recepción: canje ---- */
+  VIEWS.canje = function (b) {
+    const p = S.canjePatient;
+    const aplicado = S.canjeApplied ? Math.min(p.saldo, p.cuota) : 0;
+    const restante = p.saldo - aplicado;
+    const cobrar = p.cuota - aplicado;
+    b.insertAdjacentHTML("beforeend", `
+      <div class="scroll">
+        <div class="sect">
+          <div class="sect-label">Paciente</div>
+          <div class="chosen"><span><b>${p.nombre}</b>
+            <span style="color:var(--ink-3);font-size:13px">…${p.cedula.slice(-4)}</span></span>
+            <span style="font-size:12px;color:var(--ink-3)">agosto 2026</span></div>
+        </div>
+        <div class="sect">
+          <div class="kv"><span class="k">Crédito disponible</span><span class="v" style="color:var(--credit)">${money(p.saldo)}</span></div>
+          <div class="kv"><span class="k">Cuota del mes</span><span class="v">${money(p.cuota)}</span></div>
+          ${S.canjeApplied ? `
+            <div class="kv"><span class="k">Crédito aplicado</span><span class="v" style="color:var(--credit)">− ${money(aplicado)}</span></div>
+            <div class="kv quiet"><span class="k">Crédito que le queda</span><span class="v">${money(restante)}</span></div>` : ""}
+          <div class="kv big" style="border-top:1px solid var(--line);margin-top:8px;padding-top:10px">
+            <span class="k"><b>Cobrar</b></span><span class="v">${money(cobrar)}</span></div>
+        </div>
+        <div class="sect" style="border-bottom:0">
+          <div class="note" style="padding:0">
+            ${S.canjeApplied
+              ? "El crédito ya está aplicado a la cuota de agosto. Falta registrar el pago — son dos cosas distintas."
+              : "El crédito se aplica una sola vez por mes. Se topa en el monto de la cuota; lo que sobra se queda para el mes que viene."}
+          </div>
+        </div>
+      </div>
+      <div class="foot">
+        ${S.canjeApplied
+          ? `<button class="btn" data-pagar="1">Registrar pago de ${money(cobrar)}</button>`
+          : `<button class="btn" data-aplicar="1" ${p.saldo <= 0 ? "disabled" : ""}>Aplicar crédito</button>`}
+      </div>`);
+  };
+
+  /* ---------------- annotations ---------------- */
+  const NOTES = {
+    abrir: { h: "Abrir turno — §7.1", items: [
+      "Name, PIN, opening cash. One screen, then straight to selling.",
+      "The PIN returns the signed session token from <code>§5.1</code> — every row from here on is stamped with this volunteer and this shift, and the roster search only works while the shift is open."
+    ]},
+    venta: { h: "Venta — §7.2", items: [
+      "Search needs 3 characters and returns at most 5 patients. Try <code>mar</code>, <code>jos</code>, or <code>4821</code>.",
+      "Top 12 products by 30-day volume; <b>Ver todos</b> opens the full 26. A flat scroll of everything does not hit the 30-second target.",
+      "No prices on this screen — they are on the wall. Weights like <code>1.5 lb</code> type straight into the field; countables use ± .",
+      "COBRAR stays disabled until there is a patient and a total. Every sale belongs to someone."
+    ]},
+    confirm: { h: "Confirmar — §7.3", items: [
+      "<b>Prices appear here and only here.</b> This is the one moment a volunteer can catch a price that was set wrong in the admin screen.",
+      "Nothing is written to the server yet. This screen is the main undo.",
+      "Change is computed live; short payment blocks the confirm rather than recording a sale that did not happen."
+    ]},
+    recibo: { h: "Recibo — §7.4", items: [
+      "The arithmetic block is required, not decorative — it lets a volunteer <i>explain</i> the credit instead of saying the phone said so.",
+      "Real §6.1 algorithm: carry + total, every whole 1,000 becomes 100, remainder carries forward.",
+      "Distance to the next credit is a free sales tool, and the bar makes it legible to someone who reads numbers slowly.",
+      "Anular is available until the shift closes — a void, never an edit."
+    ]},
+    cerrar: { h: "Cerrar turno — §7.5", items: [
+      "Expected vs. counted. Edit the counted figure and watch the variance move.",
+      "This does not fix cash control, it <i>measures</i> it — variance data CCI has never had.",
+      "With the power out, close is still allowed. A volunteer at 5pm with no wifi must be able to count and go home; the shift settles when the queue drains."
+    ]},
+    canje: { h: "Recepción — §7.6", items: [
+      "Credit offsets the monthly cuota, so this happens once a month, not once a visit. The month is part of the key.",
+      "Applied credit is capped at the cuota; the surplus rolls forward and never expires.",
+      "Applying credit and taking payment are two separate acts — otherwise credit can be spent against a cuota nobody ever paid."
+    ]}
+  };
+
+  function paintNotes() {
+    const n = NOTES[S.screen];
+    el("notes").innerHTML = `
+      <div class="notecard">
+        <div class="ref">Pantalla</div>
+        <h3>${n.h}</h3>
+        <ul>${n.items.map(i => `<li>${i}</li>`).join("")}</ul>
+      </div>
+      <div class="notecard">
+        <div class="ref">Nota</div>
+        <ul><li>All copy is Spanish, as the spec requires. The English here is annotation for review only — none of it appears in the app.</li></ul>
+      </div>`;
+  }
+
+  function paintSwitcher() {
+    el("switcher").innerHTML = Object.entries(SCREENS)
+      .map(([k, v]) => `<button data-screen="${k}" aria-current="${k === S.screen}">${v.label}</button>`).join("");
+  }
+
+  /* ---------------- events ---------------- */
+  document.addEventListener("click", function (e) {
+    const t = e.target.closest("button, .result");
+    if (!t) return;
+
+    if (t.dataset.screen) {
+      const k = t.dataset.screen;
+      if (k === "confirm") seedSale();
+      if (k === "recibo")  seedRecibo();
+      S.screen = k;
+      return render();
+    }
+    if (t.dataset.go)      { S.screen = t.dataset.go; return render(); }
+    if (t.dataset.vol)     { return; }
+    if (t.dataset.pat)     { S.patient = PATIENTS.find(p => p.cedula === t.dataset.pat); S.query = ""; return render(); }
+    if (t.dataset.clear)   { S.patient = null; return render(); }
+    if (t.dataset.toggleTodos) { S.verTodos = !S.verTodos; return render(); }
+
+    if (t.dataset.inc) {
+      const p = PRODUCTS.find(x => x.id === t.dataset.inc);
+      const step = p.entrada === "decimal" ? 0.5 : 1;
+      S.cart[p.id] = Math.round(((S.cart[p.id] || 0) + step) * 100) / 100;
+      return render();
+    }
+    if (t.dataset.dec) {
+      const p = PRODUCTS.find(x => x.id === t.dataset.dec);
+      const step = p.entrada === "decimal" ? 0.5 : 1;
+      S.cart[p.id] = Math.max(0, Math.round(((S.cart[p.id] || 0) - step) * 100) / 100);
+      return render();
+    }
+
+    if (t.dataset.commit) {
+      const tot = total();
+      const before = S.patient.carry;
+      const res = aplicarCredito(S.patient.carry, S.patient.saldo, tot);
+      S.patient.carry = res.carry;
+      S.patient.saldo = res.saldo;
+      S.lastSale = { total: tot, antes: before, earned: res.earned,
+                     saldo: res.saldo, carry: res.carry, nombre: S.patient.nombre };
+      if (S.offline) S.pendientes++;
+      S.screen = "recibo";
+      return render();
+    }
+    if (t.dataset.nueva)  { S.cart = {}; S.patient = null; S.verTodos = false; S.screen = "venta"; return render(); }
+    if (t.dataset.anular) {
+      const r = S.lastSale;
+      S.patient = PATIENTS.find(p => p.nombre === r.nombre);
+      S.patient.carry = r.antes;                       // rebuild_credit, §6.2
+      S.patient.saldo = r.saldo - r.earned * 100;
+      if (S.offline && S.pendientes > 0) S.pendientes--;
+      S.screen = "venta";
+      return render();
+    }
+    if (t.dataset.aplicar) {
+      const p = S.canjePatient;
+      p.saldo = p.saldo - Math.min(p.saldo, p.cuota);
+      S.canjeApplied = true;
+      return render();
+    }
+    if (t.dataset.pagar) { S.canjeApplied = false; S.screen = "canje"; return render(); }
+  });
+
+  document.addEventListener("input", function (e) {
+    const t = e.target;
+    if (t.id === "q") {
+      S.query = t.value;
+      render();
+      const box = el("q");
+      if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); }
+      return;
+    }
+    if (t.dataset.set) {
+      const v = parseFloat(t.value.replace(",", ".")) || 0;
+      S.cart[t.dataset.set] = Math.max(0, v);
+      const foot = document.querySelector(".totalrow .amt");
+      if (foot) foot.textContent = money(total());
+      const btn = document.querySelector('[data-go="confirm"]');
+      if (btn) btn.disabled = !S.patient || total() <= 0;
+      return;
+    }
+    if (t.id === "efectivo") {
+      S.efectivo = parseFloat(t.value.replace(/[^\d.]/g, "")) || 0;
+      const pos = t.selectionStart; render();
+      const box = el("efectivo"); if (box) { box.focus(); box.setSelectionRange(pos, pos); }
+      return;
+    }
+    if (t.id === "contado") {
+      S.contado = parseFloat(t.value.replace(/[^\d.]/g, "")) || 0;
+      const pos = t.selectionStart; render();
+      const box = el("contado"); if (box) { box.focus(); box.setSelectionRange(pos, pos); }
+    }
+  });
+
+  el("tg-offline").addEventListener("click", function () {
+    S.offline = !S.offline;
+    this.setAttribute("aria-pressed", String(S.offline));
+    this.textContent = S.offline ? "Restablecer energía" : "Simular corte de energía";
+    if (!S.offline) S.pendientes = 0;
+    render();
+  });
+  el("tg-reset").addEventListener("click", function () {
+    S.cart = {}; S.patient = null; S.verTodos = false; S.pendientes = 0;
+    PATIENTS[0].carry = 710; PATIENTS[0].saldo = 200;
+    PATIENTS[1].carry = 340; PATIENTS[1].saldo = 500;
+    PATIENTS[2].carry = 0;   PATIENTS[2].saldo = 1200;
+    PATIENTS[3].carry = 880; PATIENTS[3].saldo = 0;
+    PATIENTS[4].carry = 120; PATIENTS[4].saldo = 300;
+    S.canjeApplied = false; S.screen = "venta";
+    render();
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
