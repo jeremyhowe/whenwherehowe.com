@@ -177,7 +177,7 @@
   }
   .stepper button:hover { background: var(--surface-2); }
   .stepper button:disabled { opacity: .35; cursor: default; }
-  .stepper .qty { min-width: 34px; text-align: center; font-size: 16px; font-weight: 600;
+  .stepper .qty { min-width: 42px; text-align: center; font-size: 16px; font-weight: 600;
     font-variant-numeric: tabular-nums; }
   .stepper input.dec {
     width: 62px; text-align: center; padding: 7px 4px; font-size: 15px; font-weight: 600;
@@ -320,16 +320,6 @@
   }
   .searchtoggle:hover { border-color: var(--brand); color: var(--brand); }
 
-  /* quantity presets — nobody types a number */
-  .qchips { display: flex; gap: 5px; flex-wrap: wrap; justify-content: flex-end; }
-  .qchips button {
-    min-width: 40px; padding: 7px 9px; font: inherit; font-size: 13.5px; font-weight: 600;
-    border-radius: 9px; border: 1px solid var(--line-strong); background: var(--surface);
-    color: var(--ink-2); cursor: pointer; font-variant-numeric: tabular-nums;
-  }
-  .qchips button:hover { border-color: var(--brand); }
-  .qchips button[aria-pressed="true"] { background: var(--brand); border-color: var(--brand); color: #fff; }
-  :root[data-theme="dark"] .qchips button[aria-pressed="true"] { color: #0E1116; }
 
   /* change to give, broken into notes */
   .devolver {
@@ -636,16 +626,11 @@
         <div id="plist">
           ${shown.map(p => {
             const q = S.cart[p.id] || 0;
-            const ctrl = p.entrada === "decimal"
-              ? `<div class="qchips">
-                   ${[0.5, 1, 2, 5].map(v => `<button data-qty="${p.id}:${v}"
-                       aria-pressed="${q === v}">${v === 0.5 ? "½" : v}</button>`).join("")}
+            // One control for everything. entrada only decides the step: weighed
+            // goods move by 0.5, countables by 1. Nothing is ever typed.
+            const ctrl = `<div class="stepper">
                    <button data-dec="${p.id}" ${q <= 0 ? "disabled" : ""} aria-label="Quitar">−</button>
-                   <button data-inc="${p.id}" aria-label="Agregar">+</button>
-                 </div>`
-              : `<div class="stepper">
-                   <button data-dec="${p.id}" ${q <= 0 ? "disabled" : ""} aria-label="Quitar">−</button>
-                   <span class="qty">${q}</span>
+                   <span class="qty">${plain(q)}</span>
                    <button data-inc="${p.id}" aria-label="Agregar">+</button>
                  </div>`;
             return `<div class="prow ${q > 0 ? "active" : ""}">
@@ -848,7 +833,7 @@
       "<b>The day's list is the default.</b> Clinic staff load who is expected each morning; the volunteer taps a name and never types. Served patients grey out, so the list shortens visibly through the day.",
       "Search is the fallback for someone not on the list — 3 characters, at most 5 results. Try <code>mar</code>, <code>jos</code>, or <code>4821</code>.",
       "Top 12 products by 30-day volume; <b>Ver todos</b> opens the full 26. A flat scroll of everything does not hit the 30-second target.",
-      "<b>Nothing is typed.</b> Weighed goods use ½ / 1 / 2 / 5 chips (tap the same chip again to clear); countables use ± .",
+      "<b>Nothing is typed.</b> One ± control for everything — weighed goods step by 0.5, countables by 1.",
       "COBRAR stays disabled until there is a patient and a total. Every sale belongs to someone."
     ]},
     confirm: { h: "Confirmar — §7.3", items: [
@@ -912,12 +897,6 @@
     if (t.dataset.toggleTodos) { S.verTodos = !S.verTodos; return render(); }
     if (t.dataset.buscar !== undefined) {
       S.buscando = t.dataset.buscar === "1"; S.query = ""; return render();
-    }
-    if (t.dataset.qty) {
-      const [id, v] = t.dataset.qty.split(":");
-      const val = parseFloat(v);
-      S.cart[id] = (S.cart[id] === val) ? 0 : val;   // tapping the same chip clears it
-      return render();
     }
     if (t.dataset.dmas || t.dataset.dmin) {
       const d = t.dataset.dmas || t.dataset.dmin;
