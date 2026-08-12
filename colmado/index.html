@@ -416,11 +416,24 @@
   body.appmode .toggles { display: none; }
   body.appmode .workbench { display: block; }
   body.appmode .stage { gap: 0; }
+  /* Height, in order of preference:
+       --alto-app  measured from the browser itself (see JS) — always correct;
+       100svh      the small viewport, i.e. with the address bar showing;
+       100vh       last resort. On mobile this EXCLUDES the address bar, so the
+                   footer ends up underneath it — which is exactly the bug this
+                   chain exists to avoid when svh is unsupported. */
   body.appmode .phone {
     width: 100%; max-width: none; border: 0; border-radius: 0; box-shadow: none;
-    height: 100svh;            /* fixed, so .foot stays pinned and .scroll scrolls */
+    height: 100vh;
+    height: 100svh;
+    height: var(--alto-app, 100svh);
   }
-  body.appmode, body.appmode .workbench, body.appmode .stage { height: 100svh; overflow: hidden; }
+  body.appmode, body.appmode .workbench, body.appmode .stage {
+    height: 100vh;
+    height: 100svh;
+    height: var(--alto-app, 100svh);
+    overflow: hidden;
+  }
   body.appmode .phone .statusbar { display: none; }
   body.appmode .appbar { padding-top: max(10px, env(safe-area-inset-top)); }
   body.appmode .foot { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
@@ -565,6 +578,19 @@
              || window.navigator.standalone === true
              || new URLSearchParams(location.search).has("app");
   if (enApp) document.body.classList.add("appmode");
+
+  // Browser chrome on a phone is not a fixed height — it appears, hides, and
+  // differs per browser. Measuring beats guessing. Skipped while an input has
+  // focus so the on-screen keyboard doesn't make the layout jump mid-typing.
+  function medirAlto() {
+    if (document.activeElement && document.activeElement.tagName === "INPUT") return;
+    const h = (window.visualViewport && window.visualViewport.height) || window.innerHeight;
+    document.documentElement.style.setProperty("--alto-app", Math.round(h) + "px");
+  }
+  medirAlto();
+  window.addEventListener("resize", medirAlto);
+  window.addEventListener("orientationchange", () => setTimeout(medirAlto, 250));
+  if (window.visualViewport) window.visualViewport.addEventListener("resize", medirAlto);
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
