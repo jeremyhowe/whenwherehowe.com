@@ -711,8 +711,19 @@
     canje:   { label: "Recepción",    who: "Comedero · Recepción",action: "" }
   };
 
+  let _pantallaPrevia = null;
+
   function render() {
     const body = el("screenbody");
+
+    // Two different behaviours, and getting them backwards is confusing either way:
+    //  - a NEW screen must start at the top;
+    //  - a re-render of the SAME screen (tapping + on a product far down the list)
+    //    must stay exactly where the volunteer was looking.
+    const cambioDePantalla = S.screen !== _pantallaPrevia;
+    const anterior = body.querySelector(".scroll");
+    const desplazamiento = anterior ? anterior.scrollTop : 0;
+
     body.innerHTML = "";
     const s = SCREENS[S.screen];
     const v = VOLUNTEERS.find(x => x.id === S.vol);
@@ -733,6 +744,15 @@
         `<div class="note" style="padding:24px 16px">No se pudo mostrar esta pantalla.
          <br><span style="font-family:var(--mono);font-size:11px">${err.message}</span></div>`);
     }
+    const zona = body.querySelector(".scroll");
+    if (cambioDePantalla) {
+      if (zona) zona.scrollTop = 0;
+      window.scrollTo(0, 0);          // the review page scrolls the window, not .scroll
+      _pantallaPrevia = S.screen;
+    } else if (zona) {
+      zona.scrollTop = desplazamiento;
+    }
+
     paintSwitcher();
     paintNotes();
     guardar();
