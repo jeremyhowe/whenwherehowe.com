@@ -185,10 +185,12 @@
   .prow:last-child { border-bottom: 0; }
   .prow.active { background: var(--brand-soft); }
   .pname { font-size: 15px; letter-spacing: -.005em; }
+  /* The dot is the actual identifier for these three — the word is the caption.
+     Sized to be matchable against a bag held in the hand, not a bullet point. */
   .swatch {
-    display: inline-block; width: 13px; height: 13px; border-radius: 50%;
-    margin-right: 7px; vertical-align: baseline;
-    box-shadow: 0 0 0 1px rgba(0,0,0,.22) inset, 0 0 0 1px var(--surface);
+    display: inline-block; width: 22px; height: 22px; border-radius: 50%;
+    margin-right: 9px; vertical-align: -5px;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.25) inset, 0 0 0 2px var(--surface);
   }
   .punit { font-size: 11.5px; color: var(--ink-3); text-transform: lowercase; }
   .stepper { display: flex; align-items: center; gap: 4px; }
@@ -425,6 +427,7 @@
   /* Thumbs, not cursors: everything tappable gets bigger in the real app. */
   body.appmode .btn { padding: 18px; font-size: 18px; }
   body.appmode .stepper button { width: 52px; height: 52px; font-size: 24px; border-radius: 12px; }
+  body.appmode .swatch { width: 28px; height: 28px; margin-right: 11px; vertical-align: -7px; }
   body.appmode .denom { --alto: 56px; gap: 10px; }
   body.appmode .denom .stepper button {
     flex: 0 0 var(--alto); width: var(--alto); height: var(--alto);
