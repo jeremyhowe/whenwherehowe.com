@@ -285,6 +285,26 @@
   .creditbox .total .v { font-size: 25px; font-weight: 650; color: var(--credit);
     font-variant-numeric: tabular-nums; }
   .creditbox .next { margin-top: 8px; font-size: 13px; color: var(--ink-2); }
+  .gano {
+    margin: 0 16px 14px; padding: 14px 16px; border-radius: 13px;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    background: var(--credit); color: #fff;
+  }
+  :root[data-theme="dark"] .gano { color: #17130A; }
+  .gano-k { font-size: calc(var(--esc) * 15px); font-weight: 600; }
+  .gano-v { font-size: calc(var(--esc) * 30px); font-weight: 700;
+            font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .progreso {
+    display: flex; justify-content: space-between; gap: 12px; margin-top: 9px;
+    font-size: calc(var(--esc) * 16px); color: var(--ink-2);
+  }
+  .progreso b { color: var(--ink); font-variant-numeric: tabular-nums; }
+  .regla {
+    margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line);
+    font-size: calc(var(--esc) * 15px); color: var(--ink-2);
+  }
+  .meter { height: calc(var(--esc) * 12px); }
+
   .earned-pill {
     display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 999px;
     background: var(--credit); color: var(--surface); font-size: 12px; font-weight: 700;
@@ -1097,8 +1117,6 @@
   VIEWS.confirm = function (b) {
     if (!S.patient || total() <= 0) seedSale();
     const ls = lines(), t = total();
-    // The donation is collected with the sale but is not a purchase: it must not
-    // earn credit, or credit becomes something a patient can simply buy.
     const cambio = S.efectivo - (t + S.donacion);
     b.insertAdjacentHTML("beforeend", `
       <div class="scroll">
@@ -1157,34 +1175,53 @@
     if (!S.lastSale) seedRecibo();
     const r = S.lastSale;
     const falta = 1000 - r.carry;
+    const pct = Math.min(100, (r.carry / 1000) * 100);
+
     b.insertAdjacentHTML("beforeend", `
       <div class="scroll">
         <div class="stamp">
           <div class="check">✓</div>
-          <div class="t">REGISTRADO${S.offline ? " — SE ENVIARÁ" : ""}</div>
-          <div style="font-size:13px;color:var(--ink-3)">${r.nombre}</div>
+          <div class="t">¡Listo!</div>
+          <div style="font-size:calc(var(--esc)*15px);color:var(--ink-2)">${r.nombre}</div>
         </div>
+
+        <div class="sect">
+          <div class="kv"><span class="k">Compra</span><span class="v">${money(r.total)}</span></div>
+          ${r.donacion ? `<div class="kv"><span class="k">Donación</span>
+            <span class="v">${money(r.donacion)}</span></div>
+          <div class="kv" style="border-top:1px solid var(--line);margin-top:6px;padding-top:8px">
+            <span class="k"><b>Suma para el descuento</b></span>
+            <span class="v">${money(r.total + r.donacion)}</span></div>` : ""}
+        </div>
+
+        ${r.earned ? `
+        <div class="gano">
+          <div class="gano-k">Ganó descuento</div>
+          <div class="gano-v">${money(r.earned * 100)}</div>
+        </div>` : ""}
+
         <div class="creditbox">
-          <div class="arith">
-            <div><span>Total de la compra</span><b>${money(r.total)}</b></div>
-            ${r.donacion ? `<div><span>Donación</span><b>${money(r.donacion)}</b></div>` : ""}
-            <div><span>Antes tenía</span><b>${money(r.antes)} acumulado</b></div>
-            <div><span>Ahora</span><b>${money(r.antes + r.total)}${r.earned ? " →" : ""}</b></div>
-            ${r.earned ? `<div style="justify-content:flex-end;margin-top:2px">
-              <span class="earned-pill">${r.earned} crédito${r.earned > 1 ? "s" : ""} · ${money(r.earned * 100)}</span></div>` : ""}
-          </div>
-          <hr>
           <div class="total">
-            <span class="k">Crédito total</span>
+            <span class="k">Descuento disponible</span>
             <span class="v">${money(r.saldo)}${S.offline ? ' <span class="approx">aprox.</span>' : ""}</span>
           </div>
-          <div class="meter"><i style="width:${(r.carry / 1000 * 100).toFixed(1)}%"></i></div>
-          <div class="next">Le faltan <b>${money(falta)}</b> para el próximo crédito.</div>
+          <div class="next" style="margin-top:2px">Para usar en su cuota del mes.</div>
         </div>
+
+        <div class="sect" style="border-bottom:0">
+          <div class="sect-label">Para el próximo descuento</div>
+          <div class="meter"><i style="width:${pct.toFixed(1)}%"></i></div>
+          <div class="progreso">
+            <span>Lleva <b>${money(r.carry)}</b></span>
+            <span>Faltan <b>${money(falta)}</b></span>
+          </div>
+          <div class="regla">Por cada RD$ 1,000 en compras, RD$ 100 de descuento.</div>
+        </div>
+
         <div class="note" style="padding-top:0">
           ${S.offline
             ? "Sin conexión. La venta está guardada en el teléfono y se enviará sola cuando vuelva el wifi."
-            : "Enviado al servidor. El crédito ya está disponible en recepción."}
+            : "La venta quedó guardada y el descuento actualizado."}
         </div>
       </div>
       <div class="foot">
@@ -1255,26 +1292,26 @@
             <span style="font-size:12px;color:var(--ink-3)">agosto 2026</span></div>
         </div>
         <div class="sect">
-          <div class="kv"><span class="k">Crédito disponible</span><span class="v" style="color:var(--credit)">${money(p.saldo)}</span></div>
+          <div class="kv"><span class="k">Descuento disponible</span><span class="v" style="color:var(--credit)">${money(p.saldo)}</span></div>
           <div class="kv"><span class="k">Cuota del mes</span><span class="v">${money(p.cuota)}</span></div>
           ${S.canjeApplied ? `
-            <div class="kv"><span class="k">Crédito aplicado</span><span class="v" style="color:var(--credit)">− ${money(aplicado)}</span></div>
-            <div class="kv quiet"><span class="k">Crédito que le queda</span><span class="v">${money(restante)}</span></div>` : ""}
+            <div class="kv"><span class="k">Descuento aplicado</span><span class="v" style="color:var(--credit)">− ${money(aplicado)}</span></div>
+            <div class="kv quiet"><span class="k">Descuento que le queda</span><span class="v">${money(restante)}</span></div>` : ""}
           <div class="kv big" style="border-top:1px solid var(--line);margin-top:8px;padding-top:10px">
             <span class="k"><b>Cobrar</b></span><span class="v">${money(cobrar)}</span></div>
         </div>
         <div class="sect" style="border-bottom:0">
           <div class="note" style="padding:0">
             ${S.canjeApplied
-              ? "El crédito ya está aplicado a la cuota de agosto. Falta registrar el pago — son dos cosas distintas."
-              : "El crédito se aplica una sola vez por mes. Se topa en el monto de la cuota; lo que sobra se queda para el mes que viene."}
+              ? "El descuento ya está aplicado a la cuota de agosto. Falta registrar el pago — son dos cosas distintas."
+              : "El descuento se aplica una sola vez por mes. No puede pasar del monto de la cuota; lo que sobra se queda para el mes que viene."}
           </div>
         </div>
       </div>
       <div class="foot">
         ${S.canjeApplied
           ? `<button class="btn" data-pagar="1">Registrar pago de ${money(cobrar)}</button>`
-          : `<button class="btn" data-aplicar="1" ${p.saldo <= 0 ? "disabled" : ""}>Aplicar crédito</button>`}
+          : `<button class="btn" data-aplicar="1" ${p.saldo <= 0 ? "disabled" : ""}>Aplicar descuento</button>`}
       </div>`);
   };
 
@@ -1412,7 +1449,9 @@
     if (t.dataset.commit) {
       const tot = total();
       const before = S.patient.carry;
-      const res = aplicarCredito(S.patient.carry, S.patient.saldo, tot);
+      // A donation counts toward the discount just as a purchase does (Jeremy,
+      // 2026-08-12), so the whole amount handed over goes into the calculation.
+      const res = aplicarCredito(S.patient.carry, S.patient.saldo, tot + S.donacion);
       S.patient.carry = res.carry;
       S.patient.saldo = res.saldo;
       S.lastSale = { total: tot, antes: before, earned: res.earned, donacion: S.donacion,
