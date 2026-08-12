@@ -74,6 +74,16 @@
   }
 
   * { box-sizing: border-box; }
+  /* Double-tapping + or - must not zoom the page. touch-action:manipulation
+     disables the double-tap-to-zoom gesture (and its 300ms wait) while LEAVING
+     pinch-to-zoom intact — so a volunteer who needs bigger text still has it.
+     Deliberately not using maximum-scale/user-scalable=no, which would take
+     zoom away from exactly the people most likely to need it. */
+  button, .pcard, .stepper, .qty {
+    touch-action: manipulation;
+    -webkit-user-select: none; user-select: none;
+    -webkit-tap-highlight-color: transparent;
+  }
   body {
     margin: 0; background: var(--ground); color: var(--ink);
     font-family: var(--sans); font-size: 15px; line-height: 1.5;
@@ -532,6 +542,10 @@
      localStorage so a shift survives the app being closed, backgrounded, or the
      phone locking — which is what a real day looks like. */
   const CLAVE = "colmado.demo.v1";
+  const CLAVE_DISPOSITIVO = "colmado.dispositivo";   // survives a demo reset
+
+  const dueno = () => { try { return localStorage.getItem(CLAVE_DISPOSITIVO); } catch (e) { return null; } };
+  const setDueno = id => { try { localStorage.setItem(CLAVE_DISPOSITIVO, id); } catch (e) {} };
 
   function guardar() {
     try {
@@ -638,10 +652,40 @@
 
   /* ---- abrir turno ---- */
   VIEWS.abrir = function (b) {
+    const mio = VOLUNTEERS.find(v => v.id === dueno());
+
+    // Known phone: one tap to open the shift. Nothing typed, nothing recalled.
+    if (mio) {
+      b.insertAdjacentHTML("beforeend", `
+        <div class="scroll">
+          <div class="sect" style="border-bottom:0;padding-top:34px">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:12px">
+              <span class="ini" style="width:64px;height:64px;font-size:22px">${iniciales(mio.nombre)}</span>
+              <div style="font-size:22px;font-weight:650;letter-spacing:-.01em">Hola, ${mio.nombre.split(" ")[0]}</div>
+              <div style="font-size:13.5px;color:var(--ink-3)">Comedero</div>
+            </div>
+          </div>
+          <div class="sect" style="border-bottom:0">
+            <div class="sect-label">Efectivo con que abres</div>
+            <input type="text" inputmode="numeric" value="1,500" aria-label="Efectivo inicial">
+          </div>
+          <div class="note" style="text-align:center;display:flex;flex-direction:column;gap:10px">
+            <button data-otro="1" style="background:none;border:0;color:var(--brand);font:inherit;
+              font-size:13px;text-decoration:underline;cursor:pointer">No soy ${mio.nombre.split(" ")[0]}</button>
+            <button data-reset-demo="1" style="background:none;border:0;color:var(--ink-3);font:inherit;
+              font-size:12px;text-decoration:underline;cursor:pointer">Reiniciar la demostración</button>
+          </div>
+        </div>
+        <div class="foot"><button class="btn" data-entrar="1">ABRIR TURNO</button></div>`);
+      S.vol = mio.id;
+      return;
+    }
+
+    // First run on this phone only: who does it belong to?
     b.insertAdjacentHTML("beforeend", `
       <div class="scroll">
         <div class="sect">
-          <div class="sect-label">¿Quién abre el turno?</div>
+          <div class="sect-label">¿De quién es este teléfono?</div>
           <div class="daylist">
             ${VOLUNTEERS.map(v => `
               <button class="pcard ${S.vol === v.id ? "sel" : ""}" data-vol="${v.id}">
@@ -651,23 +695,13 @@
                 ${S.vol === v.id ? '<span class="tick">✓</span>' : ""}
               </button>`).join("")}
           </div>
-        </div>
-        <div class="sect">
-          <div class="sect-label">Tu clave de 4 números</div>
-          <input type="text" inputmode="numeric" maxlength="4" value="••••" aria-label="Clave">
-        </div>
-        <div class="sect" style="border-bottom:0">
-          <div class="sect-label">Efectivo con que abres</div>
-          <input type="text" inputmode="numeric" value="1,500" aria-label="Efectivo inicial">
-        </div>
-        <div class="note" style="text-align:center">
-          <button data-reset-demo="1" style="background:none;border:0;color:var(--ink-3);
-            font:inherit;font-size:12px;text-decoration:underline;cursor:pointer">
-            Reiniciar la demostración</button>
+          <div class="note" style="padding:12px 0 0">
+            Se pregunta una sola vez. Después el teléfono ya sabe quién eres.
+          </div>
         </div>
       </div>
       <div class="foot">
-        <button class="btn" data-entrar="1" ${S.vol ? "" : "disabled"}>ABRIR TURNO</button>
+        <button class="btn" data-soy="1" ${S.vol ? "" : "disabled"}>CONTINUAR</button>
       </div>`);
   };
 
@@ -999,6 +1033,11 @@
     }
     if (t.dataset.go)      { S.screen = t.dataset.go; return render(); }
     if (t.dataset.vol)     { S.vol = t.dataset.vol; return render(); }
+    if (t.dataset.soy)  { setDueno(S.vol); return render(); }
+    if (t.dataset.otro) {
+      try { localStorage.removeItem(CLAVE_DISPOSITIVO); } catch (e) {}
+      S.vol = null; return render();
+    }
     if (t.dataset.entrar) {
       const v = VOLUNTEERS.find(x => x.id === S.vol);
       S.screen = v && v.rol === "recepcion" ? "canje" : "venta";
@@ -1051,7 +1090,7 @@
       return render();
     }
     if (t.dataset.cerrarTurno) {
-      S.screen = "abrir"; S.vol = null; S.ventas = []; S.atendidos = {};
+      S.screen = "abrir"; S.ventas = []; S.atendidos = {};
       S.conteo = {}; S.contado = 0; S.cart = {}; S.patient = null;
       return render();
     }
