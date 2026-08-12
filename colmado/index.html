@@ -502,6 +502,13 @@
   .prow, .denom + .denom { border-color: var(--line); }
   .prow { border-bottom-width: 1px; padding-top: 13px; padding-bottom: 13px; }
 
+  /* These must out-specify the earlier body.appmode rules, or they lose. */
+  body.appmode .btn { font-size: calc(var(--esc) * 21px); padding: calc(var(--esc) * 19px); }
+  body.appmode .btnrow .btn { font-size: calc(var(--esc) * 18px); }
+  body.appmode input.qtyin { font-size: calc(var(--esc) * 22px); }
+  body.appmode .pcard .nm { font-size: calc(var(--esc) * 21px); }
+  body.appmode .appbar .who { font-size: calc(var(--esc) * 17px); }
+
   /* Bigger targets again once the type grows. */
   body.appmode .denom { --alto: calc(var(--esc) * 58px); }
   body.appmode .stepper button {
