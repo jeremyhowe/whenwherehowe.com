@@ -185,6 +185,11 @@
   .prow:last-child { border-bottom: 0; }
   .prow.active { background: var(--brand-soft); }
   .pname { font-size: 15px; letter-spacing: -.005em; }
+  .swatch {
+    display: inline-block; width: 13px; height: 13px; border-radius: 50%;
+    margin-right: 7px; vertical-align: baseline;
+    box-shadow: 0 0 0 1px rgba(0,0,0,.22) inset, 0 0 0 1px var(--surface);
+  }
   .punit { font-size: 11.5px; color: var(--ink-3); text-transform: lowercase; }
   .stepper { display: flex; align-items: center; gap: 4px; }
   .stepper button {
@@ -500,16 +505,16 @@
     { id:"arroz",    nombre:"Arroz",             unidad:"libra",  precio:45,  entrada:"decimal", grupo:"comida" },
     { id:"habich",   nombre:"Habichuelas",       unidad:"libra",  precio:65,  entrada:"decimal", grupo:"comida" },
     { id:"habitas",  nombre:"Habitas",           unidad:"libra",  precio:70,  entrada:"decimal", grupo:"comida" },
-    { id:"leche",    nombre:"Leche",             unidad:"unidad", precio:95,  entrada:"stepper", grupo:"comida" },
+    { id:"leche",    nombre:"Leche",             unidad:"litro",  precio:95,  entrada:"stepper", grupo:"comida" },
     { id:"cafe",     nombre:"Café",              unidad:"libra",  precio:250, entrada:"decimal", grupo:"comida" },
     { id:"aceite8",  nombre:"Aceite 8 oz",       unidad:"unidad", precio:75,  entrada:"stepper", grupo:"comida" },
     { id:"aceite16", nombre:"Aceite 16 oz",      unidad:"unidad", precio:140, entrada:"stepper", grupo:"comida" },
     { id:"aceitemg", nombre:"Aceite medio galón",unidad:"unidad", precio:480, entrada:"stepper", grupo:"comida" },
     { id:"gviva",    nombre:"Galleta Viva",      unidad:"unidad", precio:25,  entrada:"stepper", grupo:"comida" },
     { id:"ghatuey",  nombre:"Galleta Hatuey",    unidad:"unidad", precio:30,  entrada:"stepper", grupo:"comida" },
-    { id:"manisal",  nombre:"Maní salado",       unidad:"unidad", precio:25,  entrada:"stepper", grupo:"comida" },
-    { id:"maniconf", nombre:"Maní confitado",    unidad:"unidad", precio:30,  entrada:"stepper", grupo:"comida" },
-    { id:"manijap",  nombre:"Maní japonés",      unidad:"unidad", precio:35,  entrada:"stepper", grupo:"comida" },
+    { id:"maniverde", nombre:"Maní verde",  unidad:"unidad", precio:25, entrada:"stepper", grupo:"comida", color:"#2E9E5B" },
+    { id:"maniazul",  nombre:"Maní azul",   unidad:"unidad", precio:30, entrada:"stepper", grupo:"comida", color:"#2F6FD0" },
+    { id:"manimor",   nombre:"Maní morado", unidad:"unidad", precio:35, entrada:"stepper", grupo:"comida", color:"#8250C4" },
     // ---- otros ----
     { id:"papel",    nombre:"Papel higiénico",   unidad:"unidad", precio:30,  entrada:"stepper", grupo:"otros" },
     { id:"pasta",    nombre:"Pasta dental",      unidad:"unidad", precio:85,  entrada:"stepper", grupo:"otros" },
@@ -539,6 +544,8 @@
     { id: "dolores", nombre: "Dolores Castillo", rol: "venta" },
     { id: "reina",   nombre: "Reina (recepción)", rol: "recepcion" }
   ];
+
+  const MOSTRAR_GRUPOS = false;   // revisit once the full catalogue is known
 
   const DENOMS = [2000, 1000, 500, 200, 100, 50, 25, 10, 5, 1];
 
@@ -896,10 +903,12 @@
                    <span class="qty">${plain(q)}</span>
                    <button data-inc="${p.id}" aria-label="Agregar">+</button>
                  </div>`;
-            const cabecera = (i > 0 && shown[i - 1].grupo !== p.grupo)
+            const cabecera = (MOSTRAR_GRUPOS && i > 0 && shown[i - 1].grupo !== p.grupo)
               ? `<div class="grupo">Otros</div>` : "";
             return `${cabecera}<div class="prow ${q > 0 ? "active" : ""}">
-                      <div><div class="pname">${p.nombre}</div><div class="punit">${p.unidad}</div></div>
+                      <div><div class="pname">${p.color
+                          ? `<span class="swatch" style="background:${p.color}"></span>` : ""}${p.nombre}</div>
+                        <div class="punit">${p.unidad}</div></div>
                       ${ctrl}
                     </div>`;
           }).join("")}
