@@ -1,11 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex, nofollow">
-<link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="icon" href="/favicon-32.png" sizes="32x32">
+<meta name="theme-color" content="#1B3A6B" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0E1116" media="(prefers-color-scheme: dark)">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Colmado">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png" sizes="192x192">
 <title>Colmado — Prototipo de interfaz</title>
 
 <style>
@@ -308,6 +315,7 @@
   }
   .pcard .nm { font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
   .pcard .sub { font-size: 12px; color: var(--ink-3); }
+  .pcard.sel { border-color: var(--brand); background: var(--brand-soft); }
   .pcard.done { opacity: .5; }
   .pcard.done .nm { text-decoration: line-through; }
   .pcard .tick { margin-left: auto; color: var(--ok); font-weight: 700; }
@@ -346,6 +354,29 @@
   .denom .face { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
   .denom .sum { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums;
     text-align: right; min-width: 66px; }
+
+  /* App mode: installed to the home screen, or ?app=1. The volunteer sees the
+     till and nothing else — no annotations, no screen switcher, no page. */
+  body.appmode { background: var(--surface); }
+  body.appmode .page { max-width: none; padding: 0; }
+  body.appmode .masthead,
+  body.appmode .switcher,
+  body.appmode .notes,
+  body.appmode .toggles { display: none; }
+  body.appmode .workbench { display: block; }
+  body.appmode .stage { gap: 0; }
+  body.appmode .phone {
+    width: 100%; max-width: none; min-height: 100svh; border: 0;
+    border-radius: 0; box-shadow: none;
+  }
+  body.appmode .phone .statusbar { display: none; }
+  body.appmode .appbar { padding-top: max(10px, env(safe-area-inset-top)); }
+  body.appmode .foot { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
+  /* Thumbs, not cursors: everything tappable gets bigger in the real app. */
+  body.appmode .btn { padding: 18px; font-size: 18px; }
+  body.appmode .stepper button { width: 42px; height: 42px; font-size: 20px; }
+  body.appmode .pcard { padding: 15px 14px; }
+  body.appmode .pcard .nm { font-size: 17px; }
 
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
@@ -392,6 +423,20 @@
 (function () {
   "use strict";
 
+  // Installed to the home screen, or ?app=1 for testing in a browser tab.
+  const enApp = window.matchMedia("(display-mode: standalone)").matches
+             || window.navigator.standalone === true
+             || new URLSearchParams(location.search).has("app");
+  if (enApp) document.body.classList.add("appmode");
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {
+        /* no offline shell; the app still runs */
+      });
+    });
+  }
+
   /* ---------------- data ---------------- */
   const PRODUCTS = [
     { id:"arroz",   nombre:"Arroz",            unidad:"libra",   precio:45,  entrada:"decimal", top:1 },
@@ -437,6 +482,14 @@
     "001-3320918-3312", "402-1122934-5560"
   ];
 
+  const VOLUNTEERS = [
+    { id: "roselio", nombre: "Roselio Matos",    rol: "venta" },
+    { id: "dorothy", nombre: "Dorothy Jiménez",  rol: "venta" },
+    { id: "vidal",   nombre: "Vidal Ureña",      rol: "venta" },
+    { id: "dolores", nombre: "Dolores Castillo", rol: "venta" },
+    { id: "reina",   nombre: "Reina (recepción)", rol: "recepcion" }
+  ];
+
   const DENOMS = [2000, 1000, 500, 200, 100, 50, 25, 10, 5, 1];
 
   /* Which notes to hand back. Removes the mental arithmetic that loses cash. */
@@ -454,7 +507,8 @@
 
   /* ---------------- state ---------------- */
   const S = {
-    screen: "venta",
+    screen: "abrir",
+    vol: null,
     offline: false,
     pendientes: 0,
     patient: null,
@@ -468,8 +522,44 @@
     contado: 0,
     conteo: {},   // denominación -> cantidad contada
     canjeApplied: false,
-    canjePatient: PATIENTS[0]
+    canjePatient: PATIENTS[0],
+    ventas: []           // this shift's sales, for the close-out
   };
+
+  /* Bar 1 runs entirely on the phone: no server, no network. State lives in
+     localStorage so a shift survives the app being closed, backgrounded, or the
+     phone locking — which is what a real day looks like. */
+  const CLAVE = "colmado.demo.v1";
+
+  function guardar() {
+    try {
+      localStorage.setItem(CLAVE, JSON.stringify({
+        screen: S.screen, vol: S.vol, patient: S.patient && S.patient.cedula,
+        cart: S.cart, verTodos: S.verTodos, buscando: S.buscando,
+        atendidos: S.atendidos, conteo: S.conteo, contado: S.contado,
+        lastSale: S.lastSale, offline: S.offline, pendientes: S.pendientes,
+        ventas: S.ventas, canjeApplied: S.canjeApplied,
+        saldos: PATIENTS.map(p => [p.cedula, p.saldo, p.carry])
+      }));
+    } catch (e) { /* private mode, full disk — the app still works, it just forgets */ }
+  }
+
+  function restaurar() {
+    let d; try { d = JSON.parse(localStorage.getItem(CLAVE) || "null"); } catch (e) { return; }
+    if (!d) return;
+    Object.assign(S, {
+      screen: d.screen || "abrir", vol: d.vol || null, cart: d.cart || {},
+      verTodos: !!d.verTodos, buscando: !!d.buscando, atendidos: d.atendidos || {},
+      conteo: d.conteo || {}, contado: d.contado || 0, lastSale: d.lastSale || null,
+      offline: !!d.offline, pendientes: d.pendientes || 0, ventas: d.ventas || [],
+      canjeApplied: !!d.canjeApplied
+    });
+    if (d.patient) S.patient = PATIENTS.find(p => p.cedula === d.patient) || null;
+    (d.saldos || []).forEach(([c, sal, car]) => {
+      const p = PATIENTS.find(x => x.cedula === c);
+      if (p) { p.saldo = sal; p.carry = car; }
+    });
+  }
 
   const money = n => "RD$ " + Number(n).toLocaleString("es-DO", { maximumFractionDigits: 2 });
   const plain = n => Number(n).toLocaleString("es-DO", { maximumFractionDigits: 2 });
@@ -519,7 +609,8 @@
     const body = el("screenbody");
     body.innerHTML = "";
     const s = SCREENS[S.screen];
-    el("appbar-who").textContent = s.who;
+    const v = VOLUNTEERS.find(x => x.id === S.vol);
+    el("appbar-who").textContent = v ? "Comedero · " + v.nombre.split(" ")[0] : s.who;
     const act = el("appbar-action");
     act.textContent = s.action;
     act.style.visibility = s.action ? "visible" : "hidden";
@@ -538,6 +629,7 @@
     }
     paintSwitcher();
     paintNotes();
+    guardar();
   }
 
   const VIEWS = {};
@@ -548,10 +640,15 @@
       <div class="scroll">
         <div class="sect">
           <div class="sect-label">¿Quién abre el turno?</div>
-          <div class="result" data-vol="Roselio"><span>Roselio Matos</span><span class="ced">venta</span></div>
-          <div class="result" data-vol="Dorothy"><span>Dorothy Jiménez</span><span class="ced">venta</span></div>
-          <div class="result" data-vol="Vidal"><span>Vidal Ureña</span><span class="ced">venta</span></div>
-          <div class="result" data-vol="Dolores"><span>Dolores Castillo</span><span class="ced">venta</span></div>
+          <div class="daylist">
+            ${VOLUNTEERS.map(v => `
+              <button class="pcard ${S.vol === v.id ? "sel" : ""}" data-vol="${v.id}">
+                <span class="ini">${iniciales(v.nombre)}</span>
+                <span><span class="nm">${v.nombre}</span><br>
+                      <span class="sub">${v.rol}</span></span>
+                ${S.vol === v.id ? '<span class="tick">✓</span>' : ""}
+              </button>`).join("")}
+          </div>
         </div>
         <div class="sect">
           <div class="sect-label">Tu clave de 4 números</div>
@@ -561,8 +658,15 @@
           <div class="sect-label">Efectivo con que abres</div>
           <input type="text" inputmode="numeric" value="1,500" aria-label="Efectivo inicial">
         </div>
+        <div class="note" style="text-align:center">
+          <button data-reset-demo="1" style="background:none;border:0;color:var(--ink-3);
+            font:inherit;font-size:12px;text-decoration:underline;cursor:pointer">
+            Reiniciar la demostración</button>
+        </div>
       </div>
-      <div class="foot"><button class="btn" data-go="venta">ABRIR TURNO</button></div>`);
+      <div class="foot">
+        <button class="btn" data-entrar="1" ${S.vol ? "" : "disabled"}>ABRIR TURNO</button>
+      </div>`);
   };
 
   /* ---- venta ---- */
@@ -738,14 +842,15 @@
 
   /* ---- cerrar turno ---- */
   VIEWS.cerrar = function (b) {
-    const ventas = 4230, inicial = 1500, esperado = inicial + ventas;
+    const ventas = S.ventas.reduce((a, v) => a + v.total, 0);
+    const inicial = 1500, esperado = inicial + ventas;
     const diff = S.contado - esperado;
     b.insertAdjacentHTML("beforeend", `
       <div class="scroll">
         <div class="sect">
           <div class="sect-label">Turno de hoy · Roselio</div>
           <div class="kv"><span class="k">Abriste con</span><span class="v">${money(inicial)}</span></div>
-          <div class="kv"><span class="k">Ventas del turno (17)</span><span class="v">${money(ventas)}</span></div>
+          <div class="kv"><span class="k">Ventas del turno (${S.ventas.length})</span><span class="v">${money(ventas)}</span></div>
           <div class="kv" style="border-top:1px solid var(--line);margin-top:6px;padding-top:8px">
             <span class="k"><b>Debe haber en caja</b></span><span class="v">${money(esperado)}</span></div>
         </div>
@@ -781,7 +886,7 @@
           cuando vuelva el wifi y el turno se completa después.</div>` : ""}
       </div>
       <div class="foot">
-        <button class="btn" data-go="abrir">CERRAR TURNO</button>
+        <button class="btn" data-cerrar-turno="1">CERRAR TURNO</button>
       </div>`);
   };
 
@@ -891,7 +996,17 @@
       return render();
     }
     if (t.dataset.go)      { S.screen = t.dataset.go; return render(); }
-    if (t.dataset.vol)     { return; }
+    if (t.dataset.vol)     { S.vol = t.dataset.vol; return render(); }
+    if (t.dataset.entrar) {
+      const v = VOLUNTEERS.find(x => x.id === S.vol);
+      S.screen = v && v.rol === "recepcion" ? "canje" : "venta";
+      return render();
+    }
+    if (t.dataset.resetDemo) {
+      try { localStorage.removeItem(CLAVE); } catch (e) {}
+      return location.reload();
+    }
+    if (t.id === "appbar-action") { S.screen = "cerrar"; return render(); }
     if (t.dataset.pat)     { S.patient = PATIENTS.find(p => p.cedula === t.dataset.pat); S.query = ""; return render(); }
     if (t.dataset.clear)   { S.patient = null; return render(); }
     if (t.dataset.toggleTodos) { S.verTodos = !S.verTodos; return render(); }
@@ -928,8 +1043,14 @@
       S.lastSale = { total: tot, antes: before, earned: res.earned,
                      saldo: res.saldo, carry: res.carry, nombre: S.patient.nombre };
       S.atendidos[S.patient.cedula] = true;
+      S.ventas.push({ id: "s" + Date.now(), total: tot, cedula: S.patient.cedula });
       if (S.offline) S.pendientes++;
       S.screen = "recibo";
+      return render();
+    }
+    if (t.dataset.cerrarTurno) {
+      S.screen = "abrir"; S.vol = null; S.ventas = []; S.atendidos = {};
+      S.conteo = {}; S.contado = 0; S.cart = {}; S.patient = null;
       return render();
     }
     if (t.dataset.nueva)  {
@@ -942,6 +1063,7 @@
       S.patient.carry = r.antes;                       // rebuild_credit, §6.2
       S.patient.saldo = r.saldo - r.earned * 100;
       delete S.atendidos[S.patient.cedula];
+      S.ventas = S.ventas.filter(v => v.total !== r.total || v.cedula !== S.patient.cedula);
       if (S.offline && S.pendientes > 0) S.pendientes--;
       S.buscando = false;
       S.screen = "venta";
