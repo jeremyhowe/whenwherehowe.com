@@ -200,6 +200,11 @@
     width: 62px; text-align: center; padding: 7px 4px; font-size: 15px; font-weight: 600;
     border-radius: 9px; font-variant-numeric: tabular-nums;
   }
+  .grupo {
+    padding: 14px 16px 6px; font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--ink-3); font-weight: 600; border-top: 1px solid var(--line);
+    background: var(--surface-2);
+  }
   .vertodos {
     width: 100%; padding: 13px; font: inherit; font-size: 14px; font-weight: 600;
     background: none; border: 0; border-top: 1px solid var(--line);
@@ -484,34 +489,33 @@
   }
 
   /* ---------------- data ---------------- */
+  /* PARTIAL catalogue — Jeremy's list of 2026-08-12. Prices and several units are
+     PLACEHOLDERS and must be replaced with the real wall prices before anyone
+     draws conclusions from a test. Oil is three separate products because three
+     sizes means three prices and three stock counts, not one item with a note.
+     Weighed goods step by 0.5; everything else by 1. */
   const PRODUCTS = [
-    { id:"arroz",   nombre:"Arroz",            unidad:"libra",   precio:45,  entrada:"decimal", top:1 },
-    { id:"habich",  nombre:"Habichuelas",      unidad:"libra",   precio:65,  entrada:"decimal", top:1 },
-    { id:"huevos",  nombre:"Huevos",           unidad:"huacal",  precio:200, entrada:"stepper", top:1 },
-    { id:"aceite",  nombre:"Aceite",           unidad:"litro",   precio:180, entrada:"stepper", top:1 },
-    { id:"azucar",  nombre:"Azúcar",           unidad:"libra",   precio:40,  entrada:"decimal", top:1 },
-    { id:"cafe",    nombre:"Café",             unidad:"libra",   precio:250, entrada:"decimal", top:1 },
-    { id:"salami",  nombre:"Salami",           unidad:"libra",   precio:120, entrada:"decimal", top:1 },
-    { id:"espag",   nombre:"Espaguetis",       unidad:"unidad",  precio:35,  entrada:"stepper", top:1 },
-    { id:"leche",   nombre:"Leche",            unidad:"litro",   precio:95,  entrada:"stepper", top:1 },
-    { id:"pan",     nombre:"Pan",              unidad:"unidad",  precio:15,  entrada:"stepper", top:1 },
-    { id:"jabon",   nombre:"Jabón de cuaba",   unidad:"unidad",  precio:45,  entrada:"stepper", top:1 },
-    { id:"papel",   nombre:"Papel higiénico",  unidad:"unidad",  precio:30,  entrada:"stepper", top:1 },
-    { id:"sal",     nombre:"Sal",              unidad:"libra",   precio:25,  entrada:"stepper", top:0 },
-    { id:"cebolla", nombre:"Cebolla",          unidad:"libra",   precio:55,  entrada:"decimal", top:0 },
-    { id:"ajo",     nombre:"Ajo",              unidad:"libra",   precio:140, entrada:"decimal", top:0 },
-    { id:"platano", nombre:"Plátano",          unidad:"unidad",  precio:20,  entrada:"stepper", top:0 },
-    { id:"yuca",    nombre:"Yuca",             unidad:"libra",   precio:35,  entrada:"decimal", top:0 },
-    { id:"avena",   nombre:"Avena",            unidad:"libra",   precio:70,  entrada:"decimal", top:0 },
-    { id:"sardina", nombre:"Sardina",          unidad:"unidad",  precio:75,  entrada:"stepper", top:0 },
-    { id:"maiz",    nombre:"Maíz enlatado",    unidad:"unidad",  precio:65,  entrada:"stepper", top:0 },
-    { id:"deterg",  nombre:"Detergente",       unidad:"unidad",  precio:110, entrada:"stepper", top:0 },
-    { id:"cloro",   nombre:"Cloro",            unidad:"litro",   precio:60,  entrada:"stepper", top:0 },
-    { id:"pasta",   nombre:"Pasta dental",     unidad:"unidad",  precio:85,  entrada:"stepper", top:0 },
-    { id:"galleta", nombre:"Galletas",         unidad:"unidad",  precio:40,  entrada:"stepper", top:0 },
-    { id:"harina",  nombre:"Harina",           unidad:"libra",   precio:38,  entrada:"decimal", top:0 },
-    { id:"bacalao", nombre:"Bacalao",          unidad:"libra",   precio:320, entrada:"decimal", top:0 }
+    // ---- comida y bebida ----
+    { id:"huevos",   nombre:"Huevos",            unidad:"huacal", precio:320, entrada:"stepper", grupo:"comida" },
+    { id:"arroz",    nombre:"Arroz",             unidad:"libra",  precio:45,  entrada:"decimal", grupo:"comida" },
+    { id:"habich",   nombre:"Habichuelas",       unidad:"libra",  precio:65,  entrada:"decimal", grupo:"comida" },
+    { id:"habitas",  nombre:"Habitas",           unidad:"libra",  precio:70,  entrada:"decimal", grupo:"comida" },
+    { id:"leche",    nombre:"Leche",             unidad:"unidad", precio:95,  entrada:"stepper", grupo:"comida" },
+    { id:"cafe",     nombre:"Café",              unidad:"libra",  precio:250, entrada:"decimal", grupo:"comida" },
+    { id:"aceite8",  nombre:"Aceite 8 oz",       unidad:"unidad", precio:75,  entrada:"stepper", grupo:"comida" },
+    { id:"aceite16", nombre:"Aceite 16 oz",      unidad:"unidad", precio:140, entrada:"stepper", grupo:"comida" },
+    { id:"aceitemg", nombre:"Aceite medio galón",unidad:"unidad", precio:480, entrada:"stepper", grupo:"comida" },
+    { id:"gviva",    nombre:"Galleta Viva",      unidad:"unidad", precio:25,  entrada:"stepper", grupo:"comida" },
+    { id:"ghatuey",  nombre:"Galleta Hatuey",    unidad:"unidad", precio:30,  entrada:"stepper", grupo:"comida" },
+    { id:"manisal",  nombre:"Maní salado",       unidad:"unidad", precio:25,  entrada:"stepper", grupo:"comida" },
+    { id:"maniconf", nombre:"Maní confitado",    unidad:"unidad", precio:30,  entrada:"stepper", grupo:"comida" },
+    { id:"manijap",  nombre:"Maní japonés",      unidad:"unidad", precio:35,  entrada:"stepper", grupo:"comida" },
+    // ---- otros ----
+    { id:"papel",    nombre:"Papel higiénico",   unidad:"unidad", precio:30,  entrada:"stepper", grupo:"otros" },
+    { id:"pasta",    nombre:"Pasta dental",      unidad:"unidad", precio:85,  entrada:"stepper", grupo:"otros" },
+    { id:"lentes",   nombre:"Lentes de lectura", unidad:"unidad", precio:250, entrada:"stepper", grupo:"otros" }
   ];
+
 
   const PATIENTS = [
     { cedula:"402-1938291-4821", nombre:"María Rodríguez",     carry:710, saldo:200,  cuota:1500 },
@@ -824,7 +828,10 @@
   /* ---- venta ---- */
   VIEWS.venta = function (b) {
     const t = total();
-    const shown = S.verTodos ? PRODUCTS : PRODUCTS.filter(p => p.top);
+    // With a catalogue this short, hiding half of it behind a button costs more
+    // than it saves. The split stays in the code for if it ever grows.
+    const CORTO = PRODUCTS.length <= 18;
+    const shown = (CORTO || S.verTodos) ? PRODUCTS : PRODUCTS.filter(p => p.top);
 
     let patientHTML;
     if (S.patient) {
@@ -880,7 +887,7 @@
           ${patientHTML}
         </div>
         <div id="plist">
-          ${shown.map(p => {
+          ${shown.map((p, i) => {
             const q = S.cart[p.id] || 0;
             // One control for everything. entrada only decides the step: weighed
             // goods move by 0.5, countables by 1. Nothing is ever typed.
@@ -889,14 +896,16 @@
                    <span class="qty">${plain(q)}</span>
                    <button data-inc="${p.id}" aria-label="Agregar">+</button>
                  </div>`;
-            return `<div class="prow ${q > 0 ? "active" : ""}">
+            const cabecera = (i > 0 && shown[i - 1].grupo !== p.grupo)
+              ? `<div class="grupo">Otros</div>` : "";
+            return `${cabecera}<div class="prow ${q > 0 ? "active" : ""}">
                       <div><div class="pname">${p.nombre}</div><div class="punit">${p.unidad}</div></div>
                       ${ctrl}
                     </div>`;
           }).join("")}
-          <button class="vertodos" data-toggle-todos="1">
+          ${CORTO ? "" : `<button class="vertodos" data-toggle-todos="1">
             ${S.verTodos ? "Ver menos" : `Ver todos (${PRODUCTS.length})`}
-          </button>
+          </button>`}
         </div>
       </div>
       <div class="foot">
