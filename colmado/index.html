@@ -290,6 +290,15 @@
   .variance.off  { background: var(--crit-soft); color: var(--crit); }
   .variance .v { font-size: 20px; font-weight: 650; font-variant-numeric: tabular-nums; }
 
+  .fijo {
+    display: flex; justify-content: space-between; align-items: baseline;
+    padding: 0 2px 12px; margin-bottom: 12px; border-bottom: 1px solid var(--line);
+  }
+  .fijo .k { font-size: 11.5px; letter-spacing: .1em; text-transform: uppercase;
+    font-weight: 700; color: var(--ink-3); }
+  .fijo .v { font-size: 26px; font-weight: 650; letter-spacing: -.02em;
+    font-variant-numeric: tabular-nums; }
+
   .note { padding: 10px 16px 16px; font-size: 12.5px; color: var(--ink-3); }
 
   /* ---------- annotations ---------- */
@@ -365,10 +374,22 @@
   .denom .sum { font-size: 13px; color: var(--ink-3); font-variant-numeric: tabular-nums;
     text-align: right; min-width: 62px; }
   .denom .stepper { justify-content: flex-end; gap: 6px; }
+  /* One height for the whole row, so the ± squares match the field exactly. */
+  .denom { --alto: 46px; }
+  .denom .stepper button {
+    width: var(--alto); height: var(--alto);
+    background: var(--brand-soft); border-color: color-mix(in srgb, var(--brand) 34%, transparent);
+    color: var(--brand); font-weight: 600;
+  }
+  .denom .stepper button:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--brand) 18%, var(--brand-soft));
+  }
+  .denom .stepper button:disabled { background: var(--surface-2); color: var(--ink-3); }
   .qtyin {
-    width: 56px; text-align: center; font: inherit; font-size: 17px; font-weight: 600;
-    padding: 10px 2px; border-radius: 10px; border: 1px solid var(--line-strong);
-    background: var(--surface-2); color: var(--ink);
+    width: var(--alto, 46px); height: var(--alto, 46px);
+    text-align: center; font: inherit; font-size: 17px; font-weight: 600;
+    padding: 0; border-radius: 10px; border: 1px solid var(--line-strong);
+    background: var(--surface); color: var(--ink);
   }
 
   /* App mode: installed to the home screen, or ?app=1. The volunteer sees the
@@ -392,8 +413,9 @@
   /* Thumbs, not cursors: everything tappable gets bigger in the real app. */
   body.appmode .btn { padding: 18px; font-size: 18px; }
   body.appmode .stepper button { width: 52px; height: 52px; font-size: 24px; border-radius: 12px; }
-  body.appmode .qtyin { width: 64px; padding: 14px 2px; font-size: 19px; }
-  body.appmode .denom { gap: 10px; }
+  body.appmode .denom { --alto: 56px; gap: 10px; }
+  body.appmode .denom .stepper button { border-radius: 13px; font-size: 26px; }
+  body.appmode .qtyin { font-size: 20px; border-radius: 13px; }
   body.appmode .pcard { padding: 15px 14px; }
   body.appmode .pcard .nm { font-size: 17px; }
 
@@ -545,8 +567,9 @@
       if (menos) menos.disabled = !conteo[d];
     });
 
-    const cajaTotal = el("total-" + ns);
-    if (cajaTotal) cajaTotal.textContent = money(total);
+    [el("total-" + ns), el("total-" + ns + "-fijo")].forEach(n => {
+      if (n) n.textContent = money(total);
+    });
 
     if (ns === "cie") {
       const v = el("variance");
@@ -740,7 +763,11 @@
               font-size:12px;text-decoration:underline;cursor:pointer">Reiniciar la demostración</button>
           </div>
         </div>
-        <div class="foot"><button class="btn" data-entrar="1">ABRIR TURNO</button></div>`);
+        <div class="foot">
+          <div class="fijo"><span class="k">Abres con</span>
+            <span class="v" id="total-ini-fijo">${money(S.inicial)}</span></div>
+          <button class="btn" data-entrar="1">ABRIR TURNO</button>
+        </div>`);
       S.vol = mio.id;
       return;
     }
@@ -973,6 +1000,8 @@
           cuando vuelva el wifi y el turno se completa después.</div>` : ""}
       </div>
       <div class="foot">
+        <div class="fijo"><span class="k">Contaste</span>
+          <span class="v" id="total-cie-fijo">${money(S.contado)}</span></div>
         <button class="btn" data-cerrar-turno="1">CERRAR TURNO</button>
       </div>`);
   };
