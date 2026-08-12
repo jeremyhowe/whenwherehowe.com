@@ -20,16 +20,16 @@
     --ground:      #F2F4F7;
     --surface:     #FFFFFF;
     --surface-2:   #E9ECF2;
-    --line:        #D3D9E3;
-    --line-strong: #B4BDCC;
+    --line:        #BCC5D4;
+    --line-strong: #818EA2;
     --ink:         #171A21;
     --ink-2:       #4A5364;
-    --ink-3:       #7A8494;
+    --ink-3:       #545E70;
     --brand:       #1B3A6B;
     --brand-soft:  #E3EAF5;
-    --credit:      #A9721A;
+    --credit:      #855610;
     --credit-soft: #FBF0DA;
-    --ok:          #1B6B4A;
+    --ok:          #15613F;
     --warn:        #A55A08;
     --crit:        #A32A2A;
     --crit-soft:   #FBE7E7;
@@ -42,11 +42,11 @@
       --ground:      #0E1116;
       --surface:     #171B23;
       --surface-2:   #202632;
-      --line:        #2C3340;
-      --line-strong: #3D4655;
+      --line:        #3A4250;
+      --line-strong: #596473;
       --ink:         #EDF0F5;
       --ink-2:       #A9B3C2;
-      --ink-3:       #78838F;
+      --ink-3:       #9AA6B4;
       --brand:       #7DA6E8;
       --brand-soft:  #1B2536;
       --credit:      #E0AC53;
@@ -59,15 +59,15 @@
     }
   }
   :root[data-theme="light"] {
-    --ground:#F2F4F7; --surface:#FFFFFF; --surface-2:#E9ECF2; --line:#D3D9E3;
-    --line-strong:#B4BDCC; --ink:#171A21; --ink-2:#4A5364; --ink-3:#7A8494;
-    --brand:#1B3A6B; --brand-soft:#E3EAF5; --credit:#A9721A; --credit-soft:#FBF0DA;
-    --ok:#1B6B4A; --warn:#A55A08; --crit:#A32A2A; --crit-soft:#FBE7E7;
+    --ground:#F2F4F7; --surface:#FFFFFF; --surface-2:#E9ECF2; --line:#BCC5D4;
+    --line-strong:#818EA2; --ink:#171A21; --ink-2:#4A5364; --ink-3:#545E70;
+    --brand:#1B3A6B; --brand-soft:#E3EAF5; --credit:#855610; --credit-soft:#FBF0DA;
+    --ok:#15613F; --warn:#A55A08; --crit:#A32A2A; --crit-soft:#FBE7E7;
     --shadow:0 1px 2px rgba(16,22,38,.06), 0 8px 24px rgba(16,22,38,.08);
   }
   :root[data-theme="dark"] {
-    --ground:#0E1116; --surface:#171B23; --surface-2:#202632; --line:#2C3340;
-    --line-strong:#3D4655; --ink:#EDF0F5; --ink-2:#A9B3C2; --ink-3:#78838F;
+    --ground:#0E1116; --surface:#171B23; --surface-2:#202632; --line:#3A4250;
+    --line-strong:#596473; --ink:#EDF0F5; --ink-2:#A9B3C2; --ink-3:#9AA6B4;
     --brand:#7DA6E8; --brand-soft:#1B2536; --credit:#E0AC53; --credit-soft:#2A2113;
     --ok:#5BC08D; --warn:#E0A055; --crit:#E88A8A; --crit-soft:#2E1A1A;
     --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
@@ -437,6 +437,77 @@
   body.appmode .pcard { padding: 15px 14px; }
   body.appmode .pcard .nm { font-size: 17px; }
 
+  /* ---------- Legibilidad ----------
+     Written for volunteers with presbyopia and no reading glasses to hand.
+     The governing fact: someone who cannot focus close holds the phone at
+     arm's length, so type must survive ~55cm rather than the ~30cm phones
+     assume. Everything below is sized for that distance, and --esc lets a
+     volunteer push it further still. Small grey captions are gone entirely —
+     they were the least readable thing on the screen and carried real
+     information (units, patient id, credit). */
+  :root { --esc: 1; }
+  :root[data-texto="grande"] { --esc: 1.2; }
+
+  body { font-size: calc(var(--esc) * 17px); line-height: 1.5; }
+
+  .pname            { font-size: calc(var(--esc) * 20px); font-weight: 600; }
+  .punit            { font-size: calc(var(--esc) * 15px); color: var(--ink-2);
+                      text-transform: none; font-weight: 500; }
+  .sect-label       { font-size: calc(var(--esc) * 15px); color: var(--ink-2);
+                      text-transform: none; letter-spacing: 0; font-weight: 600; }
+  .listhead .count  { font-size: calc(var(--esc) * 14px); color: var(--ink-2); }
+  .pcard .nm        { font-size: calc(var(--esc) * 20px); }
+  .pcard .sub       { font-size: calc(var(--esc) * 15px); color: var(--ink-2); }
+  .pcard .ini       { font-size: calc(var(--esc) * 16px); }
+  .result           { font-size: calc(var(--esc) * 18px); }
+  .result .ced      { font-size: calc(var(--esc) * 16px); color: var(--ink-2); }
+  .chosen           { font-size: calc(var(--esc) * 18px); }
+  .cline            { font-size: calc(var(--esc) * 18px); }
+  .cline .qty       { font-size: calc(var(--esc) * 16px); color: var(--ink-2); }
+  .cline .calc      { font-size: calc(var(--esc) * 16px); color: var(--ink-2); }
+  .cline .sub       { font-size: calc(var(--esc) * 18px); min-width: 76px; }
+  .kv               { font-size: calc(var(--esc) * 18px); }
+  .kv.big .v        { font-size: calc(var(--esc) * 24px); }
+  .kv .k            { color: var(--ink-2); }
+  .kv.quiet .k, .kv.quiet .v { color: var(--ink-2); }
+  .totalrow .lbl    { font-size: calc(var(--esc) * 14px); color: var(--ink-2); }
+  .totalrow .amt    { font-size: calc(var(--esc) * 36px); }
+  .btn              { font-size: calc(var(--esc) * 20px); }
+  .btnrow .btn      { font-size: calc(var(--esc) * 18px); }
+  .denom .face      { font-size: calc(var(--esc) * 20px); }
+  .denom .sum       { font-size: calc(var(--esc) * 16px); color: var(--ink-2); min-width: 78px; }
+  .stepper .qty     { font-size: calc(var(--esc) * 20px); }
+  input.qtyin       { font-size: calc(var(--esc) * 21px); }
+  .fijo .k          { font-size: calc(var(--esc) * 14px); color: var(--ink-2); }
+  .fijo .v          { font-size: calc(var(--esc) * 30px); }
+  .note             { font-size: calc(var(--esc) * 15px); color: var(--ink-2); }
+  .banner           { font-size: calc(var(--esc) * 15px); }
+  .appbar .who      { font-size: calc(var(--esc) * 16px); }
+  .stamp .t         { font-size: calc(var(--esc) * 20px); }
+  .creditbox .arith { font-size: calc(var(--esc) * 17px); }
+  .creditbox .total .k { font-size: calc(var(--esc) * 14px); }
+  .creditbox .total .v { font-size: calc(var(--esc) * 30px); }
+  .creditbox .next  { font-size: calc(var(--esc) * 16px); color: var(--ink-2); }
+  .devolver .k      { font-size: calc(var(--esc) * 14px); }
+  .devolver .v      { font-size: calc(var(--esc) * 38px); }
+  .bill             { font-size: calc(var(--esc) * 17px); }
+  .variance         { font-size: calc(var(--esc) * 18px); }
+  .variance .v      { font-size: calc(var(--esc) * 24px); }
+  .earned-pill      { font-size: calc(var(--esc) * 15px); }
+  .grupo            { font-size: calc(var(--esc) * 14px); }
+  .searchtoggle     { font-size: calc(var(--esc) * 16px); color: var(--ink-2); }
+  input[type="text"] { font-size: calc(var(--esc) * 18px); }
+
+  /* Rows need to be separable at arm's length, so dividers get real weight. */
+  .prow, .denom + .denom { border-color: var(--line); }
+  .prow { border-bottom-width: 1px; padding-top: 13px; padding-bottom: 13px; }
+
+  /* Bigger targets again once the type grows. */
+  body.appmode .denom { --alto: calc(var(--esc) * 58px); }
+  body.appmode .stepper button {
+    width: calc(var(--esc) * 54px); height: calc(var(--esc) * 54px);
+  }
+
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
 </style>
 
@@ -647,6 +718,12 @@
   const CLAVE = "colmado.demo.v1";
   const CLAVE_DISPOSITIVO = "colmado.dispositivo";   // survives a demo reset
 
+  const CLAVE_TEXTO = "colmado.texto";
+  const textoGrande = () => { try { return localStorage.getItem(CLAVE_TEXTO) === "grande"; } catch (e) { return false; } };
+  function aplicarTexto() {
+    document.documentElement.dataset.texto = textoGrande() ? "grande" : "normal";
+  }
+
   const dueno = () => { try { return localStorage.getItem(CLAVE_DISPOSITIVO); } catch (e) { return null; } };
   const setDueno = id => { try { localStorage.setItem(CLAVE_DISPOSITIVO, id); } catch (e) {} };
 
@@ -796,8 +873,10 @@
             </div>
           </div>
           <div class="note" style="text-align:center;display:flex;flex-direction:column;gap:10px">
+            <button class="btn ghost" data-texto="1" style="font-size:calc(var(--esc)*17px)">
+              ${textoGrande() ? "Letra normal" : "Letra más grande"}</button>
             <button data-otro="1" style="background:none;border:0;color:var(--brand);font:inherit;
-              font-size:13px;text-decoration:underline;cursor:pointer">No soy ${mio.nombre.split(" ")[0]}</button>
+              font-size:calc(var(--esc)*15px);text-decoration:underline;cursor:pointer">No soy ${mio.nombre.split(" ")[0]}</button>
             <button data-reset-demo="1" style="background:none;border:0;color:var(--ink-3);font:inherit;
               font-size:12px;text-decoration:underline;cursor:pointer">Reiniciar la demostración</button>
           </div>
@@ -1169,6 +1248,11 @@
       S.screen = v && v.rol === "recepcion" ? "canje" : "venta";
       return render();
     }
+    if (t.dataset.texto) {
+      try { localStorage.setItem(CLAVE_TEXTO, textoGrande() ? "normal" : "grande"); } catch (e) {}
+      aplicarTexto();
+      return render();
+    }
     if (t.dataset.resetDemo) {
       try { localStorage.removeItem(CLAVE); } catch (e) {}
       return location.reload();
@@ -1296,6 +1380,7 @@
     render();
   });
 
+  aplicarTexto();
   restaurar();
   render();
 })();
