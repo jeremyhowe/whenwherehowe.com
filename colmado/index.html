@@ -503,6 +503,27 @@
 
   const DENOMS = [2000, 1000, 500, 200, 100, 50, 25, 10, 5, 1];
 
+  /* One counter, used to open the caja chica and to close it out. Namespaced so
+     the two counts never touch each other. */
+  function contador(conteo, ns) {
+    return `<div class="denoms">
+      ${DENOMS.filter(d => d >= 5).map(d => {
+        const n = conteo[d] || 0;
+        return `<div class="denom">
+          <span class="face">${d}</span>
+          <span class="stepper">
+            <button data-dmin="${ns}:${d}" ${n <= 0 ? "disabled" : ""} aria-label="Menos de ${d}">−</button>
+            <span class="qty">${n}</span>
+            <button data-dmas="${ns}:${d}" aria-label="Más de ${d}">+</button>
+          </span>
+          <span class="sum">${n ? plain(n * d) : ""}</span>
+        </div>`;
+      }).join("")}
+    </div>`;
+  }
+
+  const sumar = conteo => DENOMS.reduce((a, d) => a + (conteo[d] || 0) * d, 0);
+
   /* Which notes to hand back. Removes the mental arithmetic that loses cash. */
   function desglose(monto) {
     const out = [];
@@ -532,7 +553,9 @@
     efectivo: 500,
     lastSale: null,        // { total, antes, ahora, earned, saldo, carry }
     contado: 0,
-    conteo: {},   // denominación -> cantidad contada
+    conteo: {},        // cierre:  denominación -> cantidad contada
+    conteoInicial: {}, // apertura: el fondo con que se abre la caja
+    inicial: 0,
     canjeApplied: false,
     canjePatient: PATIENTS[0],
     ventas: []           // this shift's sales, for the close-out
@@ -566,7 +589,8 @@
     Object.assign(S, {
       screen: d.screen || "abrir", vol: d.vol || null, cart: d.cart || {},
       verTodos: !!d.verTodos, buscando: !!d.buscando, atendidos: d.atendidos || {},
-      conteo: d.conteo || {}, contado: d.contado || 0, lastSale: d.lastSale || null,
+      conteo: d.conteo || {}, contado: d.contado || 0,
+      conteoInicial: d.conteoInicial || {}, inicial: d.inicial || 0, lastSale: d.lastSale || null,
       offline: !!d.offline, pendientes: d.pendientes || 0, ventas: d.ventas || [],
       canjeApplied: !!d.canjeApplied
     });
@@ -666,8 +690,11 @@
             </div>
           </div>
           <div class="sect" style="border-bottom:0">
-            <div class="sect-label">Efectivo con que abres</div>
-            <input type="text" inputmode="numeric" value="1,500" aria-label="Efectivo inicial">
+            <div class="sect-label">Cuenta el fondo de la caja</div>
+            ${contador(S.conteoInicial, "ini")}
+            <div class="kv big" style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
+              <span class="k"><b>Abres con</b></span><span class="v">${money(S.inicial)}</span>
+            </div>
           </div>
           <div class="note" style="text-align:center;display:flex;flex-direction:column;gap:10px">
             <button data-otro="1" style="background:none;border:0;color:var(--brand);font:inherit;
@@ -879,7 +906,7 @@
   /* ---- cerrar turno ---- */
   VIEWS.cerrar = function (b) {
     const ventas = S.ventas.reduce((a, v) => a + v.total, 0);
-    const inicial = 1500, esperado = inicial + ventas;
+    const inicial = S.inicial, esperado = inicial + ventas;
     const diff = S.contado - esperado;
     b.insertAdjacentHTML("beforeend", `
       <div class="scroll">
@@ -892,20 +919,7 @@
         </div>
         <div class="sect">
           <div class="sect-label">Cuenta los billetes — la app suma</div>
-          <div class="denoms">
-            ${DENOMS.filter(d => d >= 5).map(d => {
-              const n = S.conteo[d] || 0;
-              return `<div class="denom">
-                <span class="face">${d}</span>
-                <span class="stepper">
-                  <button data-dmin="${d}" ${n <= 0 ? "disabled" : ""} aria-label="Menos de ${d}">−</button>
-                  <span class="qty">${n}</span>
-                  <button data-dmas="${d}" aria-label="Más de ${d}">+</button>
-                </span>
-                <span class="sum">${n ? plain(n * d) : ""}</span>
-              </div>`;
-            }).join("")}
-          </div>
+          ${contador(S.conteo, "cie")}
           <div class="kv big" style="border-top:1px solid var(--line);margin-top:10px;padding-top:10px">
             <span class="k"><b>Contaste</b></span><span class="v">${money(S.contado)}</span></div>
           <div class="variance ${diff === 0 ? "zero" : "off"}">
@@ -1055,10 +1069,11 @@
       S.buscando = t.dataset.buscar === "1"; S.query = ""; return render();
     }
     if (t.dataset.dmas || t.dataset.dmin) {
-      const d = t.dataset.dmas || t.dataset.dmin;
+      const [ns, d] = (t.dataset.dmas || t.dataset.dmin).split(":");
       const step = t.dataset.dmas ? 1 : -1;
-      S.conteo[d] = Math.max(0, (S.conteo[d] || 0) + step);
-      S.contado = DENOMS.reduce((a, k) => a + (S.conteo[k] || 0) * k, 0);
+      const conteo = ns === "ini" ? S.conteoInicial : S.conteo;
+      conteo[d] = Math.max(0, (conteo[d] || 0) + step);
+      if (ns === "ini") S.inicial = sumar(conteo); else S.contado = sumar(conteo);
       return render();
     }
 
@@ -1146,6 +1161,7 @@
   el("tg-reset").addEventListener("click", function () {
     S.cart = {}; S.patient = null; S.verTodos = false; S.pendientes = 0;
     S.buscando = false; S.atendidos = {}; S.conteo = {}; S.contado = 0;
+    S.conteoInicial = {}; S.inicial = 0;
     PATIENTS[0].carry = 710; PATIENTS[0].saldo = 200;
     PATIENTS[1].carry = 340; PATIENTS[1].saldo = 500;
     PATIENTS[2].carry = 0;   PATIENTS[2].saldo = 1200;
