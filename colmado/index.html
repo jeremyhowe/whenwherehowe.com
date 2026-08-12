@@ -377,6 +377,7 @@
   /* One height for the whole row, so the ± squares match the field exactly. */
   .denom { --alto: 46px; }
   .denom .stepper button {
+    flex: 0 0 var(--alto);
     width: var(--alto); height: var(--alto);
     background: var(--brand-soft); border-color: color-mix(in srgb, var(--brand) 34%, transparent);
     color: var(--brand); font-weight: 600;
@@ -385,8 +386,9 @@
     background: color-mix(in srgb, var(--brand) 18%, var(--brand-soft));
   }
   .denom .stepper button:disabled { background: var(--surface-2); color: var(--ink-3); }
-  .qtyin {
-    width: var(--alto, 46px); height: var(--alto, 46px);
+  input.qtyin {
+    flex: 0 0 var(--alto, 46px);
+    width: var(--alto, 46px); height: var(--alto, 46px); min-width: 0;
     text-align: center; font: inherit; font-size: 17px; font-weight: 600;
     padding: 0; border-radius: 10px; border: 1px solid var(--line-strong);
     background: var(--surface); color: var(--ink);
@@ -414,8 +416,11 @@
   body.appmode .btn { padding: 18px; font-size: 18px; }
   body.appmode .stepper button { width: 52px; height: 52px; font-size: 24px; border-radius: 12px; }
   body.appmode .denom { --alto: 56px; gap: 10px; }
-  body.appmode .denom .stepper button { border-radius: 13px; font-size: 26px; }
-  body.appmode .qtyin { font-size: 20px; border-radius: 13px; }
+  body.appmode .denom .stepper button {
+    flex: 0 0 var(--alto); width: var(--alto); height: var(--alto);
+    border-radius: 13px; font-size: 26px;
+  }
+  body.appmode input.qtyin { font-size: 20px; border-radius: 13px; }
   body.appmode .pcard { padding: 15px 14px; }
   body.appmode .pcard .nm { font-size: 17px; }
 
