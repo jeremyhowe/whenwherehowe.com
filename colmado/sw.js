@@ -1,7 +1,7 @@
 // Colmado — offline shell.
 // The whole app is one file, so caching it is the whole job. Network-first for
 // the page (so a redeploy is picked up), cache-first for everything else.
-const CACHE = 'colmado-4164590939';
+const CACHE = 'colmado-321612203';
 const SHELL = ['./', './?app=1', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', e => {
