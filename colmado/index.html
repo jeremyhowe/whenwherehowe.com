@@ -591,6 +591,10 @@
   window.addEventListener("resize", medirAlto);
   window.addEventListener("orientationchange", () => setTimeout(medirAlto, 250));
   if (window.visualViewport) window.visualViewport.addEventListener("resize", medirAlto);
+  window.addEventListener("pageshow", medirAlto);
+  // Belt and braces: some browsers resize the viewport without firing 'resize'
+  // (and the address bar sliding away is exactly that case).
+  if (window.ResizeObserver) new ResizeObserver(medirAlto).observe(document.documentElement);
 
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", function () {
@@ -601,27 +605,27 @@
   }
 
   /* ---------------- data ---------------- */
-  /* PARTIAL catalogue — Jeremy's list of 2026-08-12. Prices and several units are
-     PLACEHOLDERS and must be replaced with the real wall prices before anyone
-     draws conclusions from a test. Oil is three separate products because three
+  /* PARTIAL catalogue. Prices below come from the Colmado ASOVIME wall sign
+     dated 20-04-2026 — real, but four months old, so worth re-checking.
+     STILL INVENTED: café, papel higiénico, pasta dental, lentes de lectura. Oil is three separate products because three
      sizes means three prices and three stock counts, not one item with a note.
      Weighed goods step by 0.5; everything else by 1. */
   const PRODUCTS = [
     // ---- comida y bebida ----
-    { id:"huevos",   nombre:"Huevos",            unidad:"huacal", precio:320, entrada:"stepper", grupo:"comida" },
+    { id:"huevos",   nombre:"Huevos",            unidad:"huacal", precio:200, entrada:"stepper", grupo:"comida" },
     { id:"arroz",    nombre:"Arroz",             unidad:"libra",  precio:45,  entrada:"decimal", grupo:"comida" },
-    { id:"habich",   nombre:"Habichuelas",       unidad:"libra",  precio:65,  entrada:"decimal", grupo:"comida" },
-    { id:"habitas",  nombre:"Habitas",           unidad:"libra",  precio:70,  entrada:"decimal", grupo:"comida" },
-    { id:"leche",    nombre:"Leche",             unidad:"litro",  precio:95,  entrada:"stepper", grupo:"comida" },
+    { id:"habich",   nombre:"Habichuelas",       unidad:"libra",  precio:70,  entrada:"decimal", grupo:"comida" },
+    { id:"habitas",  nombre:"Habitas",           unidad:"libra",  precio:45,  entrada:"decimal", grupo:"comida" },
+    { id:"leche",    nombre:"Leche",             unidad:"litro",  precio:100,  entrada:"stepper", grupo:"comida" },
     { id:"cafe",     nombre:"Café",              unidad:"libra",  precio:250, entrada:"decimal", grupo:"comida" },
-    { id:"aceite8",  nombre:"Aceite 8 oz",       unidad:"unidad", precio:75,  entrada:"stepper", grupo:"comida" },
-    { id:"aceite16", nombre:"Aceite 16 oz",      unidad:"unidad", precio:140, entrada:"stepper", grupo:"comida" },
-    { id:"aceitemg", nombre:"Aceite medio galón",unidad:"unidad", precio:480, entrada:"stepper", grupo:"comida" },
-    { id:"gviva",    nombre:"Galleta Viva",      unidad:"unidad", precio:25,  entrada:"stepper", grupo:"comida" },
-    { id:"ghatuey",  nombre:"Galleta Hatuey",    unidad:"unidad", precio:30,  entrada:"stepper", grupo:"comida" },
-    { id:"maniverde", nombre:"Maní verde",  unidad:"unidad", precio:25, entrada:"stepper", grupo:"comida", color:"#2E9E5B" },
-    { id:"maniazul",  nombre:"Maní azul",   unidad:"unidad", precio:30, entrada:"stepper", grupo:"comida", color:"#2F6FD0" },
-    { id:"manimor",   nombre:"Maní morado", unidad:"unidad", precio:35, entrada:"stepper", grupo:"comida", color:"#8250C4" },
+    { id:"aceite8",  nombre:"Aceite 8 oz",       unidad:"unidad", precio:55,  entrada:"stepper", grupo:"comida" },
+    { id:"aceite16", nombre:"Aceite 16 oz",      unidad:"unidad", precio:100, entrada:"stepper", grupo:"comida" },
+    { id:"aceitemg", nombre:"Aceite medio galón",unidad:"unidad", precio:320, entrada:"stepper", grupo:"comida" },
+    { id:"gviva",    nombre:"Galleta Viva",      unidad:"unidad", precio:15,  entrada:"stepper", grupo:"comida" },
+    { id:"ghatuey",  nombre:"Galleta Hatuey",    unidad:"unidad", precio:10,  entrada:"stepper", grupo:"comida" },
+    { id:"maniverde", nombre:"Maní verde",  unidad:"unidad", precio:15, entrada:"stepper", grupo:"comida", color:"#2E9E5B" },
+    { id:"maniazul",  nombre:"Maní azul",   unidad:"unidad", precio:15, entrada:"stepper", grupo:"comida", color:"#2F6FD0" },
+    { id:"manimor",   nombre:"Maní morado", unidad:"unidad", precio:15, entrada:"stepper", grupo:"comida", color:"#8250C4" },
     // ---- otros ----
     { id:"papel",    nombre:"Papel higiénico",   unidad:"unidad", precio:30,  entrada:"stepper", grupo:"otros" },
     { id:"pasta",    nombre:"Pasta dental",      unidad:"unidad", precio:85,  entrada:"stepper", grupo:"otros" },
