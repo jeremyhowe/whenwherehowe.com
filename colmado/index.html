@@ -366,9 +366,10 @@
   body.appmode .workbench { display: block; }
   body.appmode .stage { gap: 0; }
   body.appmode .phone {
-    width: 100%; max-width: none; min-height: 100svh; border: 0;
-    border-radius: 0; box-shadow: none;
+    width: 100%; max-width: none; border: 0; border-radius: 0; box-shadow: none;
+    height: 100svh;            /* fixed, so .foot stays pinned and .scroll scrolls */
   }
+  body.appmode, body.appmode .workbench, body.appmode .stage { height: 100svh; overflow: hidden; }
   body.appmode .phone .statusbar { display: none; }
   body.appmode .appbar { padding-top: max(10px, env(safe-area-inset-top)); }
   body.appmode .foot { padding-bottom: max(16px, env(safe-area-inset-bottom)); }
@@ -503,7 +504,8 @@
     return out;
   }
 
-  const iniciales = nombre => nombre.split(/\s+/).slice(0, 2).map(w => w[0]).join("");
+  const iniciales = nombre =>
+    (nombre.match(/[\p{L}]+/gu) || []).slice(0, 2).map(w => w[0].toUpperCase()).join("");
 
   /* ---------------- state ---------------- */
   const S = {
