@@ -352,10 +352,30 @@
   .pcard .sub { font-size: 12px; color: var(--ink-3); }
   .pcard.sel { border-color: var(--brand); background: var(--brand-soft); }
   .pcard.done { opacity: .5; }
-  .pcard.done .nm { text-decoration: line-through; }
+  /* Dimmed and ticked, never struck through — they may well come back for a
+     second purchase, so the row has to stay readable and tappable. */
+  .pcard.done { opacity: .62; }
   .pcard .tick { margin-left: auto; color: var(--ok); font-weight: 700; }
   .listhead { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 9px; }
   .listhead .count { font-size: 12px; color: var(--ink-3); font-variant-numeric: tabular-nums; }
+  .donacion { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .donacion button {
+    font: inherit; font-size: calc(var(--esc) * 17px); font-weight: 600;
+    padding: 12px 14px; border-radius: 11px; cursor: pointer;
+    border: 1px solid color-mix(in srgb, var(--credit) 40%, transparent);
+    background: var(--credit-soft); color: var(--credit);
+  }
+  .donacion button.quitar { background: none; border-color: var(--line-strong); color: var(--ink-2); }
+  .donacion input.qtyin { width: calc(var(--esc) * 86px); flex: none; }
+
+  .hoja {
+    position: absolute; inset: 0; z-index: 30; background: var(--surface);
+    display: flex; flex-direction: column;
+  }
+  .hoja-top { padding: 16px; border-bottom: 1px solid var(--line); }
+  .hoja-cuerpo { flex: 1; min-height: 0; overflow-y: auto; padding: 14px 16px; }
+  .phone { position: relative; }
+
   .searchtoggle {
     width: 100%; margin-top: 10px; padding: 11px; font: inherit; font-size: 13.5px;
     background: none; border: 1px dashed var(--line-strong); border-radius: 10px;
@@ -744,6 +764,7 @@
     cart: {},              // id -> cantidad
     verTodos: false,
     efectivo: 500,
+    donacion: 0,
     lastSale: null,        // { total, antes, ahora, earned, saldo, carry }
     contado: 0,
     conteo: {},        // cierre:  denominación -> cantidad contada
@@ -775,7 +796,7 @@
         screen: S.screen, vol: S.vol, patient: S.patient && S.patient.cedula,
         cart: S.cart, verTodos: S.verTodos, buscando: S.buscando,
         atendidos: S.atendidos, conteo: S.conteo, contado: S.contado,
-        lastSale: S.lastSale, offline: S.offline, pendientes: S.pendientes,
+        donacion: S.donacion, lastSale: S.lastSale, offline: S.offline, pendientes: S.pendientes,
         ventas: S.ventas, canjeApplied: S.canjeApplied,
         saldos: PATIENTS.map(p => [p.cedula, p.saldo, p.carry])
       }));
@@ -788,6 +809,7 @@
     Object.assign(S, {
       screen: d.screen || "abrir", vol: d.vol || null, cart: d.cart || {},
       verTodos: !!d.verTodos, buscando: !!d.buscando, atendidos: d.atendidos || {},
+      donacion: d.donacion || 0,
       conteo: d.conteo || {}, contado: d.contado || 0,
       conteoInicial: d.conteoInicial || {}, inicial: d.inicial || 0, lastSale: d.lastSale || null,
       offline: !!d.offline, pendientes: d.pendientes || 0, ventas: d.ventas || [],
@@ -872,6 +894,7 @@
     }
     try {
       VIEWS[S.screen](body);
+    if (S.buscando) body.insertAdjacentHTML("beforeend", hojaBusqueda());
     } catch (err) {
       body.insertAdjacentHTML("beforeend",
         `<div class="note" style="padding:24px 16px">No se pudo mostrar esta pantalla.
@@ -893,6 +916,40 @@
 
   const VIEWS = {};
 
+  /* A sheet rather than a field tucked above the product list: the list is long,
+     re-renders keep their scroll position, and a volunteer who taps "buscar"
+     would otherwise be looking at rice. Covering the screen removes the
+     question of where the field went. */
+  function hojaBusqueda() {
+    const q = S.query.trim().toLowerCase();
+    let cuerpo;
+    if (q.length >= 3) {
+      const hits = PATIENTS.filter(p =>
+        p.nombre.toLowerCase().includes(q) || p.cedula.replace(/-/g, "").includes(q)
+      ).slice(0, 5);
+      cuerpo = hits.length
+        ? `<div class="daylist">${hits.map(p => `
+            <button class="pcard" data-pat="${p.cedula}">
+              <span class="ini">${iniciales(p.nombre)}</span>
+              <span><span class="nm">${p.nombre}</span><br>
+                    <span class="sub">…${p.cedula.slice(-4)}</span></span>
+            </button>`).join("")}</div>`
+        : `<div class="note">Ningún paciente con ese nombre o cédula.</div>`;
+    } else {
+      cuerpo = `<div class="note">Escriba al menos 3 letras del nombre, o los números de la cédula.</div>`;
+    }
+    return `
+      <div class="hoja">
+        <div class="hoja-top">
+          <div class="sect-label" style="margin-bottom:8px">Buscar paciente</div>
+          <input type="text" id="q" value="${S.query}" autocomplete="off"
+                 placeholder="nombre o cédula" aria-label="Buscar paciente">
+        </div>
+        <div class="hoja-cuerpo">${cuerpo}</div>
+        <div class="foot"><button class="btn ghost" data-buscar="0">Cancelar</button></div>
+      </div>`;
+  }
+
   /* ---- abrir turno ---- */
   VIEWS.abrir = function (b) {
     const mio = VOLUNTEERS.find(v => v.id === dueno());
@@ -901,6 +958,10 @@
     if (mio) {
       b.insertAdjacentHTML("beforeend", `
         <div class="scroll">
+          <div class="sect" style="padding-top:12px;padding-bottom:12px">
+            <button class="btn ghost" data-texto="1" style="font-size:calc(var(--esc)*17px)">
+              ${textoGrande() ? "Letra normal" : "Letra más grande"}</button>
+          </div>
           <div class="sect" style="border-bottom:0;padding-bottom:4px">
             <div style="display:flex;align-items:center;justify-content:center;gap:10px">
               <span class="ini" style="width:38px;height:38px;font-size:14px">${iniciales(mio.nombre)}</span>
@@ -915,8 +976,6 @@
             </div>
           </div>
           <div class="note" style="text-align:center;display:flex;flex-direction:column;gap:10px">
-            <button class="btn ghost" data-texto="1" style="font-size:calc(var(--esc)*17px)">
-              ${textoGrande() ? "Letra normal" : "Letra más grande"}</button>
             <button data-otro="1" style="background:none;border:0;color:var(--brand);font:inherit;
               font-size:calc(var(--esc)*15px);text-decoration:underline;cursor:pointer">No soy ${mio.nombre.split(" ")[0]}</button>
             <button data-reset-demo="1" style="background:none;border:0;color:var(--ink-3);font:inherit;
@@ -970,8 +1029,9 @@
           <span><b>${S.patient.nombre}</b> <span class="ced" style="color:var(--ink-3);font-size:13px">…${S.patient.cedula.slice(-4)}</span></span>
           <button class="swap" data-clear="1">Cambiar</button>
         </div>`;
-    } else if (!S.buscando) {
-      const hoy = LISTA_HOY.map(c => PATIENTS.find(p => p.cedula === c));
+    } else {
+      const hoy = LISTA_HOY.map(c => PATIENTS.find(p => p.cedula === c))
+        .sort((a, b) => (S.atendidos[a.cedula] ? 1 : 0) - (S.atendidos[b.cedula] ? 1 : 0));
       const faltan = hoy.filter(p => !S.atendidos[p.cedula]).length;
       patientHTML = `
         <div class="listhead">
@@ -987,28 +1047,11 @@
                         <span class="nm">${p.nombre}</span><br>
                         <span class="sub">…${p.cedula.slice(-4)}</span>
                       </span>
-                      ${done ? '<span class="tick">✓</span>' : ""}
+                      ${done ? '<span class="tick" title="Ya compró hoy">✓</span>' : ""}
                     </button>`;
           }).join("")}
         </div>
-        <button class="searchtoggle" data-buscar="1">No está en la lista — buscar</button>`;
-    } else {
-      const q = S.query.trim().toLowerCase();
-      let results = "";
-      if (q.length >= 3) {
-        const hits = PATIENTS.filter(p =>
-          p.nombre.toLowerCase().includes(q) || p.cedula.replace(/-/g, "").includes(q)
-        ).slice(0, 5);
-        results = hits.length
-          ? hits.map(p => `<div class="result" data-pat="${p.cedula}">
-               <span>${p.nombre}</span><span class="ced">…${p.cedula.slice(-4)}</span></div>`).join("")
-          : `<div class="note" style="padding:10px 0 0">Sin resultados. Revisa el nombre o la cédula.</div>`;
-      } else if (q.length > 0) {
-        results = `<div class="note" style="padding:10px 0 0">Escribe al menos 3 letras.</div>`;
-      }
-      patientHTML = `<input type="text" id="q" placeholder="buscar nombre o cédula…" value="${S.query}"
-                       aria-label="Buscar paciente" autocomplete="off">${results}
-        <button class="searchtoggle" data-buscar="0">← Volver a la lista de hoy</button>`;
+        <button class="searchtoggle" data-buscar="1">Buscar otro paciente</button>`;
     }
 
     b.insertAdjacentHTML("beforeend", `
@@ -1054,7 +1097,9 @@
   VIEWS.confirm = function (b) {
     if (!S.patient || total() <= 0) seedSale();
     const ls = lines(), t = total();
-    const cambio = S.efectivo - t;
+    // The donation is collected with the sale but is not a purchase: it must not
+    // earn credit, or credit becomes something a patient can simply buy.
+    const cambio = S.efectivo - (t + S.donacion);
     b.insertAdjacentHTML("beforeend", `
       <div class="scroll">
         <div class="sect" style="padding-bottom:10px">
@@ -1068,8 +1113,23 @@
             <div class="calc">${l.p.precio} ×</div>
             <div class="sub tnum">${plain(l.subtotal)}</div>
           </div>`).join("")}
+        <div class="sect">
+          <div class="kv big"><span class="k">Compra</span><span class="v">${money(t)}</span></div>
+        </div>
+        <div class="sect">
+          <div class="sect-label">Donación (opcional)</div>
+          <div class="donacion">
+            ${[25, 50, 100].map(v => `<button data-don="${v}">+${v}</button>`).join("")}
+            <input class="qtyin tnum" type="text" inputmode="numeric" maxlength="5"
+                   data-donset="1" value="${S.donacion}" aria-label="Monto de la donación">
+            ${S.donacion > 0 ? `<button data-don="0" class="quitar">Quitar</button>` : ""}
+          </div>
+        </div>
         <div class="sect" style="border-bottom:0">
-          <div class="kv big"><span class="k">TOTAL</span><span class="v">${money(t)}</span></div>
+          ${S.donacion > 0 ? `<div class="kv"><span class="k">Donación</span>
+             <span class="v">${money(S.donacion)}</span></div>` : ""}
+          <div class="kv big"><span class="k"><b>A cobrar</b></span>
+            <span class="v">${money(t + S.donacion)}</span></div>
           <div style="height:10px"></div>
           <div class="sect-label">Efectivo recibido</div>
           <input type="text" inputmode="numeric" id="efectivo" class="tnum" value="${plain(S.efectivo)}" aria-label="Efectivo recibido">
@@ -1107,6 +1167,7 @@
         <div class="creditbox">
           <div class="arith">
             <div><span>Total de la compra</span><b>${money(r.total)}</b></div>
+            ${r.donacion ? `<div><span>Donación</span><b>${money(r.donacion)}</b></div>` : ""}
             <div><span>Antes tenía</span><b>${money(r.antes)} acumulado</b></div>
             <div><span>Ahora</span><b>${money(r.antes + r.total)}${r.earned ? " →" : ""}</b></div>
             ${r.earned ? `<div style="justify-content:flex-end;margin-top:2px">
@@ -1136,8 +1197,9 @@
 
   /* ---- cerrar turno ---- */
   VIEWS.cerrar = function (b) {
-    const ventas = S.ventas.reduce((a, v) => a + v.total, 0);
-    const inicial = S.inicial, esperado = inicial + ventas;
+    const ventas    = S.ventas.reduce((a, v) => a + v.total, 0);
+    const donaciones = S.ventas.reduce((a, v) => a + (v.donacion || 0), 0);
+    const inicial = S.inicial, esperado = inicial + ventas + donaciones;
     const diff = S.contado - esperado;
     b.insertAdjacentHTML("beforeend", `
       <div class="scroll">
@@ -1145,6 +1207,8 @@
           <div class="sect-label">Turno de hoy · Roselio</div>
           <div class="kv"><span class="k">Abriste con</span><span class="v">${money(inicial)}</span></div>
           <div class="kv"><span class="k">Ventas del turno (${S.ventas.length})</span><span class="v">${money(ventas)}</span></div>
+          ${donaciones ? `<div class="kv"><span class="k">Donaciones</span>
+             <span class="v">${money(donaciones)}</span></div>` : ""}
           <div class="kv" style="border-top:1px solid var(--line);margin-top:6px;padding-top:8px">
             <span class="k"><b>Debe haber en caja</b></span><span class="v">${money(esperado)}</span></div>
         </div>
@@ -1169,7 +1233,10 @@
       <div class="foot">
         <div class="fijo"><span class="k">Contaste</span>
           <span class="v" id="total-cie-fijo">${money(S.contado)}</span></div>
-        <button class="btn" data-cerrar-turno="1">CERRAR TURNO</button>
+        <div class="btnrow">
+          <button class="btn ghost" data-go="venta" style="flex:0 0 42%">← Seguir vendiendo</button>
+          <button class="btn" data-cerrar-turno="1" style="flex:1">CERRAR TURNO</button>
+        </div>
       </div>`);
   };
 
@@ -1300,11 +1367,25 @@
       return location.reload();
     }
     if (t.id === "appbar-action") { S.screen = "cerrar"; return render(); }
-    if (t.dataset.pat)     { S.patient = PATIENTS.find(p => p.cedula === t.dataset.pat); S.query = ""; return render(); }
+    if (t.dataset.pat) {
+      S.patient = PATIENTS.find(p => p.cedula === t.dataset.pat);
+      S.query = ""; S.buscando = false;
+      return render();
+    }
     if (t.dataset.clear)   { S.patient = null; return render(); }
     if (t.dataset.toggleTodos) { S.verTodos = !S.verTodos; return render(); }
     if (t.dataset.buscar !== undefined) {
-      S.buscando = t.dataset.buscar === "1"; S.query = ""; return render();
+      S.buscando = t.dataset.buscar === "1";
+      S.query = "";
+      render();
+      const campo = el("q");
+      if (campo) campo.focus();
+      return;
+    }
+    if (t.dataset.don !== undefined) {
+      const v = Number(t.dataset.don);
+      S.donacion = v === 0 ? 0 : S.donacion + v;
+      return render();
     }
     if (t.dataset.dmas || t.dataset.dmin) {
       const [ns, d] = (t.dataset.dmas || t.dataset.dmin).split(":");
@@ -1334,10 +1415,11 @@
       const res = aplicarCredito(S.patient.carry, S.patient.saldo, tot);
       S.patient.carry = res.carry;
       S.patient.saldo = res.saldo;
-      S.lastSale = { total: tot, antes: before, earned: res.earned,
+      S.lastSale = { total: tot, antes: before, earned: res.earned, donacion: S.donacion,
                      saldo: res.saldo, carry: res.carry, nombre: S.patient.nombre };
       S.atendidos[S.patient.cedula] = true;
-      S.ventas.push({ id: "s" + Date.now(), total: tot, cedula: S.patient.cedula });
+      S.ventas.push({ id: "s" + Date.now(), total: tot, donacion: S.donacion, cedula: S.patient.cedula });
+      S.donacion = 0;
       if (S.offline) S.pendientes++;
       S.screen = "recibo";
       return render();
@@ -1379,6 +1461,13 @@
 
   document.addEventListener("input", function (e) {
     const t = e.target;
+    if (t.dataset.donset) {
+      S.donacion = Math.max(0, parseInt(t.value.replace(/\D/g, ""), 10) || 0);
+      const caja = document.querySelectorAll(".kv.big .v");
+      if (caja.length) caja[caja.length - 1].textContent = money(total() + S.donacion);
+      guardar();
+      return;
+    }
     if (t.dataset.dset) {
       const [ns, d] = t.dataset.dset.split(":");
       const conteo = ns === "ini" ? S.conteoInicial : S.conteo;
@@ -1389,10 +1478,15 @@
     }
     if (t.id === "q") {
       S.query = t.value;
-      render();
-      const box = el("q");
-      if (box) { box.focus(); box.setSelectionRange(box.value.length, box.value.length); }
-      return;
+      const cuerpo = document.querySelector(".hoja-cuerpo");
+      if (cuerpo) {                       // patch results only; never touch the field
+        const tmp = document.createElement("div");
+        tmp.innerHTML = hojaBusqueda();
+        cuerpo.innerHTML = tmp.querySelector(".hoja-cuerpo").innerHTML;
+        guardar();
+        return;
+      }
+      return render();
     }
     if (t.id === "efectivo") {
       S.efectivo = parseFloat(t.value.replace(/[^\d.]/g, "")) || 0;
