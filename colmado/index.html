@@ -428,6 +428,7 @@
                    chain exists to avoid when svh is unsupported. */
   body.appmode .phone {
     width: 100%; max-width: none; border: 0; border-radius: 0; box-shadow: none;
+    min-height: 0;   /* the review-page mock is 720px tall; a real phone is not */
     height: 100vh;
     height: 100svh;
     height: var(--alto-app, 100svh);
