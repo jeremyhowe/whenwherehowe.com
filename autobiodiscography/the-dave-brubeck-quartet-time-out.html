@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "fc9a92718fa048109d8885dc112b64d2"}'></script>
+<title>The Dave Brubeck Quartet — Time Out — when where howe</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&display=swap');
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-webkit-font-smoothing:antialiased;}
+.page{max-width:620px;margin:0 auto;padding:2.75rem 2rem 6rem;}
+.wordmark{font-family:system-ui,sans-serif;font-size:11px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;text-decoration:none;display:block;margin-bottom:2.5rem;}
+.site-nav{font-family:system-ui,sans-serif;font-size:13px;color:#bbb;display:flex;gap:1.5rem;margin-bottom:2.5rem;}
+.site-nav a{color:#bbb;text-decoration:none;}
+.site-nav a:hover{color:#1c1c1a;}
+.reflection-art{width:100%;max-width:320px;display:block;margin-bottom:2rem;image-rendering:pixelated;}
+.reflection-art-wrap{position:relative;width:100%;max-width:320px;margin-bottom:2rem;}
+.reflection-art-wrap .reflection-art{margin-bottom:0;}
+.reflection-art-full{position:absolute;inset:0;max-width:none;height:100%;image-rendering:auto;opacity:0;transition:opacity 0.45s ease;pointer-events:none;}
+/* One square of the pixel grid, top right. Sized inline, from PIXEL_GRID.
+   Deliberately unmarked — no ring, no tint. The square is found by
+   wandering the cursor over the art, and an outline that blinks on as you
+   pass through reads as a rendering artifact rather than an invitation. */
+.reflection-art-hotspot{position:absolute;top:0;right:0;z-index:2;padding:0;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+/* Hover reveal is for real pointers only. iOS Safari leaves :hover stuck on
+   the last-tapped element until you tap elsewhere, so without this gate a
+   tap to dismiss would come straight back as hover and read as a dead tap.
+   Touch goes through .revealed alone. */
+@media (hover: hover){
+  .reflection-art-hotspot:hover~.reflection-art-full{opacity:1;}
+}
+.reflection-art-hotspot:focus-visible~.reflection-art-full{opacity:1;}
+.reflection-art-wrap.revealed .reflection-art-full{opacity:1;}
+@media (prefers-reduced-motion: reduce){.reflection-art-full{transition:none;}}
+.essay-meta{font-family:system-ui,sans-serif;font-size:12px;color:#bbb;margin-bottom:1.25rem;letter-spacing:0.04em;}
+.essay-title{font-size:30px;font-weight:400;line-height:1.25;margin-bottom:2rem;color:#1c1c1a;}
+.rule{border:none;border-top:1px solid #e5e1d9;margin-bottom:2.5rem;}
+.essay-body{font-size:19px;line-height:1.85;color:#1c1c1a;}
+.essay-body p{margin-bottom:1.6em;}
+.back-link{font-family:system-ui,sans-serif;font-size:12px;color:#aaa;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;margin-top:3.5rem;padding-top:2rem;border-top:1px solid #e5e1d9;width:100%;letter-spacing:0.04em;}
+.back-link::before{content:'←';}
+.back-link:hover{color:#1c1c1a;}
+</style>
+</head>
+<body>
+<div class="page">
+<a class="wordmark" href="/">when where howe</a>
+<nav class="site-nav"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
+<div class="reflection-art-wrap">
+<img class="reflection-art" src="/autobiodiscography/the-dave-brubeck-quartet-time-out.jpg" alt="The Dave Brubeck Quartet — Time Out">
+<button class="reflection-art-hotspot" type="button" style="width:10.0%;height:10.0%"
+        aria-label="Reveal the cover for The Dave Brubeck Quartet — Time Out" title="Reveal the cover"></button>
+<img class="reflection-art reflection-art-full" src="/autobiodiscography/the-dave-brubeck-quartet-time-out-full.jpg" alt="" aria-hidden="true">
+</div>
+<p class="essay-meta">The Dave Brubeck Quartet</p>
+<h1 class="essay-title">Time Out</h1>
+<hr class="rule">
+<div class="essay-body">
+<p>&quot;This is the first CD I owned. My dad bought it for me when--wait, have I told you this before?&quot;</p>
+<p>--Kim, upon hearing &quot;Blue Rondo a la Turk&quot; or &quot;Take Five&quot; playing in a store or a commercial or the radio. She <em>has</em> told me this before; definitely more than ten times and almost certainly less than 100 times. She has told me this so many times that when I hear the first flighty notes of the piano on &quot;Blue Rondo&quot; I hear her telling me this story, like how the end of songs on your favorite album seem to call to your mind the first notes of the next song, your brain anticipating the next delights the album will bring you.</p>
+<p>I didn&#x27;t know this was something I&#x27;d enjoy so much about marriage as it grows longer, the predictable rhythms, familiar scripts, and oral traditions that slowly establish over time. But it&#x27;s lovely.</p>
+</div>
+<a class="back-link" href="/autobiodiscography.html">autobiodiscography</a>
+</div>
+<script>
+// Hover on the hotspot handles the mouse; this handles tap, where there's no
+// hover to lean on. Asymmetric on purpose: the corner square reveals, but
+// ANY touch on the art puts the pixels back. Finding one square in ten by
+// touch is fine when you're looking for it and a nuisance when you just want
+// out, and after the reveal that square sits over a photo with nothing to
+// mark it. One delegated listener, because the corner tap bubbles here too.
+document.querySelectorAll('.reflection-art-wrap').forEach(function (wrap) {
+  wrap.addEventListener('click', function (e) {
+    if (wrap.classList.contains('revealed')) {
+      wrap.classList.remove('revealed');  // anywhere on the art dismisses
+    } else if (e.target.closest('.reflection-art-hotspot')) {
+      e.preventDefault();
+      wrap.classList.add('revealed');
+    }
+  });
+});
+</script>
+</body>
+</html>
