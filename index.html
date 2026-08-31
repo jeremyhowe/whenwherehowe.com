@@ -20,23 +20,85 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 .post-title{font-size:17px;font-weight:400;color:#1c1c1a;text-decoration:none;line-height:1.35;}
 .post-title:hover{color:#999;}
 .post-date{font-family:system-ui,sans-serif;font-size:11px;color:#ccc;white-space:nowrap;margin-left:2rem;flex-shrink:0;}
-.home-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-bottom:3.5rem;}
-.home-card{display:block;text-decoration:none;color:inherit;}
-.home-card .card-label{font-family:system-ui,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin:0 0 0.7rem;}
-.card-art{width:100%;aspect-ratio:1/1;object-fit:cover;display:block;border-radius:2px;background:#eeeae2;box-shadow:0 1px 4px rgba(0,0,0,0.10);}
-.card-art.pixel{image-rendering:pixelated;}
-.home-card .card-primary{font-size:15px;line-height:1.35;margin:0.7rem 0 0;}
-.home-card .card-secondary{font-size:14px;line-height:1.35;color:#888;font-style:italic;margin:0.1rem 0 0;}
-.home-card:hover .card-primary{color:#999;}
-@media (max-width:560px){.home-cards{grid-template-columns:1fr;gap:2rem;}
-.card-art{max-width:220px;}}
+/* Three objects on one surface.
+
+   The old version was a three-up card grid: identical frames, identical
+   sizes, and `aspect-ratio:1/1;object-fit:cover` on all three — which meant
+   the book was cropped square to match the records. The Book of Delights
+   lost the bottom of its own cover, author's name included, so the row
+   would line up.
+
+   That crop was the actual incoherence, not the pixel art. Three objects of
+   different kinds only read as a mistake when the layout insists they're the
+   same kind of thing. So: nothing matches. The book is a book (2:3,
+   uncropped, with a spine edge), the records are records (square, pixel).
+   What makes them a set is the setting — one surface, one light, one caption
+   voice, and sizes chosen rather than divided.
+
+   Sizes are set by HEIGHT, not width, so each object keeps its own aspect
+   ratio and they still stand on a common line. The clamp lets the whole
+   still life shrink together on a phone instead of collapsing into a
+   stack. */
+/* minmax(0,max-content), not bare max-content: the captions are allowed up
+   to 16rem, and a bare max-content track sizes the column to that even when
+   the viewport can't afford it — which pushed the third object off the right
+   edge of a phone. The minmax lets the columns shrink below their captions'
+   ideal width and wrap the text instead. */
+.shelf{display:grid;grid-template-columns:repeat(3,minmax(0,max-content));
+  grid-template-rows:auto auto;align-items:end;justify-content:space-between;
+  max-width:100%;gap:var(--s-2) clamp(0.9rem,4vw,2rem);
+  margin-bottom:0;}
+/* subgrid is what puts every caption on one line even though the objects
+   above them are different heights. */
+.object{grid-row:span 2;display:grid;grid-template-rows:subgrid;row-gap:var(--s-2);
+  text-decoration:none;color:inherit;min-width:0;}
+.object-art{align-self:end;display:block;position:relative;}
+.object-art img{height:var(--h);width:auto;display:block;border-radius:var(--radius);
+  background:var(--line);box-shadow:var(--shadow-object);
+  transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease);}
+.object-art .no-art{height:var(--h);width:calc(var(--h) * var(--ar,1));
+  border-radius:var(--radius);background:var(--line);box-shadow:var(--shadow-object);}
+.object-art img.pixel{image-rendering:pixelated;}
+/* Representational, not decoration: the shadow a book's own spine casts
+   across its front board. Only the book gets it. */
+.object--book .object-art img{box-shadow:var(--shadow-object),
+  inset 7px 0 9px -7px rgba(16,18,20,0.45);}
+/* One height for all three. An earlier draft staged them at three different
+   sizes, which looked composed but asserted a hierarchy the site doesn't
+   have — there's no reason the record on the turntable outranks the book in
+   your hand. Equal height, each keeping its own aspect ratio, so the book is
+   still visibly a book and the records are still records. */
+.object--reading{--h:clamp(6.5rem,26vw,11rem);--ar:0.667;}
+.object--playing{--h:clamp(6.5rem,26vw,11rem);--ar:1;}
+.object--reflection{--h:clamp(6.5rem,26vw,11rem);--ar:1;}
+
+.object-cap{align-self:start;display:block;max-width:16rem;}
+.object-label{display:block;font-family:var(--sans);font-size:var(--t-xs);
+  color:var(--muted);margin-bottom:0.15rem;}
+.object-title{display:block;font-family:var(--serif);font-size:var(--t-base);
+  line-height:1.25;color:var(--ink);}
+.object-by{display:block;font-family:var(--serif);font-style:italic;
+  font-size:var(--t-base);line-height:1.25;color:var(--ink-2);}
+
+.object:hover img{transform:translateY(-3px);box-shadow:var(--shadow-pop);}
+.object--book:hover .object-art img{box-shadow:var(--shadow-pop),
+  inset 7px 0 9px -7px rgba(16,18,20,0.45);}
+.object:hover .object-title{color:var(--accent);}
+.object:focus-visible{outline:none;}
+.object:focus-visible .object-art img{outline:2px solid var(--accent);outline-offset:4px;}
+
+@media (max-width:40rem){
+  .shelf{gap:var(--s-2) 0.85rem;justify-content:start;}
+  .object-cap{max-width:100%;}
+  .object-title,.object-by{font-size:var(--t-sm);}
+}
 </style>
 </head>
 <body>
 <div class="page">
 <a class="wordmark" href="/">when where howe</a>
 <nav class="site-nav"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
-<section class="home-cards"><a class="home-card" href="/reading.html"><p class="card-label">now reading</p><img class="card-art" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1556234625l/38890258.jpg" alt="The Book of Delights — Ross Gay" loading="lazy"><p class="card-primary">The Book of Delights</p><p class="card-secondary">Ross Gay</p></a><a class="home-card" href="/longplay.html"><p class="card-label">now playing</p><img class="card-art pixel" src="/home/now-playing.jpg" alt="The Blueprint — Jay-Z" loading="lazy"><p class="card-primary">The Blueprint</p><p class="card-secondary">Jay-Z</p></a><a class="home-card" href="/autobiodiscography/the-dave-brubeck-quartet-time-out.html"><p class="card-label">autobiodiscography</p><img class="card-art pixel" src="/home/autobiodiscography.jpg" alt="Time Out — The Dave Brubeck Quartet" loading="lazy"><p class="card-primary">Time Out</p><p class="card-secondary">The Dave Brubeck Quartet</p></a></section>
+<section class="shelf"><a class="object object--reading object--book" href="/reading.html"><span class="object-art"><img class="" src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1556234625l/38890258.jpg" alt="The Book of Delights — Ross Gay" loading="lazy"></span><span class="object-cap"><span class="object-label">now reading</span><span class="object-title">The Book of Delights</span><span class="object-by">Ross Gay</span></span></a><a class="object object--playing" href="/longplay.html"><span class="object-art"><img class="pixel" src="/home/now-playing.jpg" alt="Free Jazz (A Collective Improvisation) — The Ornette Coleman Double Quartet" loading="lazy"></span><span class="object-cap"><span class="object-label">now playing</span><span class="object-title">Free Jazz (A Collective Improvisation)</span><span class="object-by">The Ornette Coleman Double Quartet</span></span></a><a class="object object--reflection" href="/autobiodiscography/the-dave-brubeck-quartet-time-out.html"><span class="object-art"><img class="pixel" src="/home/autobiodiscography.jpg" alt="Time Out — The Dave Brubeck Quartet" loading="lazy"></span><span class="object-cap"><span class="object-label">latest reflection</span><span class="object-title">Time Out</span><span class="object-by">The Dave Brubeck Quartet</span></span></a></section>
 <ul class="post-list">
 
 </ul>
