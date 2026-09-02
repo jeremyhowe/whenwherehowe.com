@@ -794,5 +794,24 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 <div class="cell"></div>
 </div>
 </div>
+<script>
+// Real :hover is gated to actual pointers above, so touch relies on this
+// instead. Without it, mobile Safari either leaves the popup stuck open
+// (:focus doesn't clear on a second tap of the same element) or, for cells
+// that link to a reflection note, treats the second tap as "navigate" per
+// its first-tap-reveals-hover quirk — never as "dismiss". Toggling .active
+// explicitly makes a second tap on the same album close its own popup, and
+// tapping a different album closes whichever one was open first.
+document.querySelectorAll('.cell.played').forEach(function (cell) {
+  cell.addEventListener('click', function (e) {
+    if (e.target.closest('.tip-link')) return;  // let this tap through to the note
+    if (window.matchMedia('(hover: hover)').matches) return;  // real pointer: default click behavior
+    e.preventDefault();
+    var wasActive = cell.classList.contains('active');
+    document.querySelectorAll('.cell.played.active').forEach(function (c) { c.classList.remove('active'); });
+    if (!wasActive) cell.classList.add('active');
+  });
+});
+</script>
 </body>
 </html>
