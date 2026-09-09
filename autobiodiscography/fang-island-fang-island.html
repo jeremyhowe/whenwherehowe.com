@@ -112,13 +112,37 @@ h1,h2,h3{font-weight:400;line-height:1.15;text-wrap:balance;letter-spacing:-0.01
 }
 .site-head{display:flex;flex-wrap:wrap;align-items:baseline;
   gap:var(--s-2) var(--s-4);margin-bottom:var(--s-5);}
-/* The wordmark was 11px of #aaa — 2.19:1, and smaller than the dates under
-   it. It's the name of the site; it can be the size of the name of the
-   site. Tracking is mild (0.06em, not 0.2em) so it reads as a word. */
-.wordmark{font-family:var(--sans);font-size:var(--t-base);font-weight:700;
-  letter-spacing:0.06em;color:var(--ink);text-decoration:none;
-  white-space:nowrap;}
+/* Tracked caps, set in the site's own serif.
+
+   Three earlier versions were wrong in different ways. The original was 11px
+   of #aaa — 2.19:1, and smaller than the dates beneath it. Its replacement
+   was Atkinson bold, which fixed the contrast but said the site's name in the
+   voice reserved for metadata: neutral by design, and the only bold thing on
+   the site, so it read as an app header rather than a masthead.
+
+   This is superficially close to the original — caps, wide tracking — and the
+   differences are the whole point: twice the size, EB Garamond rather than
+   whatever sans the OS supplies, and full ink instead of a grey that failed
+   AA by half. It's a masthead now, not faded chrome.
+
+   Two mechanics that tracked caps need:
+
+   The DOM text stays lowercase and `text-transform` does the work, so screen
+   readers announce "when where howe" rather than spelling out an acronym.
+
+   letter-spacing adds its space AFTER the final letter too, so the element
+   measures 0.18em wider than it looks. Left unhandled, the gap to the nav on
+   interior pages is visibly bigger than the gap between the nav's own links.
+   The negative right margin takes that phantom space back. */
+.wordmark{font-family:var(--serif);font-size:var(--t-lg);font-weight:400;
+  text-transform:uppercase;letter-spacing:0.18em;margin-right:-0.18em;
+  color:var(--ink);text-decoration:none;white-space:nowrap;
+  transition:color var(--dur) var(--ease);}
 .wordmark:hover{color:var(--accent);}
+/* Caps at 0.18em run ~270px, which fits a 390px phone but not a 320px one. */
+@media (max-width:22rem){
+  .wordmark{font-size:var(--t-base);letter-spacing:0.14em;margin-right:-0.14em;}
+}
 
 .site-nav{font-family:var(--sans);font-size:var(--t-sm);display:flex;
   flex-wrap:wrap;gap:var(--s-2) var(--s-3);}
