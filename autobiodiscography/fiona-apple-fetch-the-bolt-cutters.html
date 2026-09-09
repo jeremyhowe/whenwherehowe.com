@@ -3,26 +3,158 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "fc9a92718fa048109d8885dc112b64d2"}'></script>
 <title>Fiona Apple — Fetch The Bolt Cutters — when where howe</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+:root{
+  color-scheme:light dark;
+  --bg:#f4f5f6;
+  --surface:#ffffff;
+  --bed:#101214;
+  --bed-cell:#1e2225;
+  --ink:#16181a;
+  --ink-2:#3a4045;
+  --muted:#5c656b;
+  --line:#dcdfe2;
+  --line-strong:#c3c8cd;
+  --accent:#8f2d34;
+  --accent-ink:#ffffff;
+
+  --serif:'EB Garamond',Georgia,'Times New Roman',serif;
+  --sans:'Atkinson Hyperlegible Next','Atkinson Hyperlegible',ui-sans-serif,system-ui,sans-serif;
+
+  /* Modular scale, 1.25. Headings are fluid; body sizes are not, because
+     prose that resizes with the viewport is prose you can't settle into. */
+  --t-xs:0.8125rem;   /* 13px — captions, play times */
+  --t-sm:0.9375rem;   /* 15px — labels, nav, metadata */
+  --t-base:1.0625rem; /* 17px — UI body */
+  --t-prose:1.1875rem;/* 19px — essay body */
+  --t-lg:1.375rem;
+  --t-xl:clamp(1.5rem,1.1rem + 1.6vw,2rem);
+  --t-2xl:clamp(2rem,1.4rem + 2.6vw,3rem);
+
+  --measure:34rem;      /* prose column, lands at ~68ch in EB Garamond */
+  --page-w:41rem;
+  --page-w-wide:72rem;  /* the exhibit needs the room */
+
+  --s-1:0.375rem; --s-2:0.75rem; --s-3:1.25rem; --s-4:2rem;
+  --s-5:3rem;     --s-6:4.5rem;  --s-7:7rem;
+
+  --radius:3px;
+  --shadow-object:0 1px 2px rgba(16,18,20,0.10),0 8px 22px -8px rgba(16,18,20,0.22);
+  --shadow-pop:0 2px 6px rgba(16,18,20,0.10),0 16px 40px -12px rgba(16,18,20,0.35);
+
+  /* One easing for the whole site. Exponential ease-out: fast departure,
+     long settle. No bounce anywhere. */
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --dur:220ms;
+
+  --z-tip:20;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#121415;
+    --surface:#1a1d1f;
+    --bed:#000000;
+    --bed-cell:#16191b;
+    --ink:#eceef0;
+    --ink-2:#c3c9cd;
+    --muted:#98a1a7;
+    --line:#2b3033;
+    --line-strong:#3c4347;
+    --accent:#e59aa0;
+    --accent-ink:#16181a;
+    --shadow-object:0 1px 2px rgba(0,0,0,0.5),0 8px 22px -8px rgba(0,0,0,0.7);
+    --shadow-pop:0 2px 6px rgba(0,0,0,0.5),0 16px 40px -12px rgba(0,0,0,0.8);
+  }
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-webkit-font-smoothing:antialiased;}
-.page{max-width:620px;margin:0 auto;padding:2.75rem 2rem 6rem;}
-.wordmark{font-family:system-ui,sans-serif;font-size:11px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;text-decoration:none;display:block;margin-bottom:2.5rem;}
-.site-nav{font-family:system-ui,sans-serif;font-size:13px;color:#bbb;display:flex;gap:1.5rem;margin-bottom:2.5rem;}
-.site-nav a{color:#bbb;text-decoration:none;}
-.site-nav a:hover{color:#1c1c1a;}
-.reflection-art{width:100%;max-width:320px;display:block;margin-bottom:2rem;image-rendering:pixelated;}
-.reflection-art-wrap{position:relative;width:100%;max-width:320px;margin-bottom:2rem;}
+html{-webkit-text-size-adjust:100%;}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);
+  font-size:var(--t-base);line-height:1.6;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;}
+.page{max-width:var(--page-w);margin:0 auto;padding:var(--s-4) var(--s-3) var(--s-7);}
+.page--wide{max-width:var(--page-w-wide);}
+img{max-width:100%;display:block;}
+
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px;}
+
+/* Every label, date, caption and control on the site. The old system set
+   these at 10-11px, uppercase, 0.1em tracked, in #aaa — four separate
+   legibility taxes stacked on the same text. This is the whole replacement:
+   normal case, real size, a color that passes. */
+.meta{font-family:var(--sans);font-size:var(--t-sm);line-height:1.45;
+  color:var(--muted);letter-spacing:0;}
+.meta--xs{font-size:var(--t-xs);}
+
+.prose{font-family:var(--serif);font-size:var(--t-prose);line-height:1.75;
+  color:var(--ink);max-width:var(--measure);text-wrap:pretty;}
+.prose p{margin-bottom:1.5em;}
+.prose p:last-child{margin-bottom:0;}
+.prose a{color:var(--accent);text-decoration:underline;
+  text-underline-offset:0.18em;text-decoration-thickness:from-font;}
+.prose em{font-style:italic;}
+
+h1,h2,h3{font-weight:400;line-height:1.15;text-wrap:balance;letter-spacing:-0.012em;}
+.title{font-family:var(--serif);font-size:var(--t-2xl);color:var(--ink);}
+.title-sm{font-family:var(--serif);font-size:var(--t-xl);color:var(--ink);}
+
+.rule{border:none;border-top:1px solid var(--line);
+  margin:var(--s-3) 0 var(--s-4);}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;transition-duration:0.01ms !important;
+    scroll-behavior:auto !important;}
+}
+.site-head{display:flex;flex-wrap:wrap;align-items:baseline;
+  gap:var(--s-2) var(--s-4);margin-bottom:var(--s-5);}
+/* The wordmark was 11px of #aaa — 2.19:1, and smaller than the dates under
+   it. It's the name of the site; it can be the size of the name of the
+   site. Tracking is mild (0.06em, not 0.2em) so it reads as a word. */
+.wordmark{font-family:var(--sans);font-size:var(--t-base);font-weight:700;
+  letter-spacing:0.06em;color:var(--ink);text-decoration:none;
+  white-space:nowrap;}
+.wordmark:hover{color:var(--accent);}
+
+.site-nav{font-family:var(--sans);font-size:var(--t-sm);display:flex;
+  flex-wrap:wrap;gap:var(--s-2) var(--s-3);}
+.site-nav a{color:var(--muted);text-decoration:none;
+  padding-bottom:2px;border-bottom:1px solid transparent;
+  transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease);}
+.site-nav a:hover{color:var(--ink);border-bottom-color:var(--line-strong);}
+/* The room you're standing in, marked once and quietly. */
+.site-nav a[aria-current="page"]{color:var(--ink);
+  border-bottom-color:var(--accent);}
+
+/* Home doesn't repeat the nav at the top — the three objects are the way in.
+   Everything still has to be reachable, and the fourth room won't have an
+   object on the shelf, so the full index lives at the foot of the page. */
+.site-foot{margin-top:var(--s-6);padding-top:var(--s-3);
+  border-top:1px solid var(--line);}
+.site-foot .site-nav{gap:var(--s-2) var(--s-3);}
+/* The art is bigger than it was (320px cap -> 26rem). This page is the one
+   place the pixel capture is the subject rather than a thumbnail, and at
+   320px the squares were small enough to read as a compression artefact. */
+.reflection-art{width:100%;max-width:26rem;display:block;margin-bottom:var(--s-4);
+  image-rendering:pixelated;border-radius:var(--radius);
+  box-shadow:var(--shadow-object);}
+.reflection-art-wrap{position:relative;width:100%;max-width:26rem;
+  margin-bottom:var(--s-4);}
 .reflection-art-wrap .reflection-art{margin-bottom:0;}
-.reflection-art-full{position:absolute;inset:0;max-width:none;height:100%;image-rendering:auto;opacity:0;transition:opacity 0.45s ease;pointer-events:none;}
+.reflection-art-full{position:absolute;inset:0;max-width:none;height:100%;
+  image-rendering:auto;opacity:0;transition:opacity 0.45s ease;
+  pointer-events:none;border-radius:var(--radius);}
 /* One square of the pixel grid, top right. Sized inline, from PIXEL_GRID.
    Deliberately unmarked — no ring, no tint. The square is found by
    wandering the cursor over the art, and an outline that blinks on as you
    pass through reads as a rendering artifact rather than an invitation. */
-.reflection-art-hotspot{position:absolute;top:0;right:0;z-index:2;padding:0;border:none;background:transparent;cursor:pointer;-webkit-tap-highlight-color:transparent;}
+.reflection-art-hotspot{position:absolute;top:0;right:0;z-index:2;padding:0;
+  border:none;background:transparent;cursor:pointer;
+  -webkit-tap-highlight-color:transparent;}
 /* Hover reveal is for real pointers only. iOS Safari leaves :hover stuck on
    the last-tapped element until you tap elsewhere, so without this gate a
    tap to dismiss would come straight back as hover and read as a dead tap.
@@ -33,30 +165,27 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 .reflection-art-hotspot:focus-visible~.reflection-art-full{opacity:1;}
 .reflection-art-wrap.revealed .reflection-art-full{opacity:1;}
 @media (prefers-reduced-motion: reduce){.reflection-art-full{transition:none;}}
-.essay-meta{font-family:system-ui,sans-serif;font-size:12px;color:#bbb;margin-bottom:1.25rem;letter-spacing:0.04em;}
-.essay-title{font-size:30px;font-weight:400;line-height:1.25;margin-bottom:2rem;color:#1c1c1a;}
-.rule{border:none;border-top:1px solid #e5e1d9;margin-bottom:2.5rem;}
-.essay-body{font-size:19px;line-height:1.85;color:#1c1c1a;}
-.essay-body p{margin-bottom:1.6em;}
-.back-link{font-family:system-ui,sans-serif;font-size:12px;color:#aaa;text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;margin-top:3.5rem;padding-top:2rem;border-top:1px solid #e5e1d9;width:100%;letter-spacing:0.04em;}
-.back-link::before{content:'←';}
-.back-link:hover{color:#1c1c1a;}
+.essay-meta{margin-bottom:var(--s-1);}
+.essay-title{margin-bottom:var(--s-3);}
+.back-link{display:inline-block;font-family:var(--sans);font-size:var(--t-sm);
+  color:var(--muted);text-decoration:none;margin-top:var(--s-5);}
+.back-link::before{content:'\2190';margin-right:0.45rem;}
+.back-link:hover{color:var(--accent);}
 </style>
 </head>
 <body>
 <div class="page">
-<a class="wordmark" href="/">when where howe</a>
-<nav class="site-nav"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
+<header class="site-head"><a class="wordmark" href="/">when where howe</a><nav class="site-nav" aria-label="Sections"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html" aria-current="page">autobiodiscography</a></nav></header>
 <div class="reflection-art-wrap">
 <img class="reflection-art" src="/autobiodiscography/fiona-apple-fetch-the-bolt-cutters.jpg" alt="Fiona Apple — Fetch The Bolt Cutters">
 <button class="reflection-art-hotspot" type="button" style="width:10.0%;height:10.0%"
         aria-label="Reveal the cover for Fiona Apple — Fetch The Bolt Cutters" title="Reveal the cover"></button>
 <img class="reflection-art reflection-art-full" src="/autobiodiscography/fiona-apple-fetch-the-bolt-cutters-full.jpg" alt="" aria-hidden="true">
 </div>
-<p class="essay-meta">Fiona Apple</p>
-<h1 class="essay-title">Fetch The Bolt Cutters</h1>
+<p class="essay-meta meta">Fiona Apple</p>
+<h1 class="essay-title title">Fetch The Bolt Cutters</h1>
 <hr class="rule">
-<div class="essay-body">
+<div class="essay-body prose">
 <p>April, 2020: COVID had gone from a far-away news item to pretty much taking control of every day of my life. At the clinic where I worked we were already several weeks into a testing and case management protocol that created a seemingly endless list of sick patients to call, assess, arrange to test, and in those patients’ wake a new list of test results to review, positives to call and manage and educate and care for. And so many rules to change and update and tell providers about. It was too much work, even if I sort of enjoyed the urgency of it, the sense it was definitely something important we were doing and probably also the way it gave me a sense of agency that most people didn’t get to have then; the pandemic wasn’t just happening to me, I was responding to it, ameliorating some small part of it, and I think that was worth the struggle, in a way.</p>
 <p>But it was also making my already pretty bad sleep tendencies worse. Nights of trying to sleep and failing, lying awake, lying still to not bother Kim sleeping next to me, or heading to the couch to toss and turn with abandon. On the night of Thursday April 16, I&#x27;d already migrated from bed to the couch, where I’d often try to move in the middle of the night when I couldn’t sleep. I’d been on the couch for a few hours when I sighed, exhausted, and reached for my phone and checked the time: 2:23 am. Defeated, I defied the instructions I usually give to patients struggling with insomnia and opened my phone and took my usual circuit of the internet, which at the time included Pitchfork. There I found that Fiona Apple&#x27;s new album was out, since it was now Friday, and that it had been given a 10.0. I am the kind of nerd who had a good sense of how rare that was, so I was even more excited than I&#x27;d been to realize that Fiona Apple had a new record. I decided to go for a walk and have a first listen.</p>
 <p>Even though we’d had pretty warm spring weather by then, it had snowed during the day before--a classic Nebraska late snowstorm that comes after two weeks of temperate weather will convince a visitor or less-savvy local to pack their sweaters away for the winter--so I grabbed a coat and hat and boots in addition to my nice, open back, over-ear headphones. And yet I was surprised at the scene when I opened my door to a winter wonderland: six inches of wet, heavy snow covered the ground, bent the branches of trees, and blanketed almost every reverberant surface of the outdoor world in soft, pillowy sound-proofing so that even through my headphones I could hear—could feel—the silence of the world in the middle of the night. I stood just outside the open door to my house and fumbled with my supposedly touchscreen capable gloves trying to pull up the album for awhile before I gave up, and pulled a hand out of my glove and pushed play before returning my hand to its cocoon, closed the door, and headed out into the snowy world.</p>
@@ -64,6 +193,7 @@ body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-w
 <p>I ended up listening to the entire album. I walked for miles in that transported state. I remember that at work later that day I was exhausted but buoyed by my excitement for the album, an excitement I could transmit to exactly none of my co-workers (who were mostly bemused when I tried to tell them about my magical morning).</p>
 </div>
 <a class="back-link" href="/autobiodiscography.html">autobiodiscography</a>
+<footer class="site-foot"><nav class="site-nav" aria-label="Sections"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html" aria-current="page">autobiodiscography</a></nav></footer>
 </div>
 <script>
 // Hover on the hotspot handles the mouse; this handles tap, where there's no

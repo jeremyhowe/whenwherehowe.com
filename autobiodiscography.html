@@ -3,44 +3,189 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "fc9a92718fa048109d8885dc112b64d2"}'></script>
 <title>autobiodiscography — when where howe</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+:root{
+  color-scheme:light dark;
+  --bg:#f4f5f6;
+  --surface:#ffffff;
+  --bed:#101214;
+  --bed-cell:#1e2225;
+  --ink:#16181a;
+  --ink-2:#3a4045;
+  --muted:#5c656b;
+  --line:#dcdfe2;
+  --line-strong:#c3c8cd;
+  --accent:#8f2d34;
+  --accent-ink:#ffffff;
+
+  --serif:'EB Garamond',Georgia,'Times New Roman',serif;
+  --sans:'Atkinson Hyperlegible Next','Atkinson Hyperlegible',ui-sans-serif,system-ui,sans-serif;
+
+  /* Modular scale, 1.25. Headings are fluid; body sizes are not, because
+     prose that resizes with the viewport is prose you can't settle into. */
+  --t-xs:0.8125rem;   /* 13px — captions, play times */
+  --t-sm:0.9375rem;   /* 15px — labels, nav, metadata */
+  --t-base:1.0625rem; /* 17px — UI body */
+  --t-prose:1.1875rem;/* 19px — essay body */
+  --t-lg:1.375rem;
+  --t-xl:clamp(1.5rem,1.1rem + 1.6vw,2rem);
+  --t-2xl:clamp(2rem,1.4rem + 2.6vw,3rem);
+
+  --measure:34rem;      /* prose column, lands at ~68ch in EB Garamond */
+  --page-w:41rem;
+  --page-w-wide:72rem;  /* the exhibit needs the room */
+
+  --s-1:0.375rem; --s-2:0.75rem; --s-3:1.25rem; --s-4:2rem;
+  --s-5:3rem;     --s-6:4.5rem;  --s-7:7rem;
+
+  --radius:3px;
+  --shadow-object:0 1px 2px rgba(16,18,20,0.10),0 8px 22px -8px rgba(16,18,20,0.22);
+  --shadow-pop:0 2px 6px rgba(16,18,20,0.10),0 16px 40px -12px rgba(16,18,20,0.35);
+
+  /* One easing for the whole site. Exponential ease-out: fast departure,
+     long settle. No bounce anywhere. */
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --dur:220ms;
+
+  --z-tip:20;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#121415;
+    --surface:#1a1d1f;
+    --bed:#000000;
+    --bed-cell:#16191b;
+    --ink:#eceef0;
+    --ink-2:#c3c9cd;
+    --muted:#98a1a7;
+    --line:#2b3033;
+    --line-strong:#3c4347;
+    --accent:#e59aa0;
+    --accent-ink:#16181a;
+    --shadow-object:0 1px 2px rgba(0,0,0,0.5),0 8px 22px -8px rgba(0,0,0,0.7);
+    --shadow-pop:0 2px 6px rgba(0,0,0,0.5),0 16px 40px -12px rgba(0,0,0,0.8);
+  }
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-webkit-font-smoothing:antialiased;}
-.page{max-width:620px;margin:0 auto;padding:2.75rem 2rem 6rem;}
-.wordmark{font-family:system-ui,sans-serif;font-size:11px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;text-decoration:none;display:block;margin-bottom:2.5rem;}
-.site-nav{font-family:system-ui,sans-serif;font-size:13px;color:#bbb;display:flex;gap:1.5rem;margin-bottom:2.5rem;}
-.site-nav a{color:#bbb;text-decoration:none;}
-.site-nav a:hover{color:#1c1c1a;}
-.essay-title{font-size:30px;font-weight:400;line-height:1.25;margin-bottom:2rem;color:#1c1c1a;}
-.post-list{list-style:none;}
-.post-item{padding:0.9rem 0;border-bottom:1px solid #e5e1d9;}
-.post-item:first-child{border-top:1px solid #e5e1d9;}
-.post-title{font-size:17px;font-weight:400;color:#1c1c1a;text-decoration:none;line-height:1.35;}
-.post-title:hover{color:#999;}
+html{-webkit-text-size-adjust:100%;}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);
+  font-size:var(--t-base);line-height:1.6;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;}
+.page{max-width:var(--page-w);margin:0 auto;padding:var(--s-4) var(--s-3) var(--s-7);}
+.page--wide{max-width:var(--page-w-wide);}
+img{max-width:100%;display:block;}
+
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px;}
+
+/* Every label, date, caption and control on the site. The old system set
+   these at 10-11px, uppercase, 0.1em tracked, in #aaa — four separate
+   legibility taxes stacked on the same text. This is the whole replacement:
+   normal case, real size, a color that passes. */
+.meta{font-family:var(--sans);font-size:var(--t-sm);line-height:1.45;
+  color:var(--muted);letter-spacing:0;}
+.meta--xs{font-size:var(--t-xs);}
+
+.prose{font-family:var(--serif);font-size:var(--t-prose);line-height:1.75;
+  color:var(--ink);max-width:var(--measure);text-wrap:pretty;}
+.prose p{margin-bottom:1.5em;}
+.prose p:last-child{margin-bottom:0;}
+.prose a{color:var(--accent);text-decoration:underline;
+  text-underline-offset:0.18em;text-decoration-thickness:from-font;}
+.prose em{font-style:italic;}
+
+h1,h2,h3{font-weight:400;line-height:1.15;text-wrap:balance;letter-spacing:-0.012em;}
+.title{font-family:var(--serif);font-size:var(--t-2xl);color:var(--ink);}
+.title-sm{font-family:var(--serif);font-size:var(--t-xl);color:var(--ink);}
+
+.rule{border:none;border-top:1px solid var(--line);
+  margin:var(--s-3) 0 var(--s-4);}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;transition-duration:0.01ms !important;
+    scroll-behavior:auto !important;}
+}
+.site-head{display:flex;flex-wrap:wrap;align-items:baseline;
+  gap:var(--s-2) var(--s-4);margin-bottom:var(--s-5);}
+/* The wordmark was 11px of #aaa — 2.19:1, and smaller than the dates under
+   it. It's the name of the site; it can be the size of the name of the
+   site. Tracking is mild (0.06em, not 0.2em) so it reads as a word. */
+.wordmark{font-family:var(--sans);font-size:var(--t-base);font-weight:700;
+  letter-spacing:0.06em;color:var(--ink);text-decoration:none;
+  white-space:nowrap;}
+.wordmark:hover{color:var(--accent);}
+
+.site-nav{font-family:var(--sans);font-size:var(--t-sm);display:flex;
+  flex-wrap:wrap;gap:var(--s-2) var(--s-3);}
+.site-nav a{color:var(--muted);text-decoration:none;
+  padding-bottom:2px;border-bottom:1px solid transparent;
+  transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease);}
+.site-nav a:hover{color:var(--ink);border-bottom-color:var(--line-strong);}
+/* The room you're standing in, marked once and quietly. */
+.site-nav a[aria-current="page"]{color:var(--ink);
+  border-bottom-color:var(--accent);}
+
+/* Home doesn't repeat the nav at the top — the three objects are the way in.
+   Everything still has to be reachable, and the fourth room won't have an
+   object on the shelf, so the full index lives at the foot of the page. */
+.site-foot{margin-top:var(--s-6);padding-top:var(--s-3);
+  border-top:1px solid var(--line);}
+.site-foot .site-nav{gap:var(--s-2) var(--s-3);}
+.ab-head{max-width:var(--measure);margin-bottom:var(--s-4);}
+.ab-title{margin-bottom:var(--s-2);}
+.ab-intro{font-size:var(--t-lg);line-height:1.5;color:var(--ink-2);
+  text-wrap:pretty;}
+.post-list{list-style:none;max-width:var(--measure);}
+.post-item{border-bottom:1px solid var(--line);}
+.post-item:first-child{border-top:1px solid var(--line);}
+/* Each entry leads with the record it's about, in the same pixel capture the
+   reflection itself opens with — so the index reads as a shelf of records
+   rather than a list of filenames, and an entry you've already read is
+   recognisable before you read its title. */
+.post-title{display:flex;align-items:center;gap:var(--s-3);
+  padding:var(--s-2) 0;font-family:var(--serif);font-size:var(--t-lg);
+  line-height:1.3;color:var(--ink);text-decoration:none;}
+.ab-art{width:3.5rem;height:3.5rem;flex-shrink:0;border-radius:2px;
+  image-rendering:pixelated;box-shadow:var(--shadow-object);
+  transition:transform var(--dur) var(--ease);}
+.ab-art--none{background:var(--line);}
+.ab-text{min-width:0;}
+.ab-title{display:block;}
+.post-title .by{display:block;font-size:var(--t-base);font-style:italic;
+  color:var(--ink-2);}
+.post-title:hover{color:var(--accent);}
+.post-title:hover .ab-art{transform:scale(1.06);}
+.ab-empty{max-width:var(--measure);color:var(--ink-2);}
 </style>
 </head>
 <body>
 <div class="page">
-<a class="wordmark" href="/">when where howe</a>
-<nav class="site-nav"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
-<h1 class="essay-title">autobiodiscography</h1>
+<header class="site-head"><a class="wordmark" href="/">when where howe</a><nav class="site-nav" aria-label="Sections"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html" aria-current="page">autobiodiscography</a></nav></header>
+<header class="ab-head">
+<h1 class="ab-title title">autobiodiscography</h1>
+<p class="ab-intro">One record at a time: the music, and everything that
+came with it.</p>
+</header>
 <ul class="post-list">
-<li class="post-item"><a class="post-title" href="/autobiodiscography/the-dave-brubeck-quartet-time-out.html">The Dave Brubeck Quartet — Time Out</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/clinic-internal-wrangler.html">Clinic — Internal Wrangler</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/m83-dead-cities-red-seas-lost-ghosts.html">M83 — Dead Cities, Red Seas &amp; Lost Ghosts</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/the-postal-service-give-up.html">The Postal Service — Give Up</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/tanlines-mixed-emotions.html">Tanlines — Mixed Emotions</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/fiona-apple-fetch-the-bolt-cutters.html">Fiona Apple — Fetch The Bolt Cutters</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/fang-island-fang-island.html">Fang Island — Fang Island</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/boards-of-canada-geogaddi.html">Boards Of Canada — Geogaddi</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/peter-bjorn-and-john-gimme-some.html">Peter Bjorn And John — Gimme Some</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/tennis-yours-conditionally.html">Tennis — Yours Conditionally</a></li>
-<li class="post-item"><a class="post-title" href="/autobiodiscography/the-appleseed-cast-low-level-owl-volumes-i-ii.html">The Appleseed Cast — Low Level Owl: Volumes I + II</a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/the-dave-brubeck-quartet-time-out.html"><img class="ab-art" src="/autobiodiscography/the-dave-brubeck-quartet-time-out.jpg" alt="The Dave Brubeck Quartet — Time Out" loading="lazy"><span class="ab-text"><span class="ab-title">Time Out</span><span class="by">The Dave Brubeck Quartet</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/clinic-internal-wrangler.html"><img class="ab-art" src="/autobiodiscography/clinic-internal-wrangler.jpg" alt="Clinic — Internal Wrangler" loading="lazy"><span class="ab-text"><span class="ab-title">Internal Wrangler</span><span class="by">Clinic</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/m83-dead-cities-red-seas-lost-ghosts.html"><img class="ab-art" src="/autobiodiscography/m83-dead-cities-red-seas-lost-ghosts.jpg" alt="M83 — Dead Cities, Red Seas &amp; Lost Ghosts" loading="lazy"><span class="ab-text"><span class="ab-title">Dead Cities, Red Seas &amp; Lost Ghosts</span><span class="by">M83</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/the-postal-service-give-up.html"><img class="ab-art" src="/autobiodiscography/the-postal-service-give-up.jpg" alt="The Postal Service — Give Up" loading="lazy"><span class="ab-text"><span class="ab-title">Give Up</span><span class="by">The Postal Service</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/tanlines-mixed-emotions.html"><img class="ab-art" src="/autobiodiscography/tanlines-mixed-emotions.jpg" alt="Tanlines — Mixed Emotions" loading="lazy"><span class="ab-text"><span class="ab-title">Mixed Emotions</span><span class="by">Tanlines</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/fiona-apple-fetch-the-bolt-cutters.html"><img class="ab-art" src="/autobiodiscography/fiona-apple-fetch-the-bolt-cutters.jpg" alt="Fiona Apple — Fetch The Bolt Cutters" loading="lazy"><span class="ab-text"><span class="ab-title">Fetch The Bolt Cutters</span><span class="by">Fiona Apple</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/fang-island-fang-island.html"><img class="ab-art" src="/autobiodiscography/fang-island-fang-island.jpg" alt="Fang Island — Fang Island" loading="lazy"><span class="ab-text"><span class="ab-title">Fang Island</span><span class="by">Fang Island</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/boards-of-canada-geogaddi.html"><img class="ab-art" src="/autobiodiscography/boards-of-canada-geogaddi.jpg" alt="Boards Of Canada — Geogaddi" loading="lazy"><span class="ab-text"><span class="ab-title">Geogaddi</span><span class="by">Boards Of Canada</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/peter-bjorn-and-john-gimme-some.html"><img class="ab-art" src="/autobiodiscography/peter-bjorn-and-john-gimme-some.jpg" alt="Peter Bjorn And John — Gimme Some" loading="lazy"><span class="ab-text"><span class="ab-title">Gimme Some</span><span class="by">Peter Bjorn And John</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/tennis-yours-conditionally.html"><img class="ab-art" src="/autobiodiscography/tennis-yours-conditionally.jpg" alt="Tennis — Yours Conditionally" loading="lazy"><span class="ab-text"><span class="ab-title">Yours Conditionally</span><span class="by">Tennis</span></span></a></li>
+<li class="post-item"><a class="post-title" href="/autobiodiscography/the-appleseed-cast-low-level-owl-volumes-i-ii.html"><img class="ab-art" src="/autobiodiscography/the-appleseed-cast-low-level-owl-volumes-i-ii.jpg" alt="The Appleseed Cast — Low Level Owl: Volumes I + II" loading="lazy"><span class="ab-text"><span class="ab-title">Low Level Owl: Volumes I + II</span><span class="by">The Appleseed Cast</span></span></a></li>
 
 </ul>
+<footer class="site-foot"><nav class="site-nav" aria-label="Sections"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html" aria-current="page">autobiodiscography</a></nav></footer>
 </div>
 </body>
 </html>

@@ -3,86 +3,243 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="color-scheme" content="light dark">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml"><link rel="icon" href="/favicon-32.png" sizes="32x32" type="image/png"><link rel="apple-touch-icon" href="/apple-touch-icon.png"><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token": "fc9a92718fa048109d8885dc112b64d2"}'></script>
 <title>reading — when where howe</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;1,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:wght@400;500;700&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap');
+:root{
+  color-scheme:light dark;
+  --bg:#f4f5f6;
+  --surface:#ffffff;
+  --bed:#101214;
+  --bed-cell:#1e2225;
+  --ink:#16181a;
+  --ink-2:#3a4045;
+  --muted:#5c656b;
+  --line:#dcdfe2;
+  --line-strong:#c3c8cd;
+  --accent:#8f2d34;
+  --accent-ink:#ffffff;
+
+  --serif:'EB Garamond',Georgia,'Times New Roman',serif;
+  --sans:'Atkinson Hyperlegible Next','Atkinson Hyperlegible',ui-sans-serif,system-ui,sans-serif;
+
+  /* Modular scale, 1.25. Headings are fluid; body sizes are not, because
+     prose that resizes with the viewport is prose you can't settle into. */
+  --t-xs:0.8125rem;   /* 13px — captions, play times */
+  --t-sm:0.9375rem;   /* 15px — labels, nav, metadata */
+  --t-base:1.0625rem; /* 17px — UI body */
+  --t-prose:1.1875rem;/* 19px — essay body */
+  --t-lg:1.375rem;
+  --t-xl:clamp(1.5rem,1.1rem + 1.6vw,2rem);
+  --t-2xl:clamp(2rem,1.4rem + 2.6vw,3rem);
+
+  --measure:34rem;      /* prose column, lands at ~68ch in EB Garamond */
+  --page-w:41rem;
+  --page-w-wide:72rem;  /* the exhibit needs the room */
+
+  --s-1:0.375rem; --s-2:0.75rem; --s-3:1.25rem; --s-4:2rem;
+  --s-5:3rem;     --s-6:4.5rem;  --s-7:7rem;
+
+  --radius:3px;
+  --shadow-object:0 1px 2px rgba(16,18,20,0.10),0 8px 22px -8px rgba(16,18,20,0.22);
+  --shadow-pop:0 2px 6px rgba(16,18,20,0.10),0 16px 40px -12px rgba(16,18,20,0.35);
+
+  /* One easing for the whole site. Exponential ease-out: fast departure,
+     long settle. No bounce anywhere. */
+  --ease:cubic-bezier(0.22,1,0.36,1);
+  --dur:220ms;
+
+  --z-tip:20;
+}
+@media (prefers-color-scheme:dark){
+  :root{
+    --bg:#121415;
+    --surface:#1a1d1f;
+    --bed:#000000;
+    --bed-cell:#16191b;
+    --ink:#eceef0;
+    --ink-2:#c3c9cd;
+    --muted:#98a1a7;
+    --line:#2b3033;
+    --line-strong:#3c4347;
+    --accent:#e59aa0;
+    --accent-ink:#16181a;
+    --shadow-object:0 1px 2px rgba(0,0,0,0.5),0 8px 22px -8px rgba(0,0,0,0.7);
+    --shadow-pop:0 2px 6px rgba(0,0,0,0.5),0 16px 40px -12px rgba(0,0,0,0.8);
+  }
+}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-body{background:#f9f8f5;color:#1c1c1a;font-family:'EB Garamond',Georgia,serif;-webkit-font-smoothing:antialiased;}
-.page{max-width:620px;margin:0 auto;padding:2.75rem 2rem 6rem;}
-.wordmark{font-family:system-ui,sans-serif;font-size:11px;font-weight:400;letter-spacing:0.2em;text-transform:uppercase;color:#aaa;text-decoration:none;display:block;margin-bottom:2.5rem;}
-.site-nav{font-family:system-ui,sans-serif;font-size:13px;color:#bbb;display:flex;gap:1.5rem;margin-bottom:2.5rem;}
-.site-nav a{color:#bbb;text-decoration:none;}
-.site-nav a:hover{color:#1c1c1a;}
-.reading-intro{font-size:17px;line-height:1.7;color:#666;margin-bottom:3rem;}
-.shelf-label{font-family:system-ui,sans-serif;font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#aaa;margin:0 0 1.25rem;}
-.book{display:block;border-top:1px solid #e5e1d9;}
-.book:last-child{border-bottom:1px solid #e5e1d9;}
-/* The whole row is the control, so the padding lives here rather than on
-   .book — a summary that only covered the title would leave most of the row
-   looking clickable without being clickable. */
-.book-head{display:flex;gap:1.5rem;padding:2rem 0;list-style:none;}
-.book-head::-webkit-details-marker{display:none;}
-.book-head::marker{content:"";}
+html{-webkit-text-size-adjust:100%;}
+body{background:var(--bg);color:var(--ink);font-family:var(--serif);
+  font-size:var(--t-base);line-height:1.6;-webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;}
+.page{max-width:var(--page-w);margin:0 auto;padding:var(--s-4) var(--s-3) var(--s-7);}
+.page--wide{max-width:var(--page-w-wide);}
+img{max-width:100%;display:block;}
+
+a{color:inherit;}
+:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:2px;}
+
+/* Every label, date, caption and control on the site. The old system set
+   these at 10-11px, uppercase, 0.1em tracked, in #aaa — four separate
+   legibility taxes stacked on the same text. This is the whole replacement:
+   normal case, real size, a color that passes. */
+.meta{font-family:var(--sans);font-size:var(--t-sm);line-height:1.45;
+  color:var(--muted);letter-spacing:0;}
+.meta--xs{font-size:var(--t-xs);}
+
+.prose{font-family:var(--serif);font-size:var(--t-prose);line-height:1.75;
+  color:var(--ink);max-width:var(--measure);text-wrap:pretty;}
+.prose p{margin-bottom:1.5em;}
+.prose p:last-child{margin-bottom:0;}
+.prose a{color:var(--accent);text-decoration:underline;
+  text-underline-offset:0.18em;text-decoration-thickness:from-font;}
+.prose em{font-style:italic;}
+
+h1,h2,h3{font-weight:400;line-height:1.15;text-wrap:balance;letter-spacing:-0.012em;}
+.title{font-family:var(--serif);font-size:var(--t-2xl);color:var(--ink);}
+.title-sm{font-family:var(--serif);font-size:var(--t-xl);color:var(--ink);}
+
+.rule{border:none;border-top:1px solid var(--line);
+  margin:var(--s-3) 0 var(--s-4);}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:0.01ms !important;
+    animation-iteration-count:1 !important;transition-duration:0.01ms !important;
+    scroll-behavior:auto !important;}
+}
+.site-head{display:flex;flex-wrap:wrap;align-items:baseline;
+  gap:var(--s-2) var(--s-4);margin-bottom:var(--s-5);}
+/* The wordmark was 11px of #aaa — 2.19:1, and smaller than the dates under
+   it. It's the name of the site; it can be the size of the name of the
+   site. Tracking is mild (0.06em, not 0.2em) so it reads as a word. */
+.wordmark{font-family:var(--sans);font-size:var(--t-base);font-weight:700;
+  letter-spacing:0.06em;color:var(--ink);text-decoration:none;
+  white-space:nowrap;}
+.wordmark:hover{color:var(--accent);}
+
+.site-nav{font-family:var(--sans);font-size:var(--t-sm);display:flex;
+  flex-wrap:wrap;gap:var(--s-2) var(--s-3);}
+.site-nav a{color:var(--muted);text-decoration:none;
+  padding-bottom:2px;border-bottom:1px solid transparent;
+  transition:color var(--dur) var(--ease),border-color var(--dur) var(--ease);}
+.site-nav a:hover{color:var(--ink);border-bottom-color:var(--line-strong);}
+/* The room you're standing in, marked once and quietly. */
+.site-nav a[aria-current="page"]{color:var(--ink);
+  border-bottom-color:var(--accent);}
+
+/* Home doesn't repeat the nav at the top — the three objects are the way in.
+   Everything still has to be reachable, and the fourth room won't have an
+   object on the shelf, so the full index lives at the foot of the page. */
+.site-foot{margin-top:var(--s-6);padding-top:var(--s-3);
+  border-top:1px solid var(--line);}
+.site-foot .site-nav{gap:var(--s-2) var(--s-3);}
+/* The shelf. Same system as the record wall next door: real objects on a
+   ground, a caption voice that stays constant, and nothing set below 4.5:1.
+
+   The old version put highlights behind a 2px left border, book-section
+   labels in 10px tracked caps at #bbb (1.81:1), and highlight locations at
+   #ccc (1.51:1). All three are gone. A highlight is already marked as a
+   quotation by being indented and italic; the stripe was decorating a
+   distinction the type had already made. */
+.reading-intro{font-family:var(--serif);font-size:var(--t-lg);line-height:1.5;
+  color:var(--ink-2);max-width:var(--measure);margin-bottom:var(--s-5);
+  text-wrap:pretty;}
+.shelf-label{font-family:var(--sans);font-size:var(--t-sm);font-weight:500;
+  color:var(--ink-2);margin:0 0 var(--s-3);}
+
+.book{border-top:1px solid var(--line);}
+.book:last-of-type{border-bottom:1px solid var(--line);}
+.book-head{display:flex;gap:var(--s-3);padding:var(--s-4) 0;
+  list-style:none;cursor:default;}
 details.book>.book-head{cursor:pointer;}
-details.book>.book-head:focus-visible{outline:2px solid #1c1c1a;outline-offset:-3px;}
-.book-cover{width:120px;flex-shrink:0;}
-.book-cover img{width:100%;border-radius:2px;box-shadow:0 2px 8px rgba(0,0,0,0.14);display:block;}
-.book-cover .no-cover{width:100%;aspect-ratio:2/3;background:#eeeae2;border-radius:2px;}
+details.book>.book-head::-webkit-details-marker{display:none;}
+details.book>.book-head::marker{content:"";}
+
+.book-cover{width:clamp(5.5rem,16vw,7.5rem);flex-shrink:0;}
+.book-cover img{width:100%;border-radius:var(--radius);
+  box-shadow:var(--shadow-object),inset 7px 0 9px -7px rgba(16,18,20,0.45);}
+/* Books whose jacket the API didn't have. The old placeholder was a flat
+   fill one step off the page color, which read as nothing at all — the row
+   just looked like it had lost its cover. This one is a blank book: same
+   shape, same light, same spine shadow, visibly an object with no jacket
+   rather than an empty slot. */
+.book-cover .no-cover{width:100%;aspect-ratio:2/3;border-radius:var(--radius);
+  background:var(--surface);border:1px solid var(--line);
+  box-shadow:var(--shadow-object),inset 7px 0 9px -7px rgba(16,18,20,0.28);}
 .book-main{flex:1;min-width:0;}
-.book-title{font-size:21px;line-height:1.3;margin:0 0 0.2rem;font-weight:400;}
-.book-author{font-size:16px;color:#888;font-style:italic;margin:0 0 0.5rem;}
-.book-meta{font-family:system-ui,sans-serif;font-size:11px;color:#bbb;letter-spacing:0.04em;margin:0;}
-.progress{height:2px;background:#e5e1d9;margin:0.8rem 0 0;max-width:180px;}
-.progress span{display:block;height:100%;background:#c9c2b4;}
-/* The expand affordance. A bordered pill rather than a bare label: the row
-   has to announce that there is more behind it even when nothing is hovered,
-   and #bbb micro-type (the rest of this page's furniture) neither reads as a
-   control nor clears 4.5:1 on this background. */
-.book-more{display:inline-flex;align-items:center;gap:0.45rem;margin-top:0.95rem;
-font-family:system-ui,sans-serif;font-size:12px;letter-spacing:0.02em;color:#6b6455;
-border:1px solid #ddd7ca;border-radius:999px;padding:0.35rem 0.8rem;
-transition:background-color 0.18s ease,border-color 0.18s ease,color 0.18s ease;}
-.book-head:hover .book-more{background:#f1ede3;border-color:#c3bbaa;color:#1c1c1a;}
-.book-more::after{content:"+";font-size:13px;line-height:1;color:#9c9484;}
+.book-title{font-family:var(--serif);font-size:var(--t-lg);line-height:1.25;
+  font-weight:400;color:var(--ink);margin:0 0 0.1rem;}
+.book-author{font-family:var(--serif);font-style:italic;font-size:var(--t-base);
+  color:var(--ink-2);margin:0 0 var(--s-1);}
+.book-meta{font-family:var(--sans);font-size:var(--t-xs);color:var(--muted);
+  margin:0;}
+.progress{height:4px;border-radius:2px;background:var(--line);
+  margin:var(--s-2) 0 0;max-width:11rem;overflow:hidden;}
+.progress span{display:block;height:100%;background:var(--accent);
+  border-radius:2px;}
+
+/* A real control, sized like one. */
+.book-more{display:inline-flex;align-items:center;gap:0.45rem;
+  margin-top:var(--s-2);font-family:var(--sans);font-size:var(--t-xs);
+  color:var(--ink-2);border:1px solid var(--line-strong);border-radius:999px;
+  padding:0.35rem 0.75rem;
+  transition:background-color var(--dur) var(--ease),
+             border-color var(--dur) var(--ease),color var(--dur) var(--ease);}
+.book-head:hover .book-more{border-color:var(--accent);color:var(--accent);}
+.book-more::after{content:"+";line-height:1;}
 .book[open] .book-more::after{content:"\2013";}
-.book-head:hover .book-more::after{color:#1c1c1a;}
 .more-hide{display:none;}
 .book[open] .more-show{display:none;}
 .book[open] .more-hide{display:inline;}
-.book-body{padding:0 0 2rem 0;}
+
+.book-body{padding:0 0 var(--s-4) 0;}
 /* The cover column is empty in the body, so the prose lines up under the
    text rather than restarting at the page edge. */
-@media (min-width:561px){.book-body{margin-left:calc(120px + 1.5rem);}}
-.book-section{margin-top:1.4rem;}
+@media (min-width:36rem){
+  .book-body{margin-left:calc(clamp(5.5rem,16vw,7.5rem) + var(--s-3));}
+}
+.book-section{margin-top:var(--s-3);}
 .book-body>.book-section:first-child{margin-top:0;}
-.book-section h3{font-family:system-ui,sans-serif;font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:#bbb;margin:0 0 0.6rem;}
-.book-section p{font-size:17px;line-height:1.75;margin-bottom:1em;}
+.book-section h3{font-family:var(--sans);font-size:var(--t-sm);font-weight:500;
+  color:var(--ink-2);margin:0 0 var(--s-2);letter-spacing:0;}
+.book-section p{font-family:var(--serif);font-size:var(--t-base);line-height:1.7;
+  max-width:var(--measure);margin-bottom:1em;}
 .book-section p:last-child{margin-bottom:0;}
-.highlight{margin:0 0 1.1rem;padding-left:1.1rem;border-left:2px solid #e5e1d9;}
+
+.highlight{margin:0 0 var(--s-3);padding-left:var(--s-3);
+  max-width:var(--measure);}
 .highlight:last-child{margin-bottom:0;}
-.highlight p{font-size:16px;line-height:1.7;color:#444;font-style:italic;margin:0;}
-.highlight .hl-loc{font-family:system-ui,sans-serif;font-size:10px;font-style:normal;color:#ccc;letter-spacing:0.04em;margin-top:0.3rem;}
-.highlight .hl-note{font-size:15px;font-style:normal;color:#888;margin-top:0.4rem;}
-.empty-note{font-size:16px;color:#bbb;font-style:italic;}
+.highlight p{font-family:var(--serif);font-size:var(--t-base);line-height:1.7;
+  color:var(--ink-2);font-style:italic;margin:0;}
+.highlight .hl-loc{font-family:var(--sans);font-size:var(--t-xs);
+  font-style:normal;color:var(--muted);margin-top:0.25rem;}
+.highlight .hl-note{font-family:var(--serif);font-size:var(--t-base);
+  font-style:normal;color:var(--ink-2);margin-top:0.35rem;}
+.empty-note{font-family:var(--serif);font-size:var(--t-base);
+  color:var(--ink-2);font-style:italic;}
+
 /* Opening is the one moment on this page where something moves, so it gets a
    short settle rather than appearing all at once. An animation, not a
    transition: <details> has no open/closed intermediate state to transition
    between without script. */
 @media (prefers-reduced-motion:no-preference){
-.book[open]>.book-body{animation:book-open 0.32s cubic-bezier(0.22,1,0.36,1);}}
+.book[open]>.book-body{animation:book-open 0.32s var(--ease);}}
 @keyframes book-open{from{opacity:0;transform:translateY(-5px);}to{opacity:1;transform:none;}}
-@media (max-width:560px){.book-head{gap:1.1rem;padding:1.6rem 0;}
-.book-cover{width:88px;}
-.book-title{font-size:19px;}
-.book-body{padding-bottom:1.6rem;}}
+@media (max-width:36rem){
+  .book-head{gap:var(--s-2);padding:var(--s-3) 0;}
+  .book-body{padding-bottom:var(--s-3);}
+}
 </style>
 </head>
 <body>
 <div class="page">
-<a class="wordmark" href="/">when where howe</a>
-<nav class="site-nav"><a href="/reading.html">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav>
-<p class="reading-intro">What I'm reading and what I've read</p>
+<header class="site-head"><a class="wordmark" href="/">when where howe</a><nav class="site-nav" aria-label="Sections"><a href="/reading.html" aria-current="page">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav></header>
+<h1 class="title" style="margin-bottom:var(--s-2)">reading</h1>
+<p class="reading-intro">What I’m reading, and what I’ve read — with
+whatever I marked along the way.</p>
 <p class="shelf-label">Now reading</p>
 <article class="book">
 <div class="book-head"><div class="book-cover"><img src="https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1759325056l/242082841.jpg" alt="" loading="lazy"></div>
@@ -346,6 +503,7 @@ transition:background-color 0.18s ease,border-color 0.18s ease,color 0.18s ease;
 
 </div></div>
 </article>
+<footer class="site-foot"><nav class="site-nav" aria-label="Sections"><a href="/reading.html" aria-current="page">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav></footer>
 </div>
 </body>
 </html>
