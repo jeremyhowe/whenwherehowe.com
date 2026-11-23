@@ -164,7 +164,121 @@ h1,h2,h3{font-weight:400;line-height:1.15;text-wrap:balance;letter-spacing:-0.01
    are the way into the three rooms, and printing the same three words
    directly above them was the site saying everything twice. The full index
    is in the footer, which is also where the fourth room will land. */
+/* Three objects on one surface.
 
+   The old version was a three-up card grid: identical frames, identical
+   sizes, and `aspect-ratio:1/1;object-fit:cover` on all three — which meant
+   the book was cropped square to match the records. The Book of Delights
+   lost the bottom of its own cover, author's name included, so the row
+   would line up.
+
+   That crop was the actual incoherence, not the pixel art. Three objects of
+   different kinds only read as a mistake when the layout insists they're the
+   same kind of thing. So: nothing matches. The book is a book (2:3,
+   uncropped, with a spine edge), the records are records (square, pixel).
+   What makes them a set is the setting — one surface, one light, one caption
+   voice, and sizes chosen rather than divided.
+
+   Sizes are set by HEIGHT, not width, so each object keeps its own aspect
+   ratio and they still stand on a common line. The clamp lets the whole
+   still life shrink together on a phone instead of collapsing into a
+   stack. */
+/* Three equal columns, not three content-sized ones.
+
+   Sizing the tracks to their contents meant the book's 2:3 footprint made
+   its column narrower than the two square ones, so the gaps between the
+   three objects were visibly unequal and the whole row read as slightly
+   off. Equal 1fr tracks fix the rhythm without cropping anything: the book
+   still keeps its own shape, it just stands in a column the same width as
+   its neighbours.
+
+   The tracks are sized to the OBJECTS, not divided evenly, and the leftover
+   is distributed by space-between. Equal tracks made the arithmetic tidy and
+   the optics wrong: the two records filled 176 of their 184px tracks while
+   the book filled only 114, so 70px of dead air sat to the book's right and
+   the eye read gaps of 102px and 40px. Sizing each track to the thing
+   standing in it means every gap is the same real distance.
+
+   The book also moved to the last column. Its caption is the narrow one and
+   its track is the short one, and at the end of the row that raggedness sits
+   against the page margin instead of between two objects.
+
+   The footer's link row uses these same three track widths and the same
+   space-between, which is what keeps each room link under its object. */
+:root{--art-h:clamp(6.5rem,26vw,11rem);
+  --art-square:var(--art-h);
+  --art-book:calc(var(--art-h) * 0.667);
+  /* The last track is the book's width, or 6.5rem if the book is narrower
+     than a caption can live in — which is what happens on a phone, where the
+     book's art is only ~68px and "now reading" was breaking across two lines.
+     The slack that creates sits at the right-hand end of the row, against the
+     page margin, where there is no neighbour for the eye to measure it
+     against. That only works because the book is the last column; anywhere
+     else the same slack would read as an uneven gap. */
+  --art-last:max(var(--art-book), 6.5rem);}
+.shelf{display:grid;
+  grid-template-columns:var(--art-square) var(--art-square) var(--art-last);
+  grid-template-rows:auto auto;align-items:end;
+  justify-content:space-between;
+  max-width:100%;row-gap:var(--s-2);
+  margin-bottom:0;}
+/* subgrid is what puts every caption on one line even though the objects
+   above them are different heights. */
+.object{grid-row:span 2;display:grid;grid-template-rows:subgrid;row-gap:var(--s-2);
+  text-decoration:none;color:inherit;min-width:0;}
+.object-art{align-self:end;display:block;position:relative;}
+.object-art img{height:var(--h);width:auto;display:block;border-radius:var(--radius);
+  background:var(--line);box-shadow:var(--shadow-object);
+  transition:transform var(--dur) var(--ease),box-shadow var(--dur) var(--ease);}
+.object-art .no-art{height:var(--h);width:calc(var(--h) * var(--ar,1));
+  border-radius:var(--radius);background:var(--line);box-shadow:var(--shadow-object);}
+.object-art img.pixel{image-rendering:pixelated;}
+/* Representational, not decoration: the shadow a book's own spine casts
+   across its front board. Only the book gets it. */
+.object--book .object-art img{box-shadow:var(--shadow-object),
+  inset 7px 0 9px -7px rgba(16,18,20,0.45);}
+/* One height for all three. An earlier draft staged them at three different
+   sizes, which looked composed but asserted a hierarchy the site doesn't
+   have — there's no reason the record on the turntable outranks the book in
+   your hand. Equal height, each keeping its own aspect ratio, so the book is
+   still visibly a book and the records are still records. */
+.object--reading{--h:var(--art-h);--ar:0.667;}
+.object--playing{--h:var(--art-h);--ar:1;}
+.object--reflection{--h:var(--art-h);--ar:1;}
+
+/* Stretches to its track, and the tracks are explicit, so a long title wraps
+   instead of widening the column — which is what would push the gaps uneven
+   again from the other direction. */
+.object-cap{align-self:start;display:block;min-width:0;}
+/* Three kinds of information stacked in a small space — what this is, what
+   it's called, who made it — and previously all three were a shade of ink,
+   separated only by size and italics. That read as one grey block.
+   
+   The accent does the work the type couldn't: the label is the only thing on
+   the page in the site's own colour, which pins it as a different KIND of
+   text (a heading for the column) rather than more of the same sentence. The
+   title stays full ink, the maker drops to secondary. */
+.object-label{display:block;font-family:var(--sans);font-size:var(--t-xs);
+  color:var(--accent);margin-bottom:0.3rem;}
+.object-title{display:block;font-family:var(--serif);font-size:var(--t-base);
+  line-height:1.25;color:var(--ink);}
+.object-by{display:block;font-family:var(--serif);font-style:italic;
+  font-size:var(--t-base);line-height:1.25;color:var(--muted);}
+
+.object:hover img{transform:translateY(-3px);box-shadow:var(--shadow-pop);}
+.object--book:hover .object-art img{box-shadow:var(--shadow-pop),
+  inset 7px 0 9px -7px rgba(16,18,20,0.45);}
+.object:hover .object-title{color:var(--accent);}
+.object:focus-visible{outline:none;}
+.object:focus-visible .object-art img{outline:2px solid var(--accent);outline-offset:4px;}
+
+@media (max-width:40rem){
+  /* No gap override needed any more: space-between derives the gap from
+     whatever space is left over, at every width, for both rows at once. */
+  .object-cap{max-width:100%;}
+  .object-title,.object-by{font-size:var(--t-sm);}
+}
+.shelf{grid-template-columns:var(--art-square);}
 /* The homepage's footer links sit on the same three tracks as the objects
    above them, so "reading" lands under the book, "long play" under the
    record and "autobiodiscography" under the reflection. Everywhere else the
@@ -207,7 +321,7 @@ h1,h2,h3{font-weight:400;line-height:1.15;text-wrap:balance;letter-spacing:-0.01
 <body>
 <div class="page">
 <header class="site-head"><a class="wordmark" href="/">when where howe</a></header>
-
+<section class="shelf"><a class="object object--playing" href="/longplay.html"><span class="object-art"><span class="no-art" role="presentation"></span></span><span class="object-cap"><span class="object-label">now playing</span><span class="object-title">Bon Iver, Bon Iver</span><span class="object-by">Bon Iver</span></span></a></section>
 
 <footer class="site-foot"><nav class="site-nav" aria-label="Sections"><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a><a href="/reading.html">reading</a></nav></footer>
 </div>
