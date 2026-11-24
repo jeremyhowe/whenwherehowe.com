@@ -232,6 +232,10 @@ details.book>.book-head::marker{content:"";}
 .book-section p{font-family:var(--serif);font-size:var(--t-base);line-height:1.7;
   max-width:var(--measure);margin-bottom:1em;}
 .book-section p:last-child{margin-bottom:0;}
+/* Same treatment as .prose a — these notes aren't wrapped in .prose, and the
+   base a{color:inherit} would leave a link looking like body text. */
+.book-section a{color:var(--accent);text-decoration:underline;
+  text-underline-offset:0.18em;text-decoration-thickness:from-font;}
 
 .highlight{margin:0 0 var(--s-3);padding-left:var(--s-3);
   max-width:var(--measure);}
@@ -260,7 +264,7 @@ details.book>.book-head::marker{content:"";}
 </head>
 <body>
 <div class="page">
-<header class="site-head"><a class="wordmark" href="/">when where howe</a><nav class="site-nav" aria-label="Sections"><a href="/reading.html" aria-current="page">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav></header>
+<header class="site-head"><a class="wordmark" href="/">when where howe</a><nav class="site-nav" aria-label="Sections"><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a><a href="/reading.html" aria-current="page">reading</a></nav></header>
 <h1 class="title" style="margin-bottom:var(--s-2)">reading</h1>
 <p class="reading-intro">What I’m reading, and what I’ve read — with
 whatever I marked along the way.</p>
@@ -349,15 +353,16 @@ whatever I marked along the way.</p>
 <span class="book-more"><span class="more-show">Show notes</span><span class="more-hide">Hide</span></span></div></summary>
 <div class="book-body"><div class="book-section"><h3>Reflections</h3><p>I understand that the passivity of the protagonist is the point, or part of the point. I get it. But this passivity also made it hard for me to connect to the main character, and thus to the story at times. I liked the sweep of the narrative, and I was engaged as we went through the story, but looking back I can’t help but wonder if I might have enjoyed this story even more if I’d cared very much about the guy everything was happening to.</p></div></div>
 </details>
-<article class="book">
-<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/579250098223978186/the-vanishing-half-a-novel-brit-bennett" alt="" loading="lazy"></div>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/579250098223978186/the-vanishing-half-a-novel-brit-bennett" alt="" loading="lazy"></div>
 <div class="book-main">
 <h2 class="book-title">The Vanishing Half</h2>
 <p class="book-author">Brit Bennett</p>
 <p class="book-meta">finished November 6, 2026</p>
 
-</div></div>
-</article>
+<span class="book-more"><span class="more-show">Show notes</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>Reflections</h3><p>I found the exploration in this book of</p></div></div>
+</details>
 <details class="book">
 <summary class="book-head"><div class="book-cover"><img src="https://readwise-assets.s3.amazonaws.com/media/reader/parsed_document_assets/500559681/B9bQ5WJnafY19c1C-97mxoeobOuN2Mj7ltywPiNGkao-cover-cover.jpeg" alt="" loading="lazy"></div>
 <div class="book-main">
@@ -440,7 +445,7 @@ whatever I marked along the way.</p>
 <p class="book-meta">finished August 21, 2026</p>
 
 <span class="book-more"><span class="more-show">Show notes and 5 highlights</span><span class="more-hide">Hide</span></span></div></summary>
-<div class="book-body"><div class="book-section"><h3>Reflections</h3><p>I had a harder time getting into the beginning of this book than the other in the Amgash series, but I think that might’ve been because I was a bit distracted while reading it. It took me longer than two weeks, and because [Amazon closed](https://goodereader.com/blog/kindle/airplane-mode-on-the-kindle-wont-extend-libby-e-books-anymore) the airplane mode loophole I used to be able to use to keep books longer than their due date while I was reading it, I had to switch to the audiobook about 2/3 of the way through.</p>
+<div class="book-body"><div class="book-section"><h3>Reflections</h3><p>I had a harder time getting into the beginning of this book than the other in the Amgash series, but I think that might’ve been because I was a bit distracted while reading it. It took me longer than two weeks, and because <a href="https://goodereader.com/blog/kindle/airplane-mode-on-the-kindle-wont-extend-libby-e-books-anymore">Amazon closed</a> the airplane mode loophole I used to be able to use to keep books longer than their due date while I was reading it, I had to switch to the audiobook about 2/3 of the way through.</p>
 <p>But wow this book finishes so strong, I was softly saying oh and nodding my head in agreement in the last 10 minutes, none of which shows up in my highlights because I was listening to the audiobook. None of us know anyone or maybe anything, except a tiny bit, and this reminded me so much of all of <em>Olive Kitteridge</em> as well.</p></div><div class="book-section"><h3>5 highlights</h3><blockquote class="highlight"><p>At times in our marriage I loathed him. I saw, with a kind of dull disc of dread in my chest, that with his pleasant distance, his mild expressions, he was unavailable. But worse. Because beneath his height of pleasantness there lurked a juvenile crabbiness, a scowl that flickered across his soul, a pudgy little boy with his lower lip thrust forward who blamed this person and that person—he blamed me, I felt this often; he was blaming me for something that had nothing to do with our present lives, and he blamed me even as he called me “Sweetheart,” making my coffee—back then he never drank coffee but he made me a cup each morning—setting it down before me martyr-like. Keep the stupid coffee, I wanted to cry out sometimes, I’ll make my own coffee. But I took it from him, touching his hand. “Thanks, sweetheart,” I would say, and we would begin another day.</p><p class="hl-loc">loc. 288</p></blockquote>
 <blockquote class="highlight"><p>Catherine always smelled good; there was a certain perfume and this was her scent. It was because of this that eventually I began to wear a certain perfume—though not hers—and have my own scent. It seemed I could never buy enough body lotion of this scent. That lovely woman psychiatrist said one day with a shrug, “It’s because you think you stink.” She was right. My sister and my brother and I were told on the playground almost every day at school by the other children, while they ran off with their noses pinched, “Your family stinks.”</p><p class="hl-loc">loc. 485</p></blockquote>
 <blockquote class="highlight"><p>A tulip stem inside me snapped. This is what I felt. It has stayed snapped, it never grew back. — I began to write more truthfully after that.</p><p class="hl-loc">loc. 826</p></blockquote>
@@ -651,7 +656,7 @@ whatever I marked along the way.</p>
 
 </div></div>
 </article>
-<footer class="site-foot"><nav class="site-nav" aria-label="Sections"><a href="/reading.html" aria-current="page">reading</a><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a></nav></footer>
+<footer class="site-foot"><nav class="site-nav" aria-label="Sections"><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a><a href="/reading.html" aria-current="page">reading</a></nav></footer>
 </div>
 </body>
 </html>
