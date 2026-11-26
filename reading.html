@@ -176,6 +176,23 @@ h1,h2,h3{font-weight:400;line-height:1.15;text-wrap:balance;letter-spacing:-0.01
 
 .book{border-top:1px solid var(--line);}
 .book:last-of-type{border-bottom:1px solid var(--line);}
+
+/* Years of the "Read" list. A past year folds down to its number alone;
+   the chevron is the only hint it opens, so it rotates rather than swapping
+   glyphs. */
+.year{margin-bottom:var(--s-4);}
+.year-head{display:flex;align-items:center;gap:0.5rem;cursor:pointer;
+  list-style:none;font-family:var(--serif);font-size:var(--t-lg);
+  color:var(--ink);padding:var(--s-2) 0;width:fit-content;}
+.year-head::-webkit-details-marker{display:none;}
+.year-head::marker{content:"";}
+.year-head::after{content:"";width:0.45em;height:0.45em;
+  border-right:1.5px solid var(--ink-2);border-bottom:1.5px solid var(--ink-2);
+  transform:rotate(-45deg);transition:transform var(--dur) var(--ease);}
+.year[open]>.year-head::after{transform:rotate(45deg);}
+.year-head:hover{color:var(--accent);}
+.year-head:hover::after{border-color:var(--accent);}
+.year[open]>.year-head{margin-bottom:var(--s-2);}
 .book-head{display:flex;gap:var(--s-3);padding:var(--s-4) 0;
   list-style:none;cursor:default;}
 details.book>.book-head{cursor:pointer;}
@@ -298,6 +315,8 @@ whatever I marked along the way.</p>
 </div></div>
 </article>
 <p class="shelf-label" style="margin-top:3.5rem">Read</p>
+<details class="year" open>
+<summary class="year-head">2026</summary>
 <article class="book">
 <div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/576945521334861035/death-comes-to-marlow-robert-thorogood" alt="" loading="lazy"></div>
 <div class="book-main">
@@ -673,6 +692,162 @@ whatever I marked along the way.</p>
 
 </div></div>
 </article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/577209406099474808/im-glad-my-mom-died-jennette-mccurdy" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">I&#x27;m Glad My Mom Died</h2>
+<p class="book-author">Jennette McCurdy</p>
+<p class="book-meta">finished May 23, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><div class="no-cover"></div></div>
+<div class="book-main">
+<h2 class="book-title">The Corrections</h2>
+<p class="book-author">Jonathan Franzen</p>
+<p class="book-meta">finished May 18, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/576927929203905846/tom-lake-a-novel-ann-patchett" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Tom Lake</h2>
+<p class="book-author">Ann Patchett</p>
+<p class="book-meta">finished May 10, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/577174221145244960/never-let-me-go-kazuo-ishiguro" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Never Let Me Go</h2>
+<p class="book-author">Kazuo Ishiguro</p>
+<p class="book-meta">finished May 4, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/577209405785352580/heartwood-a-read-with-jenna-pick-a-novel-amity-gaige" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Heartwood</h2>
+<p class="book-author">Amity Gaige</p>
+<p class="book-meta">finished May 1, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/577174220338737754/martyr-a-novel-kaveh-akbar" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Martyr!</h2>
+<p class="book-author">Kaveh Akbar</p>
+<p class="book-meta">finished April 22, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/579250098292239663/the-correspondent-a-novel-virginia-evans" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">The Correspondent</h2>
+<p class="book-author">Virginia Evans</p>
+<p class="book-meta">finished April 19, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/579250098511436566/lincoln-in-the-bardo-a-novel-george-saunders" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Lincoln in the Bardo</h2>
+<p class="book-author">George Saunders</p>
+<p class="book-meta">finished April 16, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/576540901849761309/foster-claire-keegan" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Foster</h2>
+<p class="book-author">Claire Keegan</p>
+<p class="book-meta">finished April 11, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/577209423010599151/big-fan-an-831-stories-romance-alexandra-romanoff" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Big Fan</h2>
+<p class="book-author">Alexandra Romanoff</p>
+<p class="book-meta">finished April 10, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/579250098511437771/olive-again-a-novel-elizabeth-strout" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Olive, Again</h2>
+<p class="book-author">Elizabeth Strout</p>
+<p class="book-meta">finished April 8, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><div class="no-cover"></div></div>
+<div class="book-main">
+<h2 class="book-title">Commonwealth</h2>
+<p class="book-author">Ann Patchett</p>
+<p class="book-meta">finished March 13, 2026</p>
+
+</div></div>
+</article>
+<details class="book">
+<summary class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/577174221333567015/olive-kitteridge-fiction-elizabeth-strout" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Olive Kitteridge</h2>
+<p class="book-author">Elizabeth Strout</p>
+<p class="book-meta">finished February 19, 2026</p>
+
+<span class="book-more"><span class="more-show">Show 1 highlight</span><span class="more-hide">Hide</span></span></div></summary>
+<div class="book-body"><div class="book-section"><h3>1 highlight</h3><blockquote class="highlight"><p>Inwardly, he suffered the quiet trepidations of a man who had witnessed twice in childhood the nervous breakdowns of a mother who had otherwise cared for him with stridency. And so if, as rarely happened, a customer was distressed over a price, or irritated by the quality of an Ace bandage or ice pack, Henry did what he could to rectify things quickly. For many years Mrs. Granger worked for him; her husband was a lobster fisherman, and she seemed to carry with her the cold breeze of the open water, not so eager to please a wary customer. He had to listen with half an ear as he filled prescriptions, to make sure she was not at the cash register dismissing a complaint. More than once he was reminded of that same sensation in watching to see that his wife, Olive, did not bear down too hard on Christopher over a homework assignment or a chore left undone; that sense of his attention hovering—the need to keep everyone content. When he heard a briskness in Mrs. Granger’s voice, he would step down from his back post, moving toward the center of the store to talk with the customer himself. Otherwise, Mrs. Granger did her job well. He appreciated that she was not chatty, kept perfect inventory, and almost never called in sick. That she died in her sleep one night astonished him, and left him with some feeling of responsibility, as though he had missed, working alongside her for years, whatever symptom might have shown itself that he, handling his pills and syrups and syringes, could have fixed.</p><p class="hl-loc">loc. 58</p></blockquote></div></div>
+</details>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/577209406099457412/cloud-cuckoo-land-a-novel-anthony-doerr" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">Cloud Cuckoo Land</h2>
+<p class="book-author">Anthony Doerr</p>
+<p class="book-meta">finished February 13, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/579250098291975787/in-memoriam-a-novel-alice-winn" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">In Memoriam</h2>
+<p class="book-author">Alice Winn</p>
+<p class="book-meta">finished January 18, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/579250098291797413/the-mystery-guest-a-maid-novel-nita-prose" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">The Mystery Guest</h2>
+<p class="book-author">Nita Prose</p>
+<p class="book-meta">finished January 5, 2026</p>
+
+</div></div>
+</article>
+<article class="book">
+<div class="book-head"><div class="book-cover"><img src="https://bookwise.com/product/cover/579250098291797382/the-maid-a-gma-book-club-pick-a-novel-nita-prose" alt="" loading="lazy"></div>
+<div class="book-main">
+<h2 class="book-title">The Maid</h2>
+<p class="book-author">Nita Prose</p>
+<p class="book-meta">finished January 3, 2026</p>
+
+</div></div>
+</article>
+</details>
+
 <footer class="site-foot"><nav class="site-nav" aria-label="Sections"><a href="/longplay.html">long play</a><a href="/autobiodiscography.html">autobiodiscography</a><a href="/reading.html" aria-current="page">reading</a></nav></footer>
 </div>
 </body>
